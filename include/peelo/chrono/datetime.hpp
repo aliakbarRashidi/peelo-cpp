@@ -53,7 +53,7 @@ namespace peelo
          */
         static datetime now();
 
-        inline const date& date() const
+        inline const class date& date() const
         {
             return m_date;
         }
@@ -68,7 +68,7 @@ namespace peelo
             return m_date.month();
         }
 
-        inline const time& time() const
+        inline const class time& time() const
         {
             return m_time;
         }

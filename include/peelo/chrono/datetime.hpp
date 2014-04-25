@@ -41,18 +41,32 @@ namespace peelo
                           int minute = 0,
                           int second = 0);
 
-        datetime(const date& date, const time& time);
-
         /**
          * Copy constructor.
          */
         datetime(const datetime& that);
+
+        datetime(const date& date, const time& time);
+
+        datetime(const date& date);
+
+        datetime(const time& time);
 
         /**
          * Returns current date and time based on system clock.
          */
         static datetime now();
 
+        static bool is_valid(int year,
+                             month_e month,
+                             int day,
+                             int hour,
+                             int minute,
+                             int second);
+
+        /**
+         * Returns date value.
+         */
         inline const class date& date() const
         {
             return m_date;
@@ -68,6 +82,9 @@ namespace peelo
             return m_date.month();
         }
 
+        /**
+         * Returns time value.
+         */
         inline const class time& time() const
         {
             return m_time;
@@ -93,9 +110,17 @@ namespace peelo
             return m_time.second();
         }
 
+        /**
+         * Calculates UNIX timestamp from date and time.
+         */
+        long timestamp() const;
+
         datetime& assign(const datetime& that);
         datetime& assign(const class date& date, const class time& time);
 
+        /**
+         * Assignment operator.
+         */
         inline datetime& operator=(const datetime& that)
         {
             return assign(that);
@@ -103,11 +128,17 @@ namespace peelo
 
         bool equals(const datetime& that) const;
 
+        /**
+         * Equality operator.
+         */
         inline bool operator==(const datetime& that) const
         {
             return equals(that);
         }
 
+        /**
+         * Non-equality operator.
+         */
         inline bool operator!=(const datetime& that) const
         {
             return !equals(that);

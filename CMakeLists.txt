@@ -12,6 +12,7 @@ ADD_LIBRARY(
     src/chrono/date.cpp
     src/chrono/datetime.cpp
     src/chrono/time.cpp
+    src/text/rune.cpp
 )
 
 INSTALL(

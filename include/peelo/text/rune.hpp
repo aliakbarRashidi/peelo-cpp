@@ -26,6 +26,8 @@
 #ifndef PEELO_TEXT_RUNE_HPP_GUARD
 #define PEELO_TEXT_RUNE_HPP_GUARD
 
+#include <iostream>
+
 namespace peelo
 {
     /**
@@ -226,6 +228,9 @@ namespace peelo
     private:
         value_type m_code;
     };
+
+    std::ostream& operator<<(std::ostream&, const rune&);
+    std::wostream& operator<<(std::wostream&, const rune&);
 }
 
 #endif /* !PEELO_TEXT_RUNE_HPP_GUARD */

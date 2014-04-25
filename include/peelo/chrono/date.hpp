@@ -59,6 +59,8 @@ namespace peelo
          */
         static date tomorrow();
 
+        static bool is_valid(int year, month_e month, int day);
+
         /**
          * Returns year of the date.
          */
@@ -100,9 +102,21 @@ namespace peelo
         int days_in_month() const;
 
         /**
+         * Returns the number of days in the month (28 or 31) for given month
+         * and year.
+         */
+        static int days_in_month(month_e month, int year);
+
+        /**
          * Returns the number of days in the year (365 or 366) for this date.
          */
         int days_in_year() const;
+
+        /**
+         * Returns the number of days in the year (365 or 366) for the given
+         * year.
+         */
+        static int days_in_year(int year);
 
         /**
          * Returns <code>true</code> if the year represented by the date is a
@@ -110,15 +124,24 @@ namespace peelo
          */
         bool is_leap_year() const;
 
+        /**
+         * Returns <code>true</code> if the given year is a leap year.
+         */
+        static bool is_leap_year(int year);
+
         date& assign(const date& that);
         date& assign(int year, month_e month, int day);
 
+        /**
+         * Assignment operator.
+         */
         inline date& operator=(const date& that)
         {
             return assign(that);
         }
 
         bool equals(const date& that) const;
+        bool equals(int year, month_e month, int day) const;
 
         inline bool operator==(const date& that) const
         {
@@ -131,6 +154,7 @@ namespace peelo
         }
 
         int compare(const date& that) const;
+        int compare(int year, month_e month, int day) const;
 
         inline bool operator<(const date& that) const
         {
@@ -151,6 +175,26 @@ namespace peelo
         {
             return compare(that) >= 0;
         }
+
+        /**
+         * Increments date by one day.
+         */
+        date& operator++();
+
+        /**
+         * Increments date by one day.
+         */
+        date operator++(int);
+
+        /**
+         * Decrements date by one day.
+         */
+        date& operator--();
+
+        /**
+         * Decrements date by one day.
+         */
+        date operator--(int);
 
     private:
         /** Year of the date. */

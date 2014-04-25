@@ -33,41 +33,12 @@
 
 namespace peelo
 {
-    static inline int days_in_month(month_e month, bool is_leap_year)
-    {
-        switch (month)
-        {
-            case month_jan: return 31;
-            case month_feb: return is_leap_year ? 29 : 28;
-            case month_mar: return 31;
-            case month_apr: return 30;
-            case month_may: return 31;
-            case month_jun: return 30;
-            case month_jul: return 31;
-            case month_aug: return 31;
-            case month_sep: return 30;
-            case month_oct: return 31;
-            case month_nov: return 30;
-            default: return 31;
-        }
-    }
-
-    static inline bool is_leap_year(int year)
-    {
-        return (year % 4 == 0 && year % 100 == 0) || (year % 400 == 0);
-    }
-
-    static inline bool is_valid_date(int year, month_e month, int day)
-    {
-        return day > 0 && day <= days_in_month(month, is_leap_year(year));
-    }
-
     date::date(int year, month_e month, int day)
         : m_year(year)
         , m_month(month)
         , m_day(day)
     {
-        if (!is_valid_date(year, month, day))
+        if (!is_valid(year, month, day))
         {
             throw std::invalid_argument("invalid date value");
         }
@@ -197,6 +168,11 @@ namespace peelo
 #endif
     }
 
+    bool date::is_valid(int year, month_e month, int day)
+    {
+        return day > 0 && day <= days_in_month(month, year);
+    }
+
     weekday_e date::day_of_week() const
     {
 #if defined(_WIN32)
@@ -245,12 +221,11 @@ namespace peelo
 
     int date::day_of_year() const
     {
-        bool leap_year = is_leap_year();
         int result = 0;
 
         for (int i = 1; i < m_month; ++i)
         {
-            result += peelo::days_in_month(static_cast<month_e>(i), leap_year);
+            result += days_in_month(static_cast<month_e>(i), m_year);
         }
 
         return result + m_day;
@@ -258,31 +233,56 @@ namespace peelo
 
     int date::days_in_month() const
     {
-        return peelo::days_in_month(m_month, is_leap_year());
+        return days_in_month(m_month, m_year);
+    }
+
+    int date::days_in_month(month_e month, int year)
+    {
+        switch (month)
+        {
+            case month_jan: return 31;
+            case month_feb: return is_leap_year(year) ? 29 : 28;
+            case month_mar: return 31;
+            case month_apr: return 30;
+            case month_may: return 31;
+            case month_jun: return 30;
+            case month_jul: return 31;
+            case month_aug: return 31;
+            case month_sep: return 30;
+            case month_oct: return 31;
+            case month_nov: return 30;
+            default: return 31;
+        }
     }
 
     int date::days_in_year() const
     {
-        return is_leap_year() ? 366 : 365;
+        return days_in_year(m_year);
+    }
+
+    int date::days_in_year(int year)
+    {
+        return is_leap_year(year) ? 366 : 365;
     }
 
     bool date::is_leap_year() const
     {
-        return peelo::is_leap_year(m_year);
+        return is_leap_year(m_year);
+    }
+
+    bool date::is_leap_year(int year)
+    {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     }
 
     date& date::assign(const date& that)
     {
-        m_year = that.m_year;
-        m_month = that.m_month;
-        m_day = that.m_day;
-
-        return *this;
+        return assign(that.m_year, that.m_month, that.m_day);
     }
 
     date& date::assign(int year, month_e month, int day)
     {
-        if (!is_valid_date(year, month, day))
+        if (!is_valid(year, month, day))
         {
             throw std::invalid_argument("invalid date value");
         }
@@ -295,26 +295,116 @@ namespace peelo
 
     bool date::equals(const date& that) const
     {
-        return m_year == that.m_year
-            && m_month == that.m_month
-            && m_day == that.m_day;
+        return equals(that.m_year, that.m_month, that.m_day);
+    }
+
+    bool date::equals(int year, month_e month, int day) const
+    {
+        return m_year == year
+            && m_month == month
+            && m_day == day;
     }
 
     int date::compare(const date& that) const
     {
-        if (m_year != that.m_year)
+        return compare(that.m_year, that.m_month, that.m_day);
+    }
+
+    int date::compare(int year, month_e month, int day) const
+    {
+        if (m_year != year)
         {
-            return m_year > that.m_year ? 1 : -1;
+            return m_year > year ? 1 : -1;
         }
-        else if (m_month != that.m_month)
+        else if (m_month != month)
         {
-            return m_month > that.m_month ? 1 : -1;
+            return m_month > month ? 1 : -1;
         }
-        else if (m_day != that.m_day)
+        else if (m_day != day)
         {
-            return m_day > that.m_day ? 1 : -1;
+            return m_day > day ? 1 : -1;
         } else {
             return 0;
         }
+    }
+
+    date& date::operator++()
+    {
+        if (m_day == days_in_month())
+        {
+            m_day = 1;
+            if (m_month == month_dec)
+            {
+                ++m_year;
+                m_month = month_jan;
+            } else {
+                m_month = static_cast<month_e>(m_month + 1);
+            }
+        } else {
+            ++m_day;
+        }
+
+        return *this;
+    }
+
+    date& date::operator--()
+    {
+        if (m_day > 1)
+        {
+            --m_day;
+        }
+        else if (m_month == month_jan)
+        {
+            --m_year;
+            m_month = month_dec;
+            m_day = 31;
+        } else {
+            m_month = static_cast<month_e>(m_month - 1);
+            m_day = days_in_month(m_month, m_year);
+        }
+
+        return *this;
+    }
+
+    date date::operator++(int)
+    {
+        date clone(*this);
+
+        if (m_day == days_in_month())
+        {
+            m_day = 1;
+            if (m_month == month_dec)
+            {
+                ++m_year;
+                m_month = month_jan;
+            } else {
+                m_month = static_cast<month_e>(m_month + 1);
+            }
+        } else {
+            ++m_day;
+        }
+
+        return clone;
+    }
+
+    date date::operator--(int)
+    {
+        date clone(*this);
+
+        if (m_day > 1)
+        {
+            --m_day;
+        }
+        else if (m_month == month_jan)
+        {
+            --m_year;
+            m_month = month_dec;
+            m_day = 31;
+        } else {
+            m_month = static_cast<month_e>(m_month - 1);
+            m_day = days_in_month(m_month, m_year);
+        }
+
+        return clone;
     }
 }

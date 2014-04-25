@@ -1591,4 +1591,56 @@ namespace peelo
             || (m_code >= 'a' && m_code <= 'f')
             || (m_code >= 'A' && m_code <= 'F');
     }
+
+    std::ostream& operator<<(std::ostream& stream, const rune& r)
+    {
+        const rune::value_type c = r.code();
+        const std::streamsize size = stream.width();
+
+        if (c > rune::max.code()
+            || (c & 0xfffe) == 0xfffe
+            || (c >= 0xd800 && c <= 0xdfff)
+            || (c >= 0xffd0 && c <= 0xfdef))
+        {
+            return stream;
+        }
+        if (((stream.flags() & std::ios_base::right)
+            || (stream.flags() & std::ios_base::internal))
+            && size > 1)
+        {
+            for (std::streamsize i = 1; i < size; ++i)
+            {
+                stream << stream.fill();
+            }
+        }
+        if (c < 0x80)
+        {
+            stream << static_cast<unsigned char>(c);
+        }
+        else if (c < 0x800)
+        {
+            stream << static_cast<unsigned char>(0xc0 | ((c & 0x7c0) >> 6))
+                   << static_cast<unsigned char>(0x80 | (c & 0x3f));
+        }
+        else if (c < 0x10000)
+        {
+            stream << static_cast<unsigned char>(0xe0 | ((c & 0xf000) >> 12))
+                   << static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6))
+                   << static_cast<unsigned char>(0x80 | (c & 0x3f));
+        } else {
+            stream << static_cast<unsigned char>(0xf0 | ((c & 0x1c0000) >> 18))
+                   << static_cast<unsigned char>(0x80 | ((c & 0x3f000) >> 12))
+                   << static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6))
+                   << static_cast<unsigned char>(0x80 | (c & 0x3f));
+        }
+        if ((stream.flags() & std::ios_base::left) && size > 1)
+        {
+            for (std::streamsize i = 1; i < size; ++i)
+            {
+                stream << stream.fill();
+            }
+        }
+
+        return stream;
+    }
 }

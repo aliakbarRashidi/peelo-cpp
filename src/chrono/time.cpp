@@ -33,19 +33,12 @@
 
 namespace peelo
 {
-    static inline bool is_valid_time(int hour, int minute, int second)
-    {
-        return (hour >= 0 && hour < 23)
-            && (minute >= 0 && minute < 59)
-            && (second >= 0 && second < 59);
-    }
-
     time::time(int hour, int minute, int second)
         : m_hour(hour)
         , m_minute(minute)
         , m_second(second)
     {
-        if (!is_valid_time(hour, minute, second))
+        if (!is_valid(hour, minute, second))
         {
             throw std::invalid_argument("invalid time value");
         }
@@ -77,18 +70,21 @@ namespace peelo
 #endif
     }
 
+    bool time::is_valid(int hour, int minute, int second)
+    {
+        return (hour >= 0 && hour < 23)
+            && (minute >= 0 && minute < 59)
+            && (second >= 0 && second < 59);
+    }
+
     time& time::assign(const time& that)
     {
-        m_hour = that.m_hour;
-        m_minute = that.m_minute;
-        m_second = that.m_second;
-
-        return *this;
+        return assign(that.m_hour, that.m_minute, that.m_second);
     }
 
     time& time::assign(int hour, int minute, int second)
     {
-        if (!is_valid_time(hour, minute, second))
+        if (!is_valid(hour, minute, second))
         {
             throw std::invalid_argument("invalid time value");
         }
@@ -101,26 +97,112 @@ namespace peelo
 
     bool time::equals(const time& that) const
     {
-        return m_hour == that.m_hour
-            && m_minute == that.m_minute
-            && m_second == that.m_second;
+        return equals(that.m_hour, that.m_minute, that.m_second);
+    }
+
+    bool time::equals(int hour, int minute, int second) const
+    {
+        return m_hour == hour
+            && m_minute == minute
+            && m_second == second;
     }
 
     int time::compare(const time& that) const
     {
-        if (m_hour != that.m_hour)
+        return compare(that.m_hour, that.m_minute, that.m_second);
+    }
+
+    int time::compare(int hour, int minute, int second) const
+    {
+        if (m_hour != hour)
         {
-            return m_hour > that.m_hour ? 1 : -1;
+            return m_hour > hour ? 1 : -1;
         }
-        else if (m_minute != that.m_minute)
+        else if (m_minute != minute)
         {
-            return m_minute > that.m_minute ? 1 : -1;
+            return m_minute > minute ? 1 : -1;
         }
-        else if (m_second != that.m_second)
+        else if (m_second != second)
         {
-            return m_second > that.m_second ? 1 : -1;
+            return m_second > second ? 1 : -1;
         } else {
             return 0;
         }
+    }
+
+    time& time::operator++()
+    {
+        if (++m_second >= 60)
+        {
+            m_second = 0;
+            if (++m_minute >= 60)
+            {
+                m_minute = 0;
+                if (++m_hour >= 24)
+                {
+                    m_hour = 0;
+                }
+            }
+        }
+
+        return *this;
+    }
+
+    time time::operator++(int)
+    {
+        time clone(*this);
+
+        if (++m_second >= 60)
+        {
+            m_second = 0;
+            if (++m_minute >= 60)
+            {
+                m_minute = 0;
+                if (++m_hour >= 24)
+                {
+                    m_hour = 0;
+                }
+            }
+        }
+
+        return clone;
+    }
+
+    time& time::operator--()
+    {
+        if (--m_second < 0)
+        {
+            m_second = 59;
+            if (--m_minute < 0)
+            {
+                m_minute = 59;
+                if (--m_hour < 0)
+                {
+                    m_hour = 23;
+                }
+            }
+        }
+
+        return *this;
+    }
+
+    time time::operator--(int)
+    {
+        time clone(*this);
+
+        if (--m_second < 0)
+        {
+            m_second = 59;
+            if (--m_minute < 0)
+            {
+                m_minute = 59;
+                if (--m_hour < 0)
+                {
+                    m_hour = 23;
+                }
+            }
+        }
+
+        return clone;
     }
 }

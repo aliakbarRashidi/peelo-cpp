@@ -46,16 +46,27 @@ namespace peelo
          */
         static time now();
 
+        static bool is_valid(int hour, int minute, int second);
+
+        /**
+         * Returns hour of the day (from 0 to 23).
+         */
         inline int hour() const
         {
             return m_hour;
         }
 
+        /**
+         * Returns minute of the hour (from 0 to 59).
+         */
         inline int minute() const
         {
             return m_minute;
         }
 
+        /**
+         * Returns second of the minute (from 0 to 59).
+         */
         inline int second() const
         {
             return m_second;
@@ -64,12 +75,16 @@ namespace peelo
         time& assign(const time& that);
         time& assign(int hour, int minute, int second);
 
+        /**
+         * Assignment operator.
+         */
         inline time& operator=(const time& that)
         {
             return assign(that);
         }
 
         bool equals(const time& that) const;
+        bool equals(int hour, int minute, int second) const;
 
         inline bool operator==(const time& that) const
         {
@@ -82,6 +97,7 @@ namespace peelo
         }
 
         int compare(const time& that) const;
+        int compare(int hour, int minute, int second) const;
 
         inline bool operator<(const time& that) const
         {
@@ -103,9 +119,32 @@ namespace peelo
             return compare(that) >= 0;
         }
 
+        /**
+         * Increments time by one second.
+         */
+        time& operator++();
+
+        /**
+         * Increments time by one second.
+         */
+        time operator++(int);
+
+        /**
+         * Decrements time by one second.
+         */
+        time& operator--();
+
+        /**
+         * Decrements time by one second.
+         */
+        time operator--(int);
+
     private:
+        /** Hour of the day. */
         int m_hour;
+        /** Minute of the hour. */
         int m_minute;
+        /** Second of the minute. */
         int m_second;
     };
 }

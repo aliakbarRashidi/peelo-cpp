@@ -205,4 +205,29 @@ namespace peelo
 
         return clone;
     }
+
+    std::ostream& operator<<(std::ostream& os, const time& t)
+    {
+        const int hour = t.hour();
+        const int minute = t.minute();
+        const int second = t.second();
+
+        if (hour < 10)
+        {
+            os << '0';
+        }
+        os << hour << ':';
+        if (minute < 10)
+        {
+            os << '0';
+        }
+        os << minute << ':';
+        if (second < 0)
+        {
+            os << '0';
+        }
+        os << second;
+
+        return os;
+    }
 }

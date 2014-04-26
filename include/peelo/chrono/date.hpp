@@ -28,6 +28,7 @@
 
 #include <peelo/chrono/month.hpp>
 #include <peelo/chrono/weekday.hpp>
+#include <iostream>
 
 namespace peelo
 {
@@ -204,6 +205,8 @@ namespace peelo
         /** Day of the month. */
         int m_day;
     };
+
+    std::ostream& operator<<(std::ostream&, const date&);
 }
 
 #endif /* !PEELO_CHRONO_DATE_HPP_GUARD */

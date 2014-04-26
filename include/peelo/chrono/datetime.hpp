@@ -170,6 +170,8 @@ namespace peelo
         class date m_date;
         class time m_time;
     };
+
+    std::ostream& operator<<(std::ostream&, const datetime&);
 }
 
 #endif /* !PEELO_CHRONO_DATETIME_HPP_GUARD */

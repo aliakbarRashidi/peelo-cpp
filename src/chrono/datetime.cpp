@@ -139,4 +139,11 @@ namespace peelo
             return m_time.compare(that.m_time);
         }
     }
+
+    std::ostream& operator<<(std::ostream& os, const datetime& dt)
+    {
+        os << dt.date() << ' ' << dt.time() << " UTC";
+
+        return os;
+    }
 }

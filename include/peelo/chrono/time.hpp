@@ -26,6 +26,8 @@
 #ifndef PEELO_CHRONO_TIME_HPP_GUARD
 #define PEELO_CHRONO_TIME_HPP_GUARD
 
+#include <iostream>
+
 namespace peelo
 {
     /**
@@ -147,6 +149,8 @@ namespace peelo
         /** Second of the minute. */
         int m_second;
     };
+
+    std::ostream& operator<<(std::ostream&, const time&);
 }
 
 #endif /* !PEELO_CHRONO_TIME_HPP_GUARD */

@@ -407,4 +407,25 @@ namespace peelo
 
         return clone;
     }
+
+    std::ostream& operator<<(std::ostream& os, const date& d)
+    {
+        const int year = d.year();
+        const int month = static_cast<int>(d.month());
+        const int day = d.day();
+
+        os << year << '-';
+        if (month < 10)
+        {
+            os << '0';
+        }
+        os << month << '-';
+        if (day < 10)
+        {
+            os << '0';
+        }
+        os << day;
+
+        return os;
+    }
 }

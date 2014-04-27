@@ -28,15 +28,91 @@
 
 namespace peelo
 {
-    enum weekday_e
+    class weekday
     {
-        weekday_mon = 1,
-        weekday_tue = 2,
-        weekday_wed = 3,
-        weekday_thu = 4,
-        weekday_fri = 5,
-        weekday_sat = 6,
-        weekday_sun = 7
+    public:
+        static const weekday mon;
+        static const weekday tue;
+        static const weekday wed;
+        static const weekday thu;
+        static const weekday fri;
+        static const weekday sat;
+        static const weekday sun;
+
+        explicit weekday(int index = 1);
+
+        /**
+         * Copy constructor.
+         */
+        weekday(const weekday& that);
+
+        static bool is_valid(int index);
+
+        inline int index() const
+        {
+            return m_index;
+        }
+
+        weekday& assign(const weekday& that);
+
+        /**
+         * Assignment operator.
+         */
+        inline weekday& operator=(const weekday& that)
+        {
+            return assign(that);
+        }
+
+        bool equals(const weekday& that) const;
+
+        /**
+         * Equality testing operator.
+         */
+        inline bool operator==(const weekday& that) const
+        {
+            return equals(that);
+        }
+
+        /**
+         * Non-equality testing operator.
+         */
+        inline bool operator!=(const weekday& that) const
+        {
+            return !equals(that);
+        }
+
+        int compare(const weekday& that) const;
+
+        inline bool operator<(const weekday& that) const
+        {
+            return compare(that) < 0;
+        }
+
+        inline bool operator>(const weekday& that) const
+        {
+            return compare(that) > 0;
+        }
+
+        inline bool operator<=(const weekday& that) const
+        {
+            return compare(that) <= 0;
+        }
+
+        inline bool operator>=(const weekday& that) const
+        {
+            return compare(that) >= 0;
+        }
+
+        weekday& operator++();
+
+        weekday operator++(int);
+
+        weekday& operator--();
+
+        weekday operator--(int);
+
+    private:
+        int m_index;
     };
 }
 

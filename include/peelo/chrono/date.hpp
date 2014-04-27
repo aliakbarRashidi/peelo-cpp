@@ -38,7 +38,9 @@ namespace peelo
     class date
     {
     public:
-        explicit date(int year = 1900, month_e month = month_jan, int day = 1);
+        explicit date(int year = 1900,
+                      const class month& month = month::jan,
+                      int day = 1);
 
         /**
          * Copy constructor.
@@ -60,7 +62,7 @@ namespace peelo
          */
         static date tomorrow();
 
-        static bool is_valid(int year, month_e month, int day);
+        static bool is_valid(int year, const class month& month, int day);
 
         /**
          * Returns year of the date.
@@ -73,7 +75,7 @@ namespace peelo
         /**
          * Returns month of the year.
          */
-        inline month_e month() const
+        inline const class month& month() const
         {
             return m_month;
         }
@@ -89,24 +91,13 @@ namespace peelo
         /**
          * Returns weekday for this date.
          */
-        weekday_e day_of_week() const;
+        const weekday& day_of_week() const;
 
         /**
          * Returns the day of the year (from 1 to 365 or 366 on leap years) for
          * this date.
          */
         int day_of_year() const;
-
-        /**
-         * Returns the number of days in the month (28 or 31) for this date.
-         */
-        int days_in_month() const;
-
-        /**
-         * Returns the number of days in the month (28 or 31) for given month
-         * and year.
-         */
-        static int days_in_month(month_e month, int year);
 
         /**
          * Returns the number of days in the year (365 or 366) for this date.
@@ -131,7 +122,7 @@ namespace peelo
         static bool is_leap_year(int year);
 
         date& assign(const date& that);
-        date& assign(int year, month_e month, int day);
+        date& assign(int year, const class month& month, int day);
 
         /**
          * Assignment operator.
@@ -142,7 +133,7 @@ namespace peelo
         }
 
         bool equals(const date& that) const;
-        bool equals(int year, month_e month, int day) const;
+        bool equals(int year, const class month& month, int day) const;
 
         inline bool operator==(const date& that) const
         {
@@ -155,7 +146,7 @@ namespace peelo
         }
 
         int compare(const date& that) const;
-        int compare(int year, month_e month, int day) const;
+        int compare(int year, const class month& month, int day) const;
 
         inline bool operator<(const date& that) const
         {
@@ -201,7 +192,7 @@ namespace peelo
         /** Year of the date. */
         int m_year;
         /** Month of the year. */
-        month_e m_month;
+        class month m_month;
         /** Day of the month. */
         int m_day;
     };

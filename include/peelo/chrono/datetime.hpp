@@ -35,7 +35,7 @@ namespace peelo
     {
     public:
         explicit datetime(int year = 1900,
-                          month_e month = month_jan,
+                          const class month& month = month::jan,
                           int day = 1,
                           int hour = 0,
                           int minute = 0,
@@ -58,7 +58,7 @@ namespace peelo
         static datetime now();
 
         static bool is_valid(int year,
-                             month_e month,
+                             const class month& month,
                              int day,
                              int hour,
                              int minute,
@@ -77,7 +77,7 @@ namespace peelo
             return m_date.year();
         }
 
-        inline month_e month() const
+        inline const class month& month() const
         {
             return m_date.month();
         }

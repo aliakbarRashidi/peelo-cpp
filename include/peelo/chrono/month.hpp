@@ -26,23 +26,132 @@
 #ifndef PEELO_CHRONO_MONTH_HPP_GUARD
 #define PEELO_CHRONO_MONTH_HPP_GUARD
 
+#include <iostream>
+
 namespace peelo
 {
-    enum month_e
+    /**
+     * Month value based on Gregorian calendar.
+     */
+    class month
     {
-        month_jan = 1,
-        month_feb = 2,
-        month_mar = 3,
-        month_apr = 4,
-        month_may = 5,
-        month_jun = 6,
-        month_jul = 7,
-        month_aug = 8,
-        month_sep = 9,
-        month_oct = 10,
-        month_nov = 11,
-        month_dec = 12
+    public:
+        /** January. */
+        static const month jan;
+        /** February. */
+        static const month feb;
+        /** March. */
+        static const month mar;
+        /** April. */
+        static const month apr;
+        /** May. */
+        static const month may;
+        /** June. */
+        static const month jun;
+        /** July. */
+        static const month jul;
+        /** August. */
+        static const month aug;
+        /** September. */
+        static const month sep;
+        /** October. */
+        static const month oct;
+        /** November. */
+        static const month nov;
+        /** December. */
+        static const month dec;
+
+        explicit month(int index = 1);
+
+        /**
+         * Copy constructor.
+         */
+        month(const month& that);
+
+        static bool is_valid(int index);
+
+        /**
+         * Returns numerical index of the month (from 1 to 12).
+         */
+        inline int index() const
+        {
+            return m_index;
+        }
+
+        /**
+         * Returns the number of days in the month (28 to 31).
+         */
+        int length(bool leap_year) const;
+
+        month& assign(const month& that);
+
+        /**
+         * Assignment operator.
+         */
+        inline month& operator=(const month& that)
+        {
+            return assign(that);
+        }
+
+        bool equals(const month& that) const;
+
+        inline bool operator==(const month& that) const
+        {
+            return equals(that);
+        }
+
+        inline bool operator!=(const month& that) const
+        {
+            return !equals(that);
+        }
+
+        int compare(const month& that) const;
+
+        inline bool operator<(const month& that) const
+        {
+            return compare(that) < 0;
+        }
+
+        inline bool operator>(const month& that) const
+        {
+            return compare(that) > 0;
+        }
+
+        inline bool operator<=(const month& that) const
+        {
+            return compare(that) <= 0;
+        }
+
+        inline bool operator>=(const month& that) const
+        {
+            return compare(that) >= 0;
+        }
+
+        /**
+         * Increments month by one.
+         */
+        month& operator++();
+
+        /**
+         * Increments month by one.
+         */
+        month operator++(int);
+
+        /**
+         * Decrements month by one.
+         */
+        month& operator--();
+
+        /**
+         * Decrements month by one.
+         */
+        month operator--(int);
+
+    private:
+        int m_index;
     };
+
+    std::ostream& operator<<(std::ostream&, const month&);
 }
 
 #endif /* !PEELO_CHRONO_MONTH_HPP_GUARD */

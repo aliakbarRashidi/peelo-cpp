@@ -11,7 +11,9 @@ ADD_LIBRARY(
     peelo-cpp
     src/chrono/date.cpp
     src/chrono/datetime.cpp
+    src/chrono/month.cpp
     src/chrono/time.cpp
+    src/chrono/weekday.cpp
     src/text/rune.cpp
     src/text/string.cpp
 )

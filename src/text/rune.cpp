@@ -1643,4 +1643,37 @@ namespace peelo
 
         return stream;
     }
+
+    std::wostream& operator<<(std::wostream& stream, const rune& r)
+    {
+        const rune::value_type c = r.code();
+        const std::streamsize size = stream.width();
+
+        if (c > rune::max.code()
+            || (c & 0xfffe) == 0xfffe
+            || (c >= 0xd800 && c <= 0xdfff)
+            || (c >= 0xffd0 && c <= 0xfdef))
+        {
+            return stream;
+        }
+        if (((stream.flags() & std::ios_base::right)
+            || (stream.flags() & std::ios_base::internal))
+            && size > 1)
+        {
+            for (std::streamsize i = 1; i < size; ++i)
+            {
+                stream << stream.fill();
+            }
+        }
+        stream << static_cast<wchar_t>(c);
+        if ((stream.flags() & std::ios_base::left) && size > 1)
+        {
+            for (std::streamsize i = 1; i < size; ++i)
+            {
+                stream << stream.fill();
+            }
+        }
+
+        return stream;
+    }
 }

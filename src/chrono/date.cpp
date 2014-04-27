@@ -33,7 +33,7 @@
 
 namespace peelo
 {
-    date::date(int year, month_e month, int day)
+    date::date(int year, const class month& month, int day)
         : m_year(year)
         , m_month(month)
         , m_day(day)
@@ -58,7 +58,7 @@ namespace peelo
 
         return date(
                 local_time.wYear,
-                static_cast<month_e>(local_time.wMonth),
+                peelo::month(local_time.wMonth),
                 local_time.wDay
         );
 #else
@@ -72,7 +72,7 @@ namespace peelo
 
         return date(
                 tm->tm_year + 1900,
-                static_cast<month_e>(tm->tm_mon + 1),
+                peelo::month(tm->tm_mon + 1),
                 tm->tm_mday
         );
 #endif
@@ -88,20 +88,20 @@ namespace peelo
         {
             return date(
                     local_time.wYear,
-                    static_cast<month_e>(local_time.wMonth),
+                    peelo::month(local_time.wMonth),
                     local_time.wDay - 1
             );
         }
         else if (lt.wMonth == 1)
         {
-            return date(lt.wYear - 1, month_dec, 31);
+            return date(lt.wYear - 1, month::dec, 31);
         } else {
-            month_e month = static_cast<month_e>(lt.wMonth - 1);
+            class month month(lt.wMonth - 1);
 
             return date(
                     lt.wYear,
                     month,
-                    days_in_month(month, peelo::is_leap_year(lt.wYear))
+                    month.length(is_leap_year(lt.wYear))
             );
         }
 #else
@@ -120,7 +120,7 @@ namespace peelo
 
         return date(
                 tm->tm_year + 1900,
-                static_cast<month_e>(tm->tm_mon + 1),
+                peelo::month(tm->tm_mon + 1),
                 tm->tm_mday
         );
 #endif
@@ -133,18 +133,18 @@ namespace peelo
 
         ::GetLocalTime(&local_time);
         if (lt.wDay == peelo::days_in_month(
-                    static_cast<month_e>(lt.wMonth),
-                    peelo::is_leap_year(lt.wYear)
+                    month(lt.wMonth),
+                    is_leap_year(lt.wYear)
         ))
         {
             if (lt.wMonth == month_dec)
             {
                 return date(lt.wYear + 1, month_jan, 1);
             } else {
-                return date(lt.wYear, static_cast<month_e>(lt.wMonth + 1), 1);
+                return date(lt.wYear, peelo::month(lt.wMonth + 1), 1);
             }
         } else {
-            return date(lt.wYear, static_cast<month_e>(lt.wMonth), lt.wDay + 1);
+            return date(lt.wYear, peelo::month(lt.wMonth), lt.wDay + 1);
         }
 #else
         std::time_t ts = std::time(NULL);
@@ -162,43 +162,43 @@ namespace peelo
 
         return date(
                 tm->tm_year + 1900,
-                static_cast<month_e>(tm->tm_mon + 1),
+                peelo::month(tm->tm_mon + 1),
                 tm->tm_mday
         );
 #endif
     }
 
-    bool date::is_valid(int year, month_e month, int day)
+    bool date::is_valid(int year, const class month& month, int day)
     {
-        return day > 0 && day <= days_in_month(month, year);
+        return day > 0 && day <= month.length(is_leap_year(year));
     }
 
-    weekday_e date::day_of_week() const
+    const weekday& date::day_of_week() const
     {
 #if defined(_WIN32)
         SYSTEMTIME st;
         FILETIME ft;
 
         st.wYear = m_year;
-        st.wMonth = static_cast<int>(m_month);
+        st.wMonth = m_month.index();
         st.wDay = m_day;
         ::SystemTimeToFileTime(&st, &ft);
         ::FileTimeToSystemTime(&ft, &st);
         switch (st.wDayOfWeek)
         {
-            case 0: return weekday_sun;
-            case 1: return weekday_mon;
-            case 2: return weekday_tue;
-            case 3: return weekday_wed;
-            case 4: return weekday_thu;
-            case 5: return weekday_fri;
-            case 6: return weekday_sat;
+            case 0: return weekday::sun;
+            case 1: return weekday::mon;
+            case 2: return weekday::tue;
+            case 3: return weekday::wed;
+            case 4: return weekday::thu;
+            case 5: return weekday::fri;
+            case 6: return weekday::sat;
         }
 #else
         std::tm tm;
 
         tm.tm_year = m_year - 1900;
-        tm.tm_mon = static_cast<int>(m_month) - 1;
+        tm.tm_mon = m_month.index() - 1;
         tm.tm_mday = m_day;
         if (std::mktime(&tm) == -1)
         {
@@ -206,13 +206,13 @@ namespace peelo
         }
         switch (tm.tm_wday)
         {
-            case 0: return weekday_sun;
-            case 1: return weekday_mon;
-            case 2: return weekday_tue;
-            case 3: return weekday_wed;
-            case 4: return weekday_thu;
-            case 5: return weekday_fri;
-            case 6: return weekday_sat;
+            case 0: return weekday::sun;
+            case 1: return weekday::mon;
+            case 2: return weekday::tue;
+            case 3: return weekday::wed;
+            case 4: return weekday::thu;
+            case 5: return weekday::fri;
+            case 6: return weekday::sat;
         }
 #endif
 
@@ -221,38 +221,15 @@ namespace peelo
 
     int date::day_of_year() const
     {
+        const bool leap_year = is_leap_year(m_year);
         int result = 0;
 
-        for (int i = 1; i < m_month; ++i)
+        for (int i = 1; i < m_month.index(); ++i)
         {
-            result += days_in_month(static_cast<month_e>(i), m_year);
+            result += peelo::month(i).length(leap_year);
         }
 
         return result + m_day;
-    }
-
-    int date::days_in_month() const
-    {
-        return days_in_month(m_month, m_year);
-    }
-
-    int date::days_in_month(month_e month, int year)
-    {
-        switch (month)
-        {
-            case month_jan: return 31;
-            case month_feb: return is_leap_year(year) ? 29 : 28;
-            case month_mar: return 31;
-            case month_apr: return 30;
-            case month_may: return 31;
-            case month_jun: return 30;
-            case month_jul: return 31;
-            case month_aug: return 31;
-            case month_sep: return 30;
-            case month_oct: return 31;
-            case month_nov: return 30;
-            default: return 31;
-        }
     }
 
     int date::days_in_year() const
@@ -280,14 +257,14 @@ namespace peelo
         return assign(that.m_year, that.m_month, that.m_day);
     }
 
-    date& date::assign(int year, month_e month, int day)
+    date& date::assign(int year, const class month& month, int day)
     {
         if (!is_valid(year, month, day))
         {
             throw std::invalid_argument("invalid date value");
         }
         m_year = year;
-        m_month = month;
+        m_month.assign(month);
         m_day = day;
 
         return *this;
@@ -298,10 +275,10 @@ namespace peelo
         return equals(that.m_year, that.m_month, that.m_day);
     }
 
-    bool date::equals(int year, month_e month, int day) const
+    bool date::equals(int year, const class month& month, int day) const
     {
         return m_year == year
-            && m_month == month
+            && m_month.equals(month)
             && m_day == day;
     }
 
@@ -310,7 +287,7 @@ namespace peelo
         return compare(that.m_year, that.m_month, that.m_day);
     }
 
-    int date::compare(int year, month_e month, int day) const
+    int date::compare(int year, const class month& month, int day) const
     {
         if (m_year != year)
         {
@@ -330,15 +307,15 @@ namespace peelo
 
     date& date::operator++()
     {
-        if (m_day == days_in_month())
+        if (m_day == m_month.length(is_leap_year()))
         {
             m_day = 1;
-            if (m_month == month_dec)
+            if (m_month == month::dec)
             {
                 ++m_year;
-                m_month = month_jan;
+                m_month.assign(month::jan);
             } else {
-                m_month = static_cast<month_e>(m_month + 1);
+                ++m_month;
             }
         } else {
             ++m_day;
@@ -353,14 +330,14 @@ namespace peelo
         {
             --m_day;
         }
-        else if (m_month == month_jan)
+        else if (m_month == month::jan)
         {
             --m_year;
-            m_month = month_dec;
+            m_month.assign(month::dec);
             m_day = 31;
         } else {
-            m_month = static_cast<month_e>(m_month - 1);
-            m_day = days_in_month(m_month, m_year);
+            --m_month;
+            m_day = m_month.length(is_leap_year());
         }
 
         return *this;
@@ -370,15 +347,15 @@ namespace peelo
     {
         date clone(*this);
 
-        if (m_day == days_in_month())
+        if (m_day == m_month.length(is_leap_year()))
         {
             m_day = 1;
-            if (m_month == month_dec)
+            if (m_month == month::dec)
             {
                 ++m_year;
-                m_month = month_jan;
+                m_month.assign(month::jan);
             } else {
-                m_month = static_cast<month_e>(m_month + 1);
+                ++m_month;
             }
         } else {
             ++m_day;
@@ -395,14 +372,14 @@ namespace peelo
         {
             --m_day;
         }
-        else if (m_month == month_jan)
+        else if (m_month == month::jan)
         {
             --m_year;
-            m_month = month_dec;
+            m_month.assign(month::dec);
             m_day = 31;
         } else {
-            m_month = static_cast<month_e>(m_month - 1);
-            m_day = days_in_month(m_month, m_year);
+            --m_month;
+            m_day = m_month.length(is_leap_year());
         }
 
         return clone;
@@ -411,7 +388,7 @@ namespace peelo
     std::ostream& operator<<(std::ostream& os, const date& d)
     {
         const int year = d.year();
-        const int month = static_cast<int>(d.month());
+        const int month = d.month().index();
         const int day = d.day();
 
         os << year << '-';

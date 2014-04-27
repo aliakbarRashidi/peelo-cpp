@@ -26,17 +26,26 @@
 #ifndef PEELO_CHRONO_WEEKDAY_HPP_GUARD
 #define PEELO_CHRONO_WEEKDAY_HPP_GUARD
 
+#include <iostream>
+
 namespace peelo
 {
     class weekday
     {
     public:
+        /** Monday. */
         static const weekday mon;
+        /** Tuesday. */
         static const weekday tue;
+        /** Wednesday. */
         static const weekday wed;
+        /** Thursday. */
         static const weekday thu;
+        /** Friday. */
         static const weekday fri;
+        /** Saturday. */
         static const weekday sat;
+        /** Sunday. */
         static const weekday sun;
 
         explicit weekday(int index = 1);
@@ -114,6 +123,8 @@ namespace peelo
     private:
         int m_index;
     };
+
+    std::ostream& operator<<(std::ostream&, const weekday&);
 }
 
 #endif /* !PEELO_CHRONO_WEEKDAY_HPP_GUARD */

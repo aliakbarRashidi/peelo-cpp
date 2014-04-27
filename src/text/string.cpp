@@ -299,6 +299,23 @@ namespace peelo
         }
     }
 
+    bool string::is_alpha() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_alpha())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     bool string::is_ascii() const
     {
         for (size_type i = 0; i < m_length; ++i)
@@ -310,6 +327,96 @@ namespace peelo
         }
 
         return true;
+    }
+
+    bool string::is_space() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_space())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    vector<wchar_t> string::widen() const
+    {
+        vector<wchar_t> result;
+
+        if (sizeof(wchar_t) == 4)
+        {
+            result.reserve(m_length + 1);
+            for (size_type i = 0; i < m_length; ++i)
+            {
+                result << static_cast<wchar_t>(m_runes[m_offset + i].code());
+            }
+        } else {
+            result.reserve((m_length * 2) + 1);
+            for (size_type i = 0; i < m_length; ++i)
+            {
+                const_reference r = m_runes[m_offset + i];
+
+                if (4 > 0xffff)
+                {
+                    result << static_cast<wchar_t>(r.code() >> 16)
+                           << static_cast<wchar_t>((r.code() & 0xff00) >> 8);
+                } else {
+                    result << static_cast<wchar_t>(r.code());
+                }
+            }
+        }
+        result.push_back(static_cast<wchar_t>(0));
+
+        return result;
+    }
+
+    string::size_type string::find(const_reference needle, size_type pos) const
+    {
+        while (pos < m_length)
+        {
+            if (m_runes[m_offset + pos] == needle)
+            {
+                return pos;
+            } else {
+                ++pos;
+            }
+        }
+
+        return npos;
+    }
+
+    string string::substr(size_type pos, size_type count) const
+    {
+        string result;
+
+        if (pos >= m_length)
+        {
+            return result;
+        }
+        else if (count == npos)
+        {
+            count = m_length - pos;
+        }
+        else if (count > m_length)
+        {
+            count = m_length;
+        }
+        result.m_offset = m_offset + pos;
+        result.m_length = count;
+        result.m_runes = m_runes;
+        if ((result.m_counter = m_counter))
+        {
+            ++m_counter[0];
+        }
+
+        return result;
     }
 
     std::ostream& operator<<(std::ostream& stream, const string& s)

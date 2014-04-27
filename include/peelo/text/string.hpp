@@ -26,6 +26,7 @@
 #ifndef PEELO_TEXT_STRING_HPP_GUARD
 #define PEELO_TEXT_STRING_HPP_GUARD
 
+#include <peelo/container/vector.hpp>
 #include <peelo/text/rune.hpp>
 
 namespace peelo
@@ -71,6 +72,15 @@ namespace peelo
         inline bool empty() const
         {
             return !m_length;
+        }
+
+        /**
+         * Returns <code>true</code> if string is either empty or contains only
+         * whitespace characters.
+         */
+        inline bool blank() const
+        {
+            return !m_length || is_space();
         }
 
         /**
@@ -136,12 +146,47 @@ namespace peelo
         string to_upper() const;
 
         /**
+         * Returns <code>true</code> if every character in the string is
+         * alphabetic character.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_alpha() const;
+
+        /**
          * Returns <code>true</code> if every character in the string is in the
          * ASCII range.
          *
          * Returns <code>true</code> if the string is empty.
          */
         bool is_ascii() const;
+
+        /**
+         * Returns <code>true</code> if every character in the string is a
+         * whitespace character.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_space() const;
+
+        vector<wchar_t> widen() const;
+
+        size_type find(const_reference needle, size_type pos = 0) const;
+
+        string substr(size_type pos = 0, size_type count = npos) const;
+
+        /**
+         * Extracts all lines from the string and returns them in a vector of
+         * substrings. All possible new line combinations are supported by this
+         * method.
+         */
+        vector<string> lines() const;
+
+        /**
+         * Extracts all whitespace separated words from the string and returns
+         * them in a vector of substrings.
+         */
+        vector<string> words() const;
 
     private:
         size_type m_offset;

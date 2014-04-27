@@ -25,6 +25,7 @@
  */
 #include <peelo/text/string.hpp>
 #include <stdexcept>
+#include <cstring>
 
 namespace peelo
 {
@@ -57,6 +58,64 @@ namespace peelo
         for (size_type i = 0; i < n; ++i)
         {
             m_runes[i] = runes[i];
+        }
+    }
+
+    string::string(const char* input)
+        : m_offset(0)
+        , m_length(0)
+        , m_runes(NULL)
+        , m_counter(NULL)
+    {
+        static const unsigned char utf8_length[256] =
+        {
+            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+            2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+            3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
+        };
+        static const unsigned char utf8_mask[6] =
+        {
+            0x7f,
+            0x1f,
+            0x0f,
+            0x07,
+            0x03,
+            0x01
+        };
+
+        if (input)
+        {
+            const char* p = input;
+
+            while (*p)
+            {
+                p += utf8_length[static_cast<int>(*p)];
+                ++m_length;
+            }
+            if (m_length)
+            {
+                m_counter = new unsigned(1);
+                m_runes = new value_type[m_length];
+                for (size_type i = 0; i < m_length; ++i)
+                {
+                    const size_type size = utf8_length[static_cast<int>(*input)];
+                    const unsigned char mask = utf8_mask[size - 1];
+                    unsigned int result = input[0] & mask;
+
+                    for (size_type j = 1; j < size; ++j)
+                    {
+                        result <<= 6;
+                        result |= input[j] & 0x3f;
+                    }
+                    m_runes[i] = result;
+                    input += size;
+                }
+            }
         }
     }
 
@@ -160,6 +219,50 @@ namespace peelo
         }
 
         return true;
+    }
+
+    string string::concat(const string& that) const
+    {
+        if (!m_length)
+        {
+            return that;
+        }
+        else if (!that.m_length)
+        {
+            return *this;
+        } else {
+            string result;
+
+            result.m_length = m_length + that.m_length;
+            result.m_runes = new value_type[result.m_length];
+            result.m_counter = new unsigned(1);
+            std::memcpy(static_cast<void*>(result.m_runes),
+                        static_cast<const void*>(m_runes + m_offset),
+                        m_length * sizeof(value_type));
+            std::memcpy(static_cast<void*>(result.m_runes + m_length),
+                        static_cast<const void*>(that.m_runes + that.m_offset),
+                        that.m_length * sizeof(value_type));
+
+            return result;
+        }
+    }
+
+    string string::concat(const_reference c) const
+    {
+        string result;
+
+        result.m_length = m_length + 1;
+        result.m_runes = new value_type[result.m_length];
+        result.m_counter = new unsigned(1);
+        if (m_length)
+        {
+            std::memcpy(static_cast<void*>(result.m_runes),
+                        static_cast<const void*>(m_runes + m_offset),
+                        m_length * sizeof(value_type));
+        }
+        result.m_runes[m_length] = c;
+
+        return result;
     }
 
     string string::to_lower() const

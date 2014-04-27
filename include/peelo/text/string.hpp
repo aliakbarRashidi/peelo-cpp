@@ -55,6 +55,12 @@ namespace peelo
         string(const_pointer runes, size_type n);
 
         /**
+         * Constructs string from string literal. The input is expected to be
+         * in UTF-8.
+         */
+        string(const char* input);
+
+        /**
          * Destructor.
          */
         virtual ~string();
@@ -104,6 +110,25 @@ namespace peelo
         inline bool operator!=(const string& that) const
         {
             return !equals(that);
+        }
+
+        string concat(const string& that) const;
+        string concat(const_reference c) const;
+
+        /**
+         * Concatenation operator.
+         */
+        inline string operator+(const string& that) const
+        {
+            return concat(that);
+        }
+
+        /**
+         * Concatenation operator.
+         */
+        inline string operator+(const_reference c) const
+        {
+            return concat(c);
         }
 
         string to_lower() const;

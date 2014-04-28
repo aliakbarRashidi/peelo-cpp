@@ -346,6 +346,65 @@ namespace peelo
         return true;
     }
 
+    vector<char> string::utf8() const
+    {
+        vector<char> result;
+        size_type size = 0;
+
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            unsigned int r = m_runes[m_offset + i].code();
+
+            if (!(r & 0xffffff80))
+            {
+                ++size;
+            }
+            else if (!(r & 0xfffff800))
+            {
+                size += 2;
+            }
+            else if (!(r & 0xffff0000))
+            {
+                size += 3;
+            }
+            else if (!(r & 0xffe00000))
+            {
+                size += 4;
+            }
+        }
+        result.reserve(size);
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            unsigned int r = m_runes[m_offset + i].code();
+
+            if (!(r & 0xffffff80))
+            {
+                result << static_cast<char>(r);
+            }
+            else if (!(r & 0xfffff800))
+            {
+                result << static_cast<char>(0xc0 | (r >> 6))
+                       << static_cast<char>(0x80 | (r & 0x3f));
+            }
+            else if (!(r & 0xffff0000))
+            {
+                result << static_cast<char>(0xe0 | (r >> 12))
+                       << static_cast<char>(0x80 | ((r >> 6) & 0x3f))
+                       << static_cast<char>(0x80 | (r & 0x3f));
+            }
+            else if (!(r & 0xffe00000))
+            {
+                result << static_cast<char>(0xf0 | (r >> 18))
+                       << static_cast<char>(0x80 | ((r >> 12) & 0x3f))
+                       << static_cast<char>(0x80 | ((r >> 6) & 0x3f))
+                       << static_cast<char>(0x80 | (r & 0x3f));
+            }
+        }
+        result.push_back(0);
+
+        return result;
+    }
+
     vector<wchar_t> string::widen() const
     {
         vector<wchar_t> result;

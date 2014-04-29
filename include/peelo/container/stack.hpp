@@ -23,15 +23,23 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef PEELO_CONTAINER_QUEUE_HPP_GUARD
-#define PEELO_CONTAINER_QUEUE_HPP_GUARD
+#ifndef PEELO_CONTAINER_STACK_HPP_GUARD
+#define PEELO_CONTAINER_STACK_HPP_GUARD
 
 #include <peelo/container/vector.hpp>
 
 namespace peelo
 {
+    /**
+     * Stack class is a template class which provides a stack implementation.
+     *
+     * A stack is last in, first out (LIFO) structure. Items are added to the
+     * top of the stack using push() and retrieved from the top using pop().
+     * The top() function provides access to the topmost item without removing
+     * it.
+     */
     template <class T, class Container = vector<T> >
-    class queue
+    class stack
     {
     public:
         typedef Container container_type;
@@ -40,65 +48,12 @@ namespace peelo
         typedef Container::reference reference;
         typedef Container::const_reference const_reference;
 
-        /**
-         * Constructs empty queue.
-         */
-        queue()
-            : m_container(Container()) {}
-
-        /**
-         * Copy constructor.
-         */
-        queue(const queue<T, Container>& that)
-            : m_container(that.m_container) {}
-
-        /**
-         * Constructs queue from existing container.
-         */
-        explicit queue(const Container& container)
-            : m_container(container) {}
-
-        queue& assign(const queue<T, Container>& that)
-        {
-            m_container = that.m_container;
-
-            return *this;
-        }
-
-        /**
-         * Assignment operator.
-         */
-        inline queue& operator=(const queue<T, Container>& that)
-        {
-            return assign(that);
-        }
-
-        inline operator bool() const
-        {
-            return !m_container.empty();
-        }
-
-        inline bool operator!() const
-        {
-            return m_container.empty();
-        }
-
-        inline reference front()
-        {
-            return m_container.front();
-        }
-
-        inline const_reference front()
-        {
-            return m_container.front();
-        }
-
-        inline reference back()
+        inline reference top()
         {
             return m_container.back();
         }
 
-        inline const_reference back()
+        inline const_reference top() const
         {
             return m_container.back();
         }
@@ -118,42 +73,42 @@ namespace peelo
             m_container.push_back(value);
         }
 
-        inline queue& operator<<(const_reference value)
+        inline stack& operator<<(const_reference value)
         {
             push(value);
 
             return *this;
         }
 
-        void pop()
+        inline void pop()
         {
-            m_container.pop_front();
+            m_container.pop_back();
         }
 
-        void swap(queue<T, Container>& that)
+        void swap(stack<T, Container>& that)
         {
             m_container.swap(that.m_container);
         }
 
-        bool equals(const queue<T, Container>& that) const
+        bool equals(const stack<T, Container>& that) const
         {
             return m_container == that.m_container;
         }
 
-        inline bool operator==(const queue<T, Container>& that) const
+        inline bool operator==(const stack<T, Container>& that) const
         {
             return equals(that);
         }
 
-        inline bool operator!=(const queue<T, Container>& that) const
+        inline bool operator!=(const stack<T, Container>& that) const
         {
             return !equals(that);
         }
 
     private:
-        /** Contains all elements stored in the queue. */
+        /** Contains all elements stored in the stack. */
         container_type m_container;
     };
 }
 
-#endif /* !PEELO_CONTAINER_QUEUE_HPP_GUARD */
+#endif /* !PEELO_CONTAINER_STACK_HPP_GUARD */

@@ -1,3 +1,3 @@
 - container/array iterators.
 - text/string iterators.
-- comparison operators for queue.
+- comparison operators for queue and stack.

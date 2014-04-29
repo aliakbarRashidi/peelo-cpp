@@ -48,6 +48,39 @@ namespace peelo
         typedef Container::reference reference;
         typedef Container::const_reference const_reference;
 
+        /**
+         * Constructs empty stack.
+         */
+        stack()
+            : m_container(Container()) {}
+
+        /**
+         * Copy constructor.
+         */
+        stack(const stack<T, Container>& that)
+            : m_container(that.m_container) {}
+
+        /**
+         * Constructs stack from existing container.
+         */
+        explicit stack(const Container& container)
+            : m_container(container) {}
+
+        stack& assign(const stack<T, Container>& that)
+        {
+            m_container = that.m_container;
+
+            return *this;
+        }
+
+        /**
+         * Assignment operator.
+         */
+        inline stack& operator=(const stack<T, Container>& that)
+        {
+            return assign(that);
+        }
+
         inline reference top()
         {
             return m_container.back();

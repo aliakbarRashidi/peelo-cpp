@@ -26,7 +26,6 @@
 #ifndef PEELO_CONTAINER_VECTOR_HPP_GUARD
 #define PEELO_CONTAINER_VECTOR_HPP_GUARD
 
-#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
@@ -36,22 +35,29 @@ namespace peelo
     /**
      * Vector is a template class for dynamic array.
      */
-    template <class T>
+    template <
+        class T,
+        class Allocator = std::allocator<T>
+    >
     class vector
     {
     public:
-        typedef std::size_t size_type;
         typedef T value_type;
-        typedef T& reference;
-        typedef const T& const_reference;
-        typedef T* pointer;
-        typedef const T* const_pointer;
+        typedef Allocator allocator_type;
+        typedef std::size_t size_type;
+        typedef typename Allocator::reference reference;
+        typedef typename Allocator::const_reference const_reference;
+        typedef typename Allocator::pointer pointer;
+        typedef typename Allocator::const_pointer const_pointer;
 
         /**
          * Constructs empty vector.
+         *
+         * \param allocator Allocator used for allocating memory
          */
-        vector()
-            : m_capacity(0)
+        vector(const allocator_type& allocator = allocator_type())
+            : m_allocator(allocator)
+            , m_capacity(0)
             , m_size(0)
             , m_data(NULL) {}
 
@@ -59,24 +65,37 @@ namespace peelo
          * Copy constructor.
          */
         vector(const vector<T>& that)
-            : m_capacity(that.m_size)
-            , m_size(that.m_size)
-            , m_data(m_capacity ? static_cast<T*>(std::malloc(sizeof(T) * m_capacity)) : NULL)
+            : m_allocator(that.m_allocator)
+            , m_capacity(that.m_size)
+            , m_size(m_capacity)
+            , m_data(m_size ? m_allocator.allocate(m_size) : NULL)
         {
             for (size_type i = 0; i < m_size; ++i)
             {
-                new (static_cast<void*>(m_data + i)) T(that.m_data[i]);
+                m_allocator.construct(m_data + i, that.m_data[i]);
             }
         }
 
-        explicit vector(size_type count, const_reference value)
-            : m_capacity(count)
+        /**
+         * Constructs vector which contains <i>count</i> instances of given
+         * value.
+         *
+         * \param count Number of instances of the given <i>value</i> to store
+         *              in the vector
+         * \param value The value to store in the vector
+         * \param allocator Allocator used for allocating memory
+         */
+        explicit vector(size_type count,
+                        const_reference value,
+                        const allocator_type& allocator = allocator_type())
+            : m_allocator(allocator)
+            , m_capacity(count)
             , m_size(count)
-            , m_data(m_capacity ? static_cast<T*>(std::malloc(sizeof(T) * m_capacity)) : NULL)
+            , m_data(m_size ? m_allocator.allocate(m_size) : NULL)
         {
-            for (size_type i = 0; i < count; ++i)
+            for (size_type i = 0; i < m_size; ++i)
             {
-                new (static_cast<void*>(m_data + i)) T(value);
+                m_allocator.construct(m_data + i, value);
             }
         }
 
@@ -87,19 +106,25 @@ namespace peelo
         {
             for (size_type i = 0; i < m_size; ++i)
             {
-                m_data[i].~T();
+                m_allocator.destroy(m_data + i);
             }
-            if (m_size)
+            if (m_data)
             {
-                std::free(static_cast<void*>(m_data));
+                m_allocator.deallocate(m_data, m_capacity);
             }
         }
 
+        /**
+         * Returns <code>true</code> if the vector is not empty.
+         */
         inline operator bool() const
         {
             return m_size;
         }
 
+        /**
+         * Returns <code>true</code> if the vector is empty.
+         */
         inline bool operator!() const
         {
             return !m_size;
@@ -111,6 +136,8 @@ namespace peelo
          *
          * If pos not within the range of the container, an exception of type
          * std::out_of_range is thrown.
+         *
+         * \throw std::out_of_range If index is out of bounds.
          */
         inline reference at(size_type pos)
         {
@@ -216,28 +243,35 @@ namespace peelo
             }
             old = m_data;
             m_capacity = n;
-            m_data = static_cast<T*>(std::malloc(sizeof(T) * m_capacity));
+            m_data = m_allocator.allocate(n);
             for (size_type i = 0; i < m_size; ++i)
             {
-                new (static_cast<void*>(m_data + i)) T(old[i]);
-                old[i].~T();
+                m_allocator.construct(m_data + i, old[i]);
+                m_allocator.destroy(old + i);
             }
             if (old)
             {
-                std::free(static_cast<void*>(old));
+                m_allocator.deallocate(old, m_capacity);
             }
+            m_capacity = n;
         }
 
+        /**
+         * Returns current capacity of the vector.
+         */
         inline size_type capacity() const
         {
             return m_capacity;
         }
 
+        /**
+         * Removes all elements from the vector.
+         */
         void clear()
         {
             for (size_type i = 0; i < m_size; ++i)
             {
-                m_data[i].~T();
+                m_allocator.destroy(m_data + i);
             }
             m_size = 0;
         }
@@ -246,10 +280,12 @@ namespace peelo
          * Inserts <i>value</i> at index position <i>i</i> in the vector. If
          * <i>i</i> is <code>0</code>, then value is prepended to the vector.
          * If <i>i</i> is size(), then value is appended to the vector.
+         *
+         * \throw std::out_of_range If index is out of bounds.
          */
         void insert(size_type i, const_reference value)
         {
-            if (i > m_size)
+            if (i >= m_size)
             {
                 throw std::out_of_range("vector index out of range");
             }
@@ -266,52 +302,64 @@ namespace peelo
                     std::memmove(
                             static_cast<void*>(m_data + i + 1),
                             static_cast<const void*>(m_data + i),
-                            sizeof(T) * (m_size - i)
+                            sizeof(value_type) * (m_size - i)
                     );
                 } else {
                     pointer old = m_data;
 
-                    m_data = static_cast<T*>(std::malloc(sizeof(T) * (m_size + 1)));
+                    m_data = m_allocator.allocate(m_size + 1);
                     for (size_type j = 0; j < i - 1; ++j)
                     {
-                        new (static_cast<void*>(m_data + j)) T(old[j]);
-                        old[j].~T();
+                        m_allocator.construct(m_data + j, old[j]);
+                        m_allocator.destroy(old + j);
                     }
                     for (size_type j = i; j < m_size; ++j)
                     {
-                        new (static_cast<void*>(m_data + j + 1)) T(old[j]);
-                        old[j].~T();
+                        m_allocator.construct(m_data + j + 1, old[j]);
+                        m_allocator.destroy(old + j);
                     }
                     if (old)
                     {
-                        std::free(static_cast<void*>(old));
+                        m_allocator.destroy(old, m_capacity);
                     }
+                    m_capacity = m_size + 1;
                 }
-                new (static_cast<void*>(m_data + i)) T(value);
+                m_allocator.construct(m_data + i, value);
                 ++m_size;
             }
         }
 
+        /**
+         * Removes element from specified index.
+         *
+         * \throw std::out_of_range If index is out of bounds.
+         */
         void erase(size_type pos)
         {
             if (pos >= m_size)
             {
                 throw std::out_of_range("vector index out of bounds");
             }
-            m_data[pos].~T();
+            m_allocator.destroy(m_data + pos);
             std::memmove(
                     static_cast<void*>(m_data + pos),
                     static_cast<const void*>(m_data + pos + 1),
-                    sizeof(T) * (--m_size - pos)
+                    sizeof(value_type) * (--m_size - pos)
             );
         }
 
+        /**
+         * Inserts given element to the end of the vector.
+         */
         void push_back(const_reference value)
         {
             reserve(m_size + 1);
-            new (static_cast<void*>(m_data + m_size++)) T(value);
+            m_allocator.construct(m_data + m_size++, value);
         }
 
+        /**
+         * Inserts given element to the beginning of the vector.
+         */
         void push_front(const_reference value)
         {
             if (m_capacity >= m_size + 1)
@@ -319,36 +367,30 @@ namespace peelo
                 std::memmove(
                         static_cast<void*>(m_data + 1),
                         static_cast<const void*>(m_data),
-                        sizeof(T) * m_size
+                        sizeof(value_type) * m_size
                 );
             } else {
-                ++m_capacity;
-                if (m_size)
-                {
-                    pointer old = m_data;
+                pointer old = m_data;
 
-                    m_data = static_cast<T*>(std::malloc(sizeof(T) * m_capacity));
-                    for (size_type i = 0; i < m_size; ++i)
-                    {
-                        new (static_cast<void*>(m_data + i + 1)) T(old[i]);
-                        old[i].~T();
-                    }
-                    if (old)
-                    {
-                        std::free(static_cast<void*>(old));
-                    }
-                } else {
-                    if (m_data)
-                    {
-                        std::free(static_cast<void*>(m_data));
-                    }
-                    m_data = static_cast<T*>(std::malloc(sizeof(T) * m_capacity));
+                m_data = m_allocator.allocate(m_capacity + 1);
+                for (size_type i = 0; i < m_size; ++i)
+                {
+                    m_allocator.construct(m_data + i + 1, old[i]);
+                    m_allocator.destroy(old + i);
                 }
+                if (old)
+                {
+                    m_allocator.deallocate(old, m_capacity);
+                }
+                ++m_capacity;
             }
-            new (static_cast<void*>(m_data)) T(value);
+            m_allocator.construct(m_data, value);
             ++m_size;
         }
 
+        /**
+         * Inserts given element to the end of the vector.
+         */
         inline vector& operator<<(const_reference value)
         {
             push_back(value);
@@ -358,6 +400,8 @@ namespace peelo
 
         /**
          * Returns and removes last element from the vector.
+         *
+         * \throw std::out_of_range If vector is empty.
          */
         value_type pop_back()
         {
@@ -365,7 +409,7 @@ namespace peelo
             {
                 value_type element(m_data[--m_size]);
 
-                m_data[m_size].~T();
+                m_allocator.destroy(m_data + m_size);
 
                 return element;
             }
@@ -375,6 +419,8 @@ namespace peelo
 
         /**
          * Returns and removes first element from the vector.
+         *
+         * \throw std::out_of_range If vector is empty.
          */
         value_type pop_front()
         {
@@ -382,17 +428,25 @@ namespace peelo
             {
                 value_type element(m_data[0]);
 
-                m_data[0].~T();
+                m_allocator.destroy(m_data);
                 std::memmove(
                         static_cast<void*>(m_data),
                         static_cast<const void*>(m_data + 1),
-                        sizeof(T) * --m_size
+                        sizeof(value_type) * --m_size
                 );
+
+                return element;
             }
 
             throw std::out_of_range("vector is empty");
         }
 
+        /**
+         * Removes last element from the vector and assigns it to the given
+         * slot.
+         *
+         * \throw std::out_of_range If vector is empty.
+         */
         inline vector& operator>>(reference value)
         {
             value = pop_back();
@@ -400,17 +454,9 @@ namespace peelo
             return *this;
         }
 
-        void swap(vector<T>& that)
-        {
-            if (m_data != that.m_data)
-            {
-                pointer tmp = m_data;
-
-                m_data = that.m_data;
-                that.m_data = tmp;
-            }
-        }
-
+        /**
+         * Tests whether two vectors have equal contents.
+         */
         bool equals(const vector<T>& that) const
         {
             if (m_data == that.m_data)
@@ -497,22 +543,21 @@ namespace peelo
             {
                 for (size_type i = 0; i < m_size; ++i)
                 {
-                    m_data[i].~T();
+                    m_allocator.destroy(m_data + i);
                 }
                 if (m_capacity < that.m_size)
                 {
-                    m_capacity = that.m_size;
                     if (m_data)
                     {
-                        std::free(static_cast<void*>(m_data));
+                        m_allocator.deallocate(m_data, m_capacity);
                     }
-                    m_data = static_cast<T*>(std::malloc(sizeof(T) * m_capacity));
+                    m_data = m_allocator.allocate(m_capacity = that.m_size);
+                }
+                for (size_type i = 0; i < that.m_size; ++i)
+                {
+                    m_allocator.construct(m_data + i, that.m_data[i]);
                 }
                 m_size = that.m_size;
-                for (size_type i = 0; i < m_size; ++i)
-                {
-                    new (static_cast<void*>(m_data + i)) T(that.m_data[i]);
-                }
             }
 
             return *this;
@@ -527,6 +572,8 @@ namespace peelo
         }
 
     private:
+        /** Allocator instance used for allocating memory. */
+        allocator_type m_allocator;
         /** Size of the array. */
         size_type m_capacity;
         /** Number of elements stored in the array. */
@@ -535,10 +582,14 @@ namespace peelo
         pointer m_data;
     };
 
+    /**
+     * Outputs each element from the vector into the output stream, separated
+     * by commas.
+     */
     template <class T>
-    inline std::ostream& operator<<(std::ostream& os, const vector<T>& v)
+    std::ostream& operator<<(std::ostream& os, const vector<T>& v)
     {
-        for (std::size_t i = 0; i < v.size(); ++i)
+        for (typename vector<T>::size_type i = 0; i < v.size(); ++i)
         {
             if (i > 0)
             {

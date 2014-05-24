@@ -1,3 +1,10 @@
-- container/array iterators.
-- text/string iterators.
-- comparison operators for queue and stack.
+# Containers
+- container/queue
+- container/stack
+- container/set
+- container/hashmap
+
+# Iterators
+- container/array
+- container/vector
+- text/string

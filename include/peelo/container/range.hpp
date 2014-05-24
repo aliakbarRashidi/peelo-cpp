@@ -34,8 +34,75 @@ namespace peelo
     class range
     {
     public:
+        class iterator;
         typedef T value_type;
+        typedef value_type& reference;
+        typedef const value_type& const_reference;
+        typedef iterator const_iterator;
         
+        range()
+            : m_front(T())
+            , m_back(T()) {}
+
+        range(const range<T>& that)
+            : m_front(that.m_front)
+            , m_back(that.m_back) {}
+
+        range(const value_type& front, const value_type& back)
+            : m_front(front)
+            , m_back(back) {}
+
+        inline const_reference front() const
+        {
+            return m_front;
+        }
+
+        inline const_reference back() const
+        {
+            return m_back;
+        }
+
+        inline iterator begin() const
+        {
+            return iterator(m_front);
+        }
+
+        inline iterator end() const
+        {
+            return iterator(m_back);
+        }
+
+        range& assign(const range<T>& that)
+        {
+            m_front = that.m_front;
+            m_back = that.m_back;
+
+            return *this;
+        }
+
+        /**
+         * Assignment operator.
+         */
+        inline range& operator=(const range<T>& that)
+        {
+            return assign(that);
+        }
+
+        bool equals(const range<T>& that) const
+        {
+            return m_front == that.m_front && m_back == that.m_back;
+        }
+
+        inline bool operator==(const range<T>& that) const
+        {
+            return equals(that);
+        }
+
+        inline bool operator!=(const range<T>& that) const
+        {
+            return !equals(that);
+        }
+
         class iterator
         {
             friend class range;
@@ -50,7 +117,7 @@ namespace peelo
 
                 return *this;
             }
-        
+
             inline value_type operator*() const
             {
                 return m_current;
@@ -95,48 +162,35 @@ namespace peelo
 
             inline bool operator!=(const iterator& that) const
             {
-                return !(m_current == that.m_current);
+                return m_current != that.m_current;
             }
 
-        protected:
-            iterator(const value_type& start)
-                : m_current(start) {}
+            inline bool operator<(const iterator& that) const
+            {
+                return m_current < that.m_current;
+            }
+
+            inline bool operator>(const iterator& that) const
+            {
+                return m_current > that.m_current;
+            }
+
+            inline bool operator<=(const iterator& that) const
+            {
+                return m_current <= that.m_current;
+            }
+
+            inline bool operator>=(const iterator& that) const
+            {
+                return m_current >= that.m_current;
+            }
 
         private:
+            iterator(const_reference current)
+                : m_current(current) {}
+
             value_type m_current;
         };
-
-        range()
-            : m_front(T())
-            , m_back(T()) {}
-
-        range(const range<T>& that)
-            : m_front(that.m_front)
-            , m_back(that.m_back) {}
-
-        range(const value_type& front, const value_type& back)
-            : m_front(front)
-            , m_back(back) {}
-
-        inline const value_type& front() const
-        {
-            return m_front;
-        }
-
-        inline const value_type& back() const
-        {
-            return m_back;
-        }
-
-        inline iterator begin() const
-        {
-            return iterator(m_front);
-        }
-
-        inline iterator end() const
-        {
-            return iterator(m_back);
-        }
 
     private:
         value_type m_front;

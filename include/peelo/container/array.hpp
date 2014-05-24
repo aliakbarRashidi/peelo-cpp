@@ -26,41 +26,43 @@
 #ifndef PEELO_CONTAINER_ARRAY_HPP_GUARD
 #define PEELO_CONTAINER_ARRAY_HPP_GUARD
 
-#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 
 namespace peelo
 {
-    template <class T, std::size_t N>
+    /**
+     * C++11 like wrapper for constant sized arrays.
+     */
+    template<
+        class T,
+        std::size_t N
+    >
     class array
     {
     public:
-        typedef std::size_t size_type;
         typedef T value_type;
-        typedef T& reference;
-        typedef const T& const_reference;
-        typedef T* pointer;
-        typedef const T* const_pointer;
+        typedef std::size_t size_type;
+        typedef value_type& reference;
+        typedef const value_type& const_reference;
+        typedef value_type* pointer;
+        typedef const value_type* const_pointer;
 
+        /**
+         * Constructs new array.
+         */
         array()
-            : m_data(N ? static_cast<T*>(std::malloc(sizeof(T) * N)) : NULL)
-        {
-            for (size_type i = 0; i < N; ++i)
-            {
-                new (static_cast<void*>(m_data + i)) T();
-            }
-        }
+            : m_data(N ? new value_type[N] : NULL) {}
 
         /**
          * Copy constructor.
          */
         array(const array<T, N>& that)
-            : m_data(N ? static_cast<T*>(std::malloc(sizeof(T) * N)) : NULL)
+            : m_data(N ? new value_type[N] : NULL)
         {
             for (size_type i = 0; i < N; ++i)
             {
-                new (static_cast<void*>(m_data + i)) T(that.m_data[i]);
+                m_data[i] = that.m_data[i];
             }
         }
 
@@ -69,26 +71,37 @@ namespace peelo
          */
         virtual ~array()
         {
-            for (size_type i = 0; i < N; ++i)
+            if (m_data)
             {
-                m_data[i].~T();
-            }
-            if (N)
-            {
-                std::free(static_cast<void*>(m_data));
+                delete[] m_data;
             }
         }
 
+        /**
+         * Returns <code>true</code> if the array is not empty.
+         */
         inline operator bool() const
         {
             return N;
         }
 
+        /**
+         * Returns <code>true</code> if the array is empty.
+         */
         inline bool operator!() const
         {
             return !N;
         }
 
+        /**
+         * Returns a reference to the element at specified location pos, with
+         * bounds checking.
+         *
+         * If pos not within the range of the container, an exception of type
+         * std::out_of_range is thrown.
+         *
+         * \throw std::out_of_range If index is out of bounds.
+         */
         inline reference at(size_type pos)
         {
             if (pos >= N)
@@ -109,6 +122,10 @@ namespace peelo
             }
         }
 
+        /**
+         * Returns a reference to the element at specified location pos. No
+         * bounds checking is performed.
+         */
         inline reference operator[](size_type pos)
         {
             return m_data[pos];
@@ -133,6 +150,10 @@ namespace peelo
             return m_data[0];
         }
 
+        /**
+         * Returns reference to the last element in the container. Calling
+         * back() on an empty container is undefined.
+         */
         inline reference back()
         {
             return m_data[N - 1];
@@ -143,6 +164,10 @@ namespace peelo
             return m_data[N - 1];
         }
 
+        /**
+         * Returns pointer to the array data. Could be NULL if the array is
+         * empty.
+         */
         inline pointer data()
         {
             return m_data;
@@ -161,6 +186,9 @@ namespace peelo
             return !N;
         }
 
+        /**
+         * Returns size of the array.
+         */
         inline size_type size() const
         {
             return N;
@@ -177,6 +205,11 @@ namespace peelo
             }
         }
 
+        /**
+         * Swaps contents with another array.
+         *
+         * \param that Another array to swap contents with
+         */
         void swap(array<T, N>& that)
         {
             pointer tmp = m_data;
@@ -206,6 +239,9 @@ namespace peelo
             return assign(that);
         }
 
+        /**
+         * Tests whether two arrays have equal contents.
+         */
         bool equals(const array<T, N>& that) const
         {
             if (m_data == that.m_data)
@@ -280,6 +316,7 @@ namespace peelo
         }
 
     private:
+        /** Pointer to the array data. */
         pointer m_data;
     };
 

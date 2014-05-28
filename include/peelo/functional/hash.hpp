@@ -45,6 +45,8 @@ namespace peelo
     template<>
     struct hash<bool>
     {
+        typedef std::size_t result_type;
+
         result_type operator()(bool key) const
         {
             return key ? 1 : 0;
@@ -54,13 +56,15 @@ namespace peelo
     template<>
     struct hash<string>
     {
+        typedef std::size_t result_type;
+
         result_type operator()(const string& key) const
         {
             result_type result = 5381;
 
             for (string::size_type i = 0; i < key.length(); ++i)
             {
-                result = ((result << 5) + result) + key[i];
+                result = ((result << 5) + result) + key[i].code();
             }
 
             return result;

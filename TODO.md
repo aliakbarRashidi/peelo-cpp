@@ -8,3 +8,5 @@
 - container/array
 - container/vector
 - text/string
+
+- More hash implementations.

@@ -55,6 +55,22 @@ namespace peelo
 
         explicit rune(value_type code);
 
+        /**
+         * Returns <code>true</code> if rune value is not zero.
+         */
+        inline operator bool() const
+        {
+            return m_code;
+        }
+
+        /**
+         * Returns <code>true</code> if rune value is zero.
+         */
+        inline bool operator!() const
+        {
+            return !m_code;
+        }
+
         inline value_type code() const
         {
             return m_code;

@@ -225,6 +225,26 @@ namespace peelo
          */
         bool is_xdigit() const;
 
+        /**
+         * Increments rune by one.
+         */
+        rune& operator++();
+
+        /**
+         * Increments rune by one.
+         */
+        rune operator++(int);
+
+        /**
+         * Decrements rune by one.
+         */
+        rune& operator--();
+
+        /**
+         * Decrements rune by one.
+         */
+        rune operator--(int);
+
     private:
         value_type m_code;
     };

@@ -1592,6 +1592,58 @@ namespace peelo
             || (m_code >= 'A' && m_code <= 'F');
     }
 
+    rune& rune::operator++()
+    {
+        if (m_code == max.m_code)
+        {
+            m_code = min.m_code;
+        } else {
+            ++m_code;
+        }
+
+        return *this;
+    }
+
+    rune rune::operator++(int)
+    {
+        value_type original = m_code;
+
+        if (m_code == max.m_code)
+        {
+            m_code = min.m_code;
+        } else {
+            ++m_code;
+        }
+
+        return rune(original);
+    }
+
+    rune& rune::operator--()
+    {
+        if (m_code == min.m_code)
+        {
+            m_code = max.m_code;
+        } else {
+            --m_code;
+        }
+
+        return *this;
+    }
+
+    rune rune::operator--(int)
+    {
+        value_type original = m_code;
+
+        if (m_code == min.m_code)
+        {
+            m_code = max.m_code;
+        } else {
+            --m_code;
+        }
+
+        return rune(original);
+    }
+
     std::ostream& operator<<(std::ostream& stream, const rune& r)
     {
         const rune::value_type c = r.code();

@@ -1,6 +1,4 @@
 # Containers
-- container/queue
-- container/stack
 - container/set
 - container/hashmap
 

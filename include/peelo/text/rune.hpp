@@ -105,16 +105,6 @@ namespace peelo
             return !equals(that);
         }
 
-        inline bool operator==(value_type code) const
-        {
-            return equals(code);
-        }
-
-        inline bool operator!=(value_type code) const
-        {
-            return !equals(code);
-        }
-
         int compare(const rune& that) const;
         int compare(value_type code) const;
 
@@ -139,26 +129,6 @@ namespace peelo
         inline bool operator>=(const rune& that) const
         {
             return compare(that) >= 0;
-        }
-
-        inline bool operator<(value_type code) const
-        {
-            return compare(code) < 0;
-        }
-
-        inline bool operator>(value_type code) const
-        {
-            return compare(code) > 0;
-        }
-
-        inline bool operator<=(value_type code) const
-        {
-            return compare(code) <= 0;
-        }
-
-        inline bool operator>=(value_type code) const
-        {
-            return compare(code) >= 0;
         }
 
         /**

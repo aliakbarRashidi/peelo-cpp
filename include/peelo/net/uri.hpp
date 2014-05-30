@@ -37,10 +37,11 @@ namespace peelo
          * Default constructor for URI.
          */
         explicit uri(const string& scheme = string(),
+                     const string& scheme_specific = string(),
                      const string& username = string(),
                      const string& password = string(),
                      const string& hostname = string(),
-                     int port = -1,
+                     int port = 0,
                      const string& path = string(),
                      const string& query = string(),
                      const string& fragment = string());
@@ -53,11 +54,20 @@ namespace peelo
         uri(const uri& that);
 
         /**
-         * Returns scheme of the URI or empty string if the URI is invalid.
+         * Returns scheme of the URI or empty string if not specified.
          */
         inline const string& scheme() const
         {
             return m_scheme;
+        }
+
+        /**
+         * Returns scheme specific information or empty string if not
+         * specified.
+         */
+        inline const string& scheme_specific() const
+        {
+            return m_scheme_specific;
         }
 
         /**
@@ -145,6 +155,7 @@ namespace peelo
 
     private:
         string m_scheme;
+        string m_scheme_specific;
         string m_username;
         string m_password;
         string m_hostname;
@@ -153,6 +164,8 @@ namespace peelo
         string m_query;
         string m_fragment;
     };
+
+    std::ostream& operator<<(std::ostream&, const uri&);
 }
 
 #endif /* !PEELO_NET_URI_HPP_GUARD */

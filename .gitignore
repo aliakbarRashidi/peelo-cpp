@@ -1,5 +1,4 @@
 /build
 /doxygen
-/test
 *.o
 *.swp

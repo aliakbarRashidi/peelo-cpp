@@ -67,6 +67,22 @@ namespace peelo
         virtual ~string();
 
         /**
+         * Returns <code>true</code> if the string is not empty.
+         */
+        inline operator bool() const
+        {
+            return m_length;
+        }
+
+        /**
+         * Returns <code>true</code> if the string is empty.
+         */
+        inline bool operator!() const
+        {
+            return !m_length;
+        }
+
+        /**
          * Returns <code>true</code> if the string is empty.
          */
         inline bool empty() const
@@ -103,20 +119,38 @@ namespace peelo
         }
 
         string& assign(const string& that);
+        string& assign(const_reference rune);
 
+        /**
+         * Assignment operator.
+         */
         inline string& operator=(const string& that)
         {
             return assign(that);
         }
 
+        /**
+         * Assignment operator.
+         */
+        inline string& operator=(const_reference rune)
+        {
+            return assign(rune);
+        }
+
         bool equals(const string& that) const;
         bool equals_icase(const string& that) const;
 
+        /**
+         * Equality testing operator.
+         */
         inline bool operator==(const string& that) const
         {
             return equals(that);
         }
 
+        /**
+         * Non-equality testing operator.
+         */
         inline bool operator!=(const string& that) const
         {
             return !equals(that);
@@ -141,8 +175,14 @@ namespace peelo
             return concat(c);
         }
 
+        /**
+         * Converts string into lower case and returns result.
+         */
         string to_lower() const;
 
+        /**
+         * Converts string into upper case and returns result.
+         */
         string to_upper() const;
 
         /**

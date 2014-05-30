@@ -179,6 +179,22 @@ namespace peelo
         return *this;
     }
 
+    string& string::assign(const_reference rune)
+    {
+        if (m_counter && !--(*m_counter))
+        {
+            delete m_counter;
+            delete[] m_runes;
+        }
+        m_offset = 0;
+        m_length = 1;
+        m_runes = new value_type[1];
+        m_counter = new unsigned(1);
+        m_runes[0] = rune;
+
+        return *this;
+    }
+
     bool string::equals(const string& that) const
     {
         if (m_runes == that.m_runes)

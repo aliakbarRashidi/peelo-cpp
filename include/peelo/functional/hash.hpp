@@ -54,6 +54,116 @@ namespace peelo
     };
 
     template<>
+    struct hash<char>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(char key) const
+        {
+            return static_cast<result_type>(key);
+        }
+    };
+
+    template<>
+    struct hash<signed char>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(signed char key) const
+        {
+            return static_cast<result_type>(key);
+        }
+    };
+
+    template<>
+    struct hash<unsigned char>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(unsigned char key) const
+        {
+            return static_cast<result_type>(key);
+        }
+    };
+
+    template<>
+    struct hash<short>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(short key) const
+        {
+            return static_cast<result_type>(key);
+        }
+    };
+
+    template<>
+    struct hash<unsigned short>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(unsigned short key) const
+        {
+            return static_cast<result_type>(key);
+        }
+    };
+
+    template<>
+    struct hash<int>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(int key) const
+        {
+            return static_cast<result_type>(key);
+        }
+    };
+
+    template<>
+    struct hash<unsigned int>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(unsigned int key) const
+        {
+            return static_cast<result_type>(key);
+        }
+    };
+
+    template<>
+    struct hash<long>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(long key) const
+        {
+            return static_cast<result_type>(key);
+        }
+    };
+
+    template<>
+    struct hash<unsigned long>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(unsigned long key) const
+        {
+            return static_cast<result_type>(key);
+        }
+    };
+
+    template<>
+    struct hash<rune>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(const rune& key) const
+        {
+            return static_cast<result_type>(key.code());
+        }
+    };
+
+    template<>
     struct hash<string>
     {
         typedef std::size_t result_type;

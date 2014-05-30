@@ -9,4 +9,9 @@
 - container/vector
 - text/string
 
-- More hash implementations.
+# Hash
+- long long
+- unsigned long long
+- float
+- double
+- long double

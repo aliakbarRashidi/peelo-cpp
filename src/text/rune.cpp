@@ -177,12 +177,6 @@ namespace peelo
         return c;
     }
 
-    rune::rune()
-        : m_code(0) {}
-
-    rune::rune(const rune& that)
-        : m_code(that.m_code) {}
-
     rune::rune(value_type code)
         : m_code(code)
     {
@@ -191,6 +185,9 @@ namespace peelo
             throw std::out_of_range("code point too large");
         }
     }
+
+    rune::rune(const rune& that)
+        : m_code(that.m_code) {}
 
     rune& rune::assign(const rune& that)
     {

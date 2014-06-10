@@ -43,17 +43,12 @@ namespace peelo
         /** Maximum value for rune. */
         static const rune max;
 
-        /**
-         * Empty constructor. Value of the rune is set to zero.
-         */
-        rune();
+        explicit rune(value_type code = 0);
 
         /**
          * Copy constructor.
          */
         rune(const rune& that);
-
-        explicit rune(value_type code);
 
         /**
          * Returns <code>true</code> if rune value is not zero.

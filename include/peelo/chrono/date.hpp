@@ -38,6 +38,15 @@ namespace peelo
     class date
     {
     public:
+        /**
+         * Constructs a date from given values.
+         *
+         * \param year  Year of the date
+         * \param month Month of the year
+         * \param day   Day of the month
+         * \throw std::invalid_argument If given values do not construct a
+         *                              valid date
+         */
         explicit date(int year = 1900,
                       const class month& month = month::jan,
                       int day = 1);
@@ -62,6 +71,9 @@ namespace peelo
          */
         static date tomorrow();
 
+        /**
+         * Test whether given values are a valid date.
+         */
         static bool is_valid(int year, const class month& month, int day);
 
         /**

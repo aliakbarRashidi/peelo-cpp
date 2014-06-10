@@ -285,14 +285,17 @@ namespace peelo
     {
         if (m_length)
         {
-            value_type result[m_length];
+            string result;
 
+            result.m_length = m_length;
+            result.m_runes = new value_type[m_length];
+            result.m_counter = new unsigned(1);
             for (size_type i = 0; i < m_length; ++i)
             {
-                result[i] = m_runes[m_offset + i].to_lower();
+                result.m_runes[i] = m_runes[m_offset + i].to_lower();
             }
 
-            return string(result, m_length);
+            return result;
         } else {
             return string();
         }
@@ -302,14 +305,17 @@ namespace peelo
     {
         if (m_length)
         {
-            value_type result[m_length];
+            string result;
 
+            result.m_length = m_length;
+            result.m_runes = new value_type[m_length];
+            result.m_counter = new unsigned(1);
             for (size_type i = 0; i < m_length; ++i)
             {
-                result[i] = m_runes[m_offset + i].to_upper();
+                result.m_runes[i] = m_runes[m_offset + i].to_upper();
             }
 
-            return string(result, m_length);
+            return result;
         } else {
             return string();
         }

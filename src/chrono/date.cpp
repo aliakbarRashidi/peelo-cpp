@@ -62,7 +62,7 @@ namespace peelo
                 local_time.wDay
         );
 #else
-        std::time_t ts = std::time(NULL);
+        std::time_t ts = std::time(0);
         std::tm* tm = std::localtime(&ts);
 
         if (!tm)
@@ -105,7 +105,7 @@ namespace peelo
             );
         }
 #else
-        std::time_t ts = std::time(NULL);
+        std::time_t ts = std::time(0);
         std::tm* tm = std::localtime(&ts);
 
         if (!tm)
@@ -147,7 +147,7 @@ namespace peelo
             return date(lt.wYear, peelo::month(lt.wMonth), lt.wDay + 1);
         }
 #else
-        std::time_t ts = std::time(NULL);
+        std::time_t ts = std::time(0);
         std::tm* tm = std::localtime(&ts);
 
         if (!tm)

@@ -34,8 +34,8 @@ namespace peelo
     string::string()
         : m_offset(0)
         , m_length(0)
-        , m_runes(NULL)
-        , m_counter(NULL) {}
+        , m_runes(0)
+        , m_counter(0) {}
 
     string::string(const string& that)
         : m_offset(that.m_offset)
@@ -52,8 +52,8 @@ namespace peelo
     string::string(const_pointer runes, size_type n)
         : m_offset(0)
         , m_length(n)
-        , m_runes(n ? new value_type[n] : NULL)
-        , m_counter(n ? new unsigned(1) : NULL)
+        , m_runes(n ? new value_type[n] : 0)
+        , m_counter(n ? new unsigned(1) : 0)
     {
         for (size_type i = 0; i < n; ++i)
         {
@@ -64,8 +64,8 @@ namespace peelo
     string::string(const char* input)
         : m_offset(0)
         , m_length(0)
-        , m_runes(NULL)
-        , m_counter(NULL)
+        , m_runes(0)
+        , m_counter(0)
     {
         static const unsigned char utf8_length[256] =
         {

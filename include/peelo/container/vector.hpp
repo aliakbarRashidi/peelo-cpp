@@ -59,7 +59,7 @@ namespace peelo
             : m_allocator(allocator)
             , m_capacity(0)
             , m_size(0)
-            , m_data(NULL) {}
+            , m_data(0) {}
 
         /**
          * Copy constructor.
@@ -68,7 +68,7 @@ namespace peelo
             : m_allocator(that.m_allocator)
             , m_capacity(that.m_size)
             , m_size(m_capacity)
-            , m_data(m_size ? m_allocator.allocate(m_size) : NULL)
+            , m_data(m_size ? m_allocator.allocate(m_size) : 0)
         {
             for (size_type i = 0; i < m_size; ++i)
             {
@@ -91,7 +91,7 @@ namespace peelo
             : m_allocator(allocator)
             , m_capacity(count)
             , m_size(count)
-            , m_data(m_size ? m_allocator.allocate(m_size) : NULL)
+            , m_data(m_size ? m_allocator.allocate(m_size) : 0)
         {
             for (size_type i = 0; i < m_size; ++i)
             {

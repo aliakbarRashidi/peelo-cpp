@@ -502,17 +502,6 @@ namespace peelo
 
     std::ostream& operator<<(std::ostream& stream, const string& s)
     {
-        const std::streamsize size = stream.width();
-
-        if (((stream.flags() & std::ios_base::right)
-            || (stream.flags() & std::ios_base::internal))
-            && size > static_cast<std::streamsize>(s.length()))
-        {
-            for (std::streamsize i = s.length(); i < size; ++i)
-            {
-                stream << stream.fill();
-            }
-        }
         for (string::size_type i = 0; i < s.length(); ++i)
         {
             const rune::value_type c = s[i].code();
@@ -543,14 +532,6 @@ namespace peelo
                        << static_cast<unsigned char>(0x80 | ((c & 0x3f000) >> 12))
                        << static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6))
                        << static_cast<unsigned char>(0x80 | (c & 0x3f));
-            }
-        }
-        if ((stream.flags() & std::ios_base::left)
-            && size > static_cast<std::streamsize>(s.length()))
-        {
-            for (std::streamsize i = s.length(); i < size; ++i)
-            {
-                stream << stream.fill();
             }
         }
 

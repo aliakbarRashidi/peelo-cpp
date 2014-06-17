@@ -13,3 +13,6 @@
 - float
 - double
 - long double
+
+# Text
+- Update to Unicode 7.0

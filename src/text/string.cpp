@@ -159,6 +159,40 @@ namespace peelo
         }
     }
 
+    string::iterator string::begin() const
+    {
+        iterator i;
+
+        if (m_runes)
+        {
+            i.m_pointer = m_runes + m_offset;
+        }
+
+        return i;
+    }
+
+    string::iterator string::end() const
+    {
+        iterator i;
+
+        if (m_runes)
+        {
+            i.m_pointer = m_runes + m_offset + m_length;
+        }
+
+        return i;
+    }
+
+    string::reverse_iterator string::rbegin() const
+    {
+        return reverse_iterator(end());
+    }
+
+    string::reverse_iterator string::rend() const
+    {
+        return reverse_iterator(begin());
+    }
+
     string& string::assign(const string& that)
     {
         if (m_runes != that.m_runes)

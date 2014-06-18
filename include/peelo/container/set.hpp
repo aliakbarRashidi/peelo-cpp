@@ -56,6 +56,102 @@ namespace peelo
         typedef value_type* pointer;
         typedef const value_type* const_pointer;
 
+    private:
+        struct entry
+        {
+            typename hasher::result_type hash;
+            value_type data;
+            entry* next;
+            entry* prev;
+            entry* child;
+        };
+
+    public:
+        struct iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+        {
+        public:
+            iterator()
+                : m_pointer(0) {}
+
+            iterator(const iterator& that)
+                : m_pointer(that.m_pointer) {}
+
+            iterator& operator=(const iterator& that)
+            {
+                m_pointer = that.m_pointer;
+
+                return *this;
+            }
+
+            iterator& operator++()
+            {
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->next;
+                }
+
+                return *this;
+            }
+
+            iterator operator++(int)
+            {
+                iterator tmp(*this);
+
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->next;
+                }
+
+                return tmp;
+            }
+
+            iterator& operator--()
+            {
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->prev;
+                }
+
+                return *this;
+            }
+
+            iterator operator--(int)
+            {
+                iterator tmp(*this);
+
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->prev;
+                }
+
+                return tmp;
+            }
+
+            inline bool operator==(const iterator& that) const
+            {
+                return m_pointer == that.m_pointer;
+            }
+
+            inline bool operator!=(const iterator& that) const
+            {
+                return m_pointer != that.m_pointer;
+            }
+
+            inline reference operator*()
+            {
+                return m_pointer->data;
+            }
+
+            inline reference operator->()
+            {
+                return m_pointer->data;
+            }
+
+        private:
+            entry* m_pointer;
+            friend class set;
+        };
+
         explicit set(size_type bucket_count = 8,
                      const hasher& hash = hasher(),
                      const key_equal& equal = key_equal(),
@@ -336,109 +432,6 @@ namespace peelo
 
             return 0;
         }
-
-    private:
-        struct entry
-        {
-            typename hasher::result_type hash;
-            value_type data;
-            entry* next;
-            entry* prev;
-            entry* child;
-        };
-
-    public:
-        class iterator : public std::iterator<
-                         std::bidirectional_iterator_tag,
-                         value_type
-        >
-        {
-        public:
-            iterator()
-                : m_current(0) {}
-
-            iterator(const iterator& that)
-                : m_current(that.m_current) {}
-
-            iterator& operator=(const iterator& that)
-            {
-                m_current = that.m_current;
-
-                return *this;
-            }
-
-            iterator& operator++()
-            {
-                if (m_current)
-                {
-                    m_current = m_current->next;
-                }
-
-                return *this;
-            }
-
-            iterator operator++(int)
-            {
-                iterator tmp(*this);
-
-                operator++();
-
-                return tmp;
-            }
-
-            iterator& operator--()
-            {
-                if (m_current)
-                {
-                    m_current = m_current->prev;
-                }
-
-                return *this;
-            }
-
-            iterator& operator--(int)
-            {
-                iterator tmp(*this);
-
-                operator--();
-
-                return tmp;
-            }
-
-            inline bool operator==(const iterator& that) const
-            {
-                return m_current == that.m_current;
-            }
-
-            inline bool operator!=(const iterator& that) const
-            {
-                return m_current != that.m_current;
-            }
-
-            inline reference operator*()
-            {
-                return m_current->data;
-            }
-
-            inline const_reference operator*() const
-            {
-                return m_current->data;
-            }
-
-            inline reference operator->()
-            {
-                return m_current->data;
-            }
-
-            inline const_reference operator->() const
-            {
-                return m_current->data;
-            }
-
-        private:
-            entry* m_current;
-            friend class set;
-        };
 
         typedef iterator const_iterator;
 

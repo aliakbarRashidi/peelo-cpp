@@ -148,7 +148,7 @@ namespace peelo
         }
 
         /**
-         * Returns <code>true</code> if the vector is empty.
+         * Returns <code>true</code> if the map is empty.
          */
         inline bool empty() const
         {
@@ -171,7 +171,7 @@ namespace peelo
                 entry* e2 = static_cast<entry*>(std::malloc(sizeof(entry)));
                 const size_type index = static_cast<size_type>(e1->hash % m_bucket_count);
 
-                m_allocator.allocate(e2->data, *e1->data);
+                m_allocator.construct(&e2->data, e1->data);
                 e2->hash = e1->hash;
                 e2->next = 0;
                 if ((e2->prev = m_back))

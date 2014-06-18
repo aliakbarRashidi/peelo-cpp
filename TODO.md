@@ -1,6 +1,5 @@
 # Iterators
 - container/array
-- container/vector
 - text/string
 
 # Hash

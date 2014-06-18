@@ -431,29 +431,48 @@ namespace peelo
     {
         vector<wchar_t> result;
 
-        if (sizeof(wchar_t) == 4)
+#if defined(_WIN32)
+        result.reserve(m_length + 1);
+        for (size_type i = 0; i < m_length; ++i)
         {
-            result.reserve(m_length + 1);
-            for (size_type i = 0; i < m_length; ++i)
-            {
-                result << static_cast<wchar_t>(m_runes[m_offset + i].code());
-            }
-        } else {
-            result.reserve((m_length * 2) + 1);
-            for (size_type i = 0; i < m_length; ++i)
-            {
-                const_reference r = m_runes[m_offset + i];
+            const_reference r = m_runes[m_offset + i];
 
-                if (4 > 0xffff)
-                {
-                    result << static_cast<wchar_t>(r.code() >> 16)
-                           << static_cast<wchar_t>((r.code() & 0xff00) >> 8);
-                } else {
-                    result << static_cast<wchar_t>(r.code());
-                }
+            if (r > 0xffff)
+            {
+                result << static_cast<wchar_t>(0xd800 + (r.code() >> 10))
+                       << static_cast<wchar_t>(0xdc00 + (r.code() & 0x3ff));
+            } else {
+                result << static_cast<wchar_t>(r.code());
             }
         }
-        result.push_back(static_cast<wchar_t>(0));
+#else
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            const rune::value_type c = m_runes[m_offset + i].code();
+
+            if (c < 0x80)
+            {
+                result << static_cast<wchar_t>(c);
+            }
+            else if (c < 0x800)
+            {
+                result << static_cast<wchar_t>(0xc0 | ((c & 0x7c0)) >> 6)
+                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
+            }
+            else if (c < 0x10000)
+            {
+                result << static_cast<wchar_t>(0xe0 | ((c & 0xf000) >> 12))
+                       << static_cast<wchar_t>(0x80 | ((c & 0xfc0) >> 6))
+                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
+            } else {
+                result << static_cast<wchar_t>(0xf0 | ((c & 0x1c0000) >> 18))
+                       << static_cast<wchar_t>(0x80 | ((c & 0x3f000) >> 12))
+                       << static_cast<wchar_t>(0x80 | ((c & 0xfc0) >> 6))
+                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
+            }
+        }
+#endif
+        result << static_cast<wchar_t>(0);
 
         return result;
     }
@@ -591,7 +610,7 @@ namespace peelo
             {
                 continue;
             }
-            else if (c > 0xfff)
+            else if (c > 0xffff)
             {
                 result << static_cast<wchar_t>(0xd800 + (c >> 10))
                        << static_cast<wchar_t>(0xdc00 + (c & 0x3ff));

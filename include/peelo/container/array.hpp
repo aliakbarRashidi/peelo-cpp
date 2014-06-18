@@ -27,6 +27,7 @@
 #define PEELO_CONTAINER_ARRAY_HPP_GUARD
 
 #include <iostream>
+#include <iterator>
 #include <stdexcept>
 
 namespace peelo
@@ -43,10 +44,284 @@ namespace peelo
     public:
         typedef T value_type;
         typedef std::size_t size_type;
+        typedef std::ptrdiff_t difference_type;
         typedef value_type& reference;
         typedef const value_type& const_reference;
         typedef value_type* pointer;
         typedef const value_type* const_pointer;
+
+        struct iterator : public std::iterator<std::random_access_iterator_tag, value_type>
+        {
+        public:
+            iterator()
+                : m_pointer(0) {}
+
+            iterator(const iterator& that)
+                : m_pointer(that.m_pointer) {}
+
+            iterator& operator=(const iterator& that)
+            {
+                m_pointer = that.m_pointer;
+
+                return *this;
+            }
+
+            inline reference operator*()
+            {
+                return *m_pointer;
+            }
+
+            inline pointer operator->()
+            {
+                return m_pointer;
+            }
+
+            iterator& operator++()
+            {
+                ++m_pointer;
+
+                return *this;
+            }
+
+            iterator operator++(int)
+            {
+                iterator tmp(*this);
+
+                ++m_pointer;
+
+                return *this;
+            }
+
+            iterator& operator--()
+            {
+                --m_pointer;
+
+                return *this;
+            }
+
+            iterator operator--(int)
+            {
+                iterator tmp(*this);
+
+                --m_pointer;
+
+                return *this;
+            }
+
+            inline bool operator==(const iterator& that) const
+            {
+                return m_pointer == that.m_pointer;
+            }
+
+            inline bool operator!=(const iterator& that) const
+            {
+                return m_pointer != that.m_pointer;
+            }
+
+            inline bool operator<(const iterator& that) const
+            {
+                return m_pointer < that.m_pointer;
+            }
+
+            inline bool operator>(const iterator& that) const
+            {
+                return m_pointer > that.m_pointer;
+            }
+
+            inline bool operator<=(const iterator& that) const
+            {
+                return m_pointer <= that.m_pointer;
+            }
+
+            inline bool operator>=(const iterator& that) const
+            {
+                return m_pointer >= that.m_pointer;
+            }
+
+            inline reference operator[](size_type n)
+            {
+                return m_pointer[n];
+            }
+
+            iterator operator+(size_type n) const
+            {
+                iterator result(*this);
+
+                result.m_pointer += n;
+
+                return result;
+            }
+
+            iterator operator-(size_type n) const
+            {
+                iterator result(*this);
+
+                result.m_pointer -= n;
+
+                return result;
+            }
+
+            iterator& operator+=(size_type n)
+            {
+                m_pointer += n;
+
+                return *this;
+            }
+
+            iterator& operator-=(size_type n)
+            {
+                m_pointer -= n;
+
+                return *this;
+            }
+
+            difference_type operator-(const iterator& that) const
+            {
+                return m_pointer - that.m_pointer;
+            }
+
+        private:
+            pointer m_pointer;
+            friend class array;
+        };
+
+        struct const_iterator : public std::iterator<std::random_access_iterator_tag, value_type>
+        {
+        public:
+            const_iterator()
+                : m_pointer(0) {}
+
+            const_iterator(const iterator& that)
+                : m_pointer(that.m_pointer) {}
+
+            const_iterator& operator=(const const_iterator& that)
+            {
+                m_pointer = that.m_pointer;
+
+                return *this;
+            }
+
+            inline const_reference operator*()
+            {
+                return *m_pointer;
+            }
+
+            inline const_pointer operator->()
+            {
+                return m_pointer;
+            }
+
+            const_iterator& operator++()
+            {
+                ++m_pointer;
+
+                return *this;
+            }
+
+            const_iterator operator++(int)
+            {
+                const_iterator tmp(*this);
+
+                ++m_pointer;
+
+                return *this;
+            }
+
+            const_iterator& operator--()
+            {
+                --m_pointer;
+
+                return *this;
+            }
+
+            const_iterator operator--(int)
+            {
+                const_iterator tmp(*this);
+
+                --m_pointer;
+
+                return *this;
+            }
+
+            inline bool operator==(const const_iterator& that) const
+            {
+                return m_pointer == that.m_pointer;
+            }
+
+            inline bool operator!=(const const_iterator& that) const
+            {
+                return m_pointer != that.m_pointer;
+            }
+
+            inline bool operator<(const const_iterator& that) const
+            {
+                return m_pointer < that.m_pointer;
+            }
+
+            inline bool operator>(const const_iterator& that) const
+            {
+                return m_pointer > that.m_pointer;
+            }
+
+            inline bool operator<=(const const_iterator& that) const
+            {
+                return m_pointer <= that.m_pointer;
+            }
+
+            inline bool operator>=(const const_iterator& that) const
+            {
+                return m_pointer >= that.m_pointer;
+            }
+
+            inline const_reference operator[](size_type n)
+            {
+                return m_pointer[n];
+            }
+
+            const_iterator operator+(size_type n) const
+            {
+                const_iterator result(*this);
+
+                result.m_pointer += n;
+
+                return result;
+            }
+
+            const_iterator operator-(size_type n) const
+            {
+                const_iterator result(*this);
+
+                result.m_pointer -= n;
+
+                return result;
+            }
+
+            const_iterator& operator+=(size_type n)
+            {
+                m_pointer += n;
+
+                return *this;
+            }
+
+            const_iterator& operator-=(size_type n)
+            {
+                m_pointer -= n;
+
+                return *this;
+            }
+
+            difference_type operator-(const const_iterator& that) const
+            {
+                return m_pointer - that.m_pointer;
+            }
+
+        private:
+            const_pointer m_pointer;
+            friend class array;
+        };
+
+        typedef std::reverse_iterator<iterator> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
         /**
          * Constructs new array.
@@ -192,6 +467,89 @@ namespace peelo
         inline size_type size() const
         {
             return N;
+        }
+
+        /**
+         * Returns an iterator to the first element of the vector.
+         */
+        iterator begin()
+        {
+            iterator i;
+
+            i.m_pointer = m_data;
+
+            return i;
+        }
+
+        const_iterator begin() const
+        {
+            const_iterator i;
+
+            i.m_pointer = m_data;
+
+            return i;
+        }
+
+        inline const_iterator cbegin() const
+        {
+            return begin();
+        }
+
+        /**
+         * Returns an iterator to the element following the last element of the
+         * vector.
+         */
+        iterator end()
+        {
+            iterator i;
+
+            i.m_pointer = m_data + N;
+
+            return i;
+        }
+
+        const_iterator end() const
+        {
+            const_iterator i;
+
+            i.m_pointer = m_data + N;
+
+            return i;
+        }
+
+        inline const_iterator cend() const
+        {
+            return end();
+        }
+
+        inline reverse_iterator rbegin()
+        {
+            return reverse_iterator(end());
+        }
+
+        inline const_reverse_iterator rbegin() const
+        {
+            return const_reverse_iterator(end());
+        }
+
+        inline const_reverse_iterator crbegin() const
+        {
+            return rbegin();
+        }
+
+        inline reverse_iterator rend()
+        {
+            return reverse_iterator(begin());
+        }
+
+        inline const_reverse_iterator rend() const
+        {
+            return const_reverse_iterator(begin());
+        }
+
+        inline const_reverse_iterator crend() const
+        {
+            return rend();
         }
 
         /**

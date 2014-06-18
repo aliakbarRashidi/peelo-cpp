@@ -1,5 +1,4 @@
 # Iterators
-- container/array
 - text/string
 
 # Hash

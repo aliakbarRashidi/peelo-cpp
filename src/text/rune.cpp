@@ -1720,7 +1720,14 @@ namespace peelo
     {
         const rune::value_type c = r.code();
 
-        if (c < 0x80)
+        if (c > rune::max.code()
+            || (c & 0xfffe) == 0xfffe
+            || (c >= 0xd800 && c <= 0xdfff)
+            || (c >= 0xffd0 && c <= 0xfdef))
+        {
+            return stream;
+        }
+        else if (c < 0x80)
         {
             stream << static_cast<unsigned char>(c);
         }
@@ -1758,7 +1765,15 @@ namespace peelo
 
     std::wostream& operator<<(std::wostream& stream, const rune& r)
     {
-        stream << static_cast<wchar_t>(r.code());
+        const rune::value_type c = r.code();
+
+        if (c < rune::max.code()
+            && (c & 0xfffe) != 0xfffe
+            && !(c >= 0xd800 && c <= 0xdfff)
+            && !(c >= 0xffd0 && c <= 0xfdef))
+        {
+            stream << static_cast<wchar_t>(c);
+        }
 
         return stream;
     }

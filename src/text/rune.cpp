@@ -31,7 +31,89 @@ namespace peelo
     const rune rune::min(0);
     const rune rune::max(0x10ffff);
 
-    static inline unsigned int codepoint_to_lower(unsigned int c)
+    rune::rune(value_type code)
+        : m_code(code)
+    {
+        if (code > 0x10ffff)
+        {
+            throw std::out_of_range("code point too large");
+        }
+    }
+
+    rune::rune(const rune& that)
+        : m_code(that.m_code) {}
+
+    rune& rune::assign(const rune& that)
+    {
+        m_code = that.m_code;
+
+        return *this;
+    }
+
+    rune& rune::assign(value_type code)
+    {
+        if (code > 0x10ffff)
+        {
+            throw std::out_of_range("code point too large");
+        }
+        m_code = code;
+
+        return *this;
+    }
+
+    bool rune::equals(const rune& that) const
+    {
+        return m_code == that.m_code;
+    }
+
+    bool rune::equals(value_type code) const
+    {
+        return m_code == code;
+    }
+
+    bool rune::equals_icase(const rune& that) const
+    {
+        value_type a = to_lower(m_code);
+        value_type b = to_lower(that.m_code);
+
+        return a == b;
+    }
+
+    bool rune::equals_icase(value_type code) const
+    {
+        value_type a = to_lower(m_code);
+        value_type b = to_lower(code);
+
+        return a == b;
+    }
+
+    int rune::compare(const rune& that) const
+    {
+        return m_code > that.m_code ? 1 : m_code < that.m_code ? -1 : 0;
+    }
+
+    int rune::compare(value_type code) const
+    {
+        return m_code > code ? 1 : m_code < code ? -1 : 0;
+    }
+
+    int rune::compare_icase(const rune& that) const
+    {
+        value_type a = to_lower(m_code);
+        value_type b = to_lower(that.m_code);
+
+        return a > b ? 1 : a < b ? -1 : 0;
+    }
+
+    int rune::compare_icase(value_type code) const
+    {
+        value_type a = to_lower(m_code);
+        value_type b = to_lower(code);
+
+        return a > b ? 1 : a < b ? -1 : 0;
+    }
+
+    rune::value_type rune::to_lower(value_type c)
     {
         if (c >= 'A' && c <= 'Z')
         {
@@ -104,7 +186,12 @@ namespace peelo
         return c;
     }
 
-    static inline unsigned int codepoint_to_upper(unsigned int c)
+    rune rune::to_lower() const
+    {
+        return rune(to_lower(m_code));
+    }
+
+    rune::value_type rune::to_upper(value_type c)
     {
         if (c >= 'a' && c <= 'z')
         {
@@ -177,96 +264,9 @@ namespace peelo
         return c;
     }
 
-    rune::rune(value_type code)
-        : m_code(code)
-    {
-        if (code > 0x10ffff)
-        {
-            throw std::out_of_range("code point too large");
-        }
-    }
-
-    rune::rune(const rune& that)
-        : m_code(that.m_code) {}
-
-    rune& rune::assign(const rune& that)
-    {
-        m_code = that.m_code;
-
-        return *this;
-    }
-
-    rune& rune::assign(value_type code)
-    {
-        if (code > 0x10ffff)
-        {
-            throw std::out_of_range("code point too large");
-        }
-        m_code = code;
-
-        return *this;
-    }
-
-    bool rune::equals(const rune& that) const
-    {
-        return m_code == that.m_code;
-    }
-
-    bool rune::equals(value_type code) const
-    {
-        return m_code == code;
-    }
-
-    bool rune::equals_icase(const rune& that) const
-    {
-        value_type a = codepoint_to_lower(m_code);
-        value_type b = codepoint_to_lower(that.m_code);
-
-        return a == b;
-    }
-
-    bool rune::equals_icase(value_type code) const
-    {
-        value_type a = codepoint_to_lower(m_code);
-        value_type b = codepoint_to_lower(code);
-
-        return a == b;
-    }
-
-    int rune::compare(const rune& that) const
-    {
-        return m_code > that.m_code ? 1 : m_code < that.m_code ? -1 : 0;
-    }
-
-    int rune::compare(value_type code) const
-    {
-        return m_code > code ? 1 : m_code < code ? -1 : 0;
-    }
-
-    int rune::compare_icase(const rune& that) const
-    {
-        value_type a = codepoint_to_lower(m_code);
-        value_type b = codepoint_to_lower(that.m_code);
-
-        return a > b ? 1 : a < b ? -1 : 0;
-    }
-
-    int rune::compare_icase(value_type code) const
-    {
-        value_type a = codepoint_to_lower(m_code);
-        value_type b = codepoint_to_lower(code);
-
-        return a > b ? 1 : a < b ? -1 : 0;
-    }
-
-    rune rune::to_lower() const
-    {
-        return rune(codepoint_to_lower(m_code));
-    }
-
     rune rune::to_upper() const
     {
-        return rune(codepoint_to_upper(m_code));
+        return rune(to_upper(m_code));
     }
 
     bool rune::is_alnum(value_type code)

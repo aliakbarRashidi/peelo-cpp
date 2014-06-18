@@ -127,9 +127,21 @@ namespace peelo
         }
 
         /**
+         * Returns lower case equivalent of given code point if it's upper
+         * case.
+         */
+        static value_type to_lower(value_type code);
+
+        /**
          * Returns lower case equivalent if character is upper case.
          */
         rune to_lower() const;
+
+        /**
+         * Returns upper case equivalent of given code point if it's lower
+         * case.
+         */
+        static value_type to_upper(value_type code);
 
         /**
          * Returns upper case equivalent if character is lower case.

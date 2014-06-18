@@ -1720,43 +1720,37 @@ namespace peelo
     {
         const rune::value_type c = r.code();
 
-        if (c > rune::max.code()
-            || (c & 0xfffe) == 0xfffe
-            || (c >= 0xd800 && c <= 0xdfff)
-            || (c >= 0xffd0 && c <= 0xfdef))
+        if (c < rune::max.code()
+            && (c & 0xfffe) != 0xfffe
+            && !(c >= 0xd800 && c <= 0xdfff)
+            && !(c >= 0xffd0 && c <= 0xfdef))
         {
-            return stream;
-        }
-        else if (c < 0x80)
-        {
-            stream << static_cast<unsigned char>(c);
-        }
-        else if (c < 0x800)
-        {
-            unsigned char s[3];
+            char s[5];
 
-            s[0] = static_cast<unsigned char>(0xc0 | ((c & 0x7c0)) >> 6);
-            s[1] = static_cast<unsigned char>(0x80 | (c & 0x3f));
-            s[2] = 0;
-            stream << s;
-        }
-        else if (c < 0x10000)
-        {
-            unsigned char s[4];
-
-            s[0] = static_cast<unsigned char>(0xe0 | ((c & 0xf000) >> 12));
-            s[1] = static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6));
-            s[2] = static_cast<unsigned char>(0x80 | (c & 0x3f));
-            s[3] = 0;
-            stream << s;
-        } else {
-            unsigned char s[5];
-
-            s[0] = static_cast<unsigned char>(0xf0 | ((c & 0x1c0000) >> 18));
-            s[1] = static_cast<unsigned char>(0x80 | ((c & 0x3f000) >> 12));
-            s[2] = static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6));
-            s[3] = static_cast<unsigned char>(0x80 | (c & 0x3f));
-            s[4] = 0;
+            if (c < 0x80)
+            {
+                s[0] = static_cast<unsigned char>(c);
+                s[1] = 0;
+            }
+            else if (c < 0x800)
+            {
+                s[0] = static_cast<unsigned char>(0xc0 | ((c & 0x7c0)) >> 6);
+                s[1] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+                s[2] = 0;
+            }
+            else if (c < 0x10000)
+            {
+                s[0] = static_cast<unsigned char>(0xe0 | ((c & 0xf000) >> 12));
+                s[1] = static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6));
+                s[2] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+                s[3] = 0;
+            } else {
+                s[0] = static_cast<unsigned char>(0xf0 | ((c & 0x1c0000) >> 18));
+                s[1] = static_cast<unsigned char>(0x80 | ((c & 0x3f000) >> 12));
+                s[2] = static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6));
+                s[3] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+                s[4] = 0;
+            }
             stream << s;
         }
 
@@ -1772,7 +1766,36 @@ namespace peelo
             && !(c >= 0xd800 && c <= 0xdfff)
             && !(c >= 0xffd0 && c <= 0xfdef))
         {
-            stream << static_cast<wchar_t>(c);
+#if defined(_WIN32)
+            if (c > 0xfff)
+            {
+                stream << static_cast<wchar_t>(0xd800 + (c >> 10))
+                       << static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
+            } else {
+                stream << static_cast<wchar_t>(c);
+            }
+#else
+            if (c < 0x80)
+            {
+                stream << static_cast<wchar_t>(c);
+            }
+            else if (c < 0x800)
+            {
+                stream << static_cast<wchar_t>(0xc0 | ((c & 0x7c0)) >> 6)
+                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
+            }
+            else if (c < 0x10000)
+            {
+                stream << static_cast<wchar_t>(0xe0 | ((c & 0xf000) >> 12))
+                       << static_cast<wchar_t>(0x80 | ((c & 0xfc0) >> 6))
+                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
+            } else {
+                stream << static_cast<wchar_t>(0xf0 | ((c & 0x1c0000) >> 18))
+                       << static_cast<wchar_t>(0x80 | ((c & 0x3f000) >> 12))
+                       << static_cast<wchar_t>(0x80 | ((c & 0xfc0) >> 6))
+                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
+            }
+#endif
         }
 
         return stream;

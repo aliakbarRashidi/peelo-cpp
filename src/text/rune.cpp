@@ -31,7 +31,89 @@ namespace peelo
     const rune rune::min(0);
     const rune rune::max(0x10ffff);
 
-    static inline unsigned int codepoint_to_lower(unsigned int c)
+    rune::rune(value_type code)
+        : m_code(code)
+    {
+        if (code > 0x10ffff)
+        {
+            throw std::out_of_range("code point too large");
+        }
+    }
+
+    rune::rune(const rune& that)
+        : m_code(that.m_code) {}
+
+    rune& rune::assign(const rune& that)
+    {
+        m_code = that.m_code;
+
+        return *this;
+    }
+
+    rune& rune::assign(value_type code)
+    {
+        if (code > 0x10ffff)
+        {
+            throw std::out_of_range("code point too large");
+        }
+        m_code = code;
+
+        return *this;
+    }
+
+    bool rune::equals(const rune& that) const
+    {
+        return m_code == that.m_code;
+    }
+
+    bool rune::equals(value_type code) const
+    {
+        return m_code == code;
+    }
+
+    bool rune::equals_icase(const rune& that) const
+    {
+        value_type a = to_lower(m_code);
+        value_type b = to_lower(that.m_code);
+
+        return a == b;
+    }
+
+    bool rune::equals_icase(value_type code) const
+    {
+        value_type a = to_lower(m_code);
+        value_type b = to_lower(code);
+
+        return a == b;
+    }
+
+    int rune::compare(const rune& that) const
+    {
+        return m_code > that.m_code ? 1 : m_code < that.m_code ? -1 : 0;
+    }
+
+    int rune::compare(value_type code) const
+    {
+        return m_code > code ? 1 : m_code < code ? -1 : 0;
+    }
+
+    int rune::compare_icase(const rune& that) const
+    {
+        value_type a = to_lower(m_code);
+        value_type b = to_lower(that.m_code);
+
+        return a > b ? 1 : a < b ? -1 : 0;
+    }
+
+    int rune::compare_icase(value_type code) const
+    {
+        value_type a = to_lower(m_code);
+        value_type b = to_lower(code);
+
+        return a > b ? 1 : a < b ? -1 : 0;
+    }
+
+    rune::value_type rune::to_lower(value_type c)
     {
         if (c >= 'A' && c <= 'Z')
         {
@@ -104,7 +186,12 @@ namespace peelo
         return c;
     }
 
-    static inline unsigned int codepoint_to_upper(unsigned int c)
+    rune rune::to_lower() const
+    {
+        return rune(to_lower(m_code));
+    }
+
+    rune::value_type rune::to_upper(value_type c)
     {
         if (c >= 'a' && c <= 'z')
         {
@@ -177,102 +264,12 @@ namespace peelo
         return c;
     }
 
-    rune::rune()
-        : m_code(0) {}
-
-    rune::rune(const rune& that)
-        : m_code(that.m_code) {}
-
-    rune::rune(value_type code)
-        : m_code(code)
-    {
-        if (code > 0x10ffff)
-        {
-            throw std::out_of_range("code point too large");
-        }
-    }
-
-    rune& rune::assign(const rune& that)
-    {
-        m_code = that.m_code;
-
-        return *this;
-    }
-
-    rune& rune::assign(value_type code)
-    {
-        if (code > 0x10ffff)
-        {
-            throw std::out_of_range("code point too large");
-        }
-        m_code = code;
-
-        return *this;
-    }
-
-    bool rune::equals(const rune& that) const
-    {
-        return m_code == that.m_code;
-    }
-
-    bool rune::equals(value_type code) const
-    {
-        return m_code == code;
-    }
-
-    bool rune::equals_icase(const rune& that) const
-    {
-        value_type a = codepoint_to_lower(m_code);
-        value_type b = codepoint_to_lower(that.m_code);
-
-        return a == b;
-    }
-
-    bool rune::equals_icase(value_type code) const
-    {
-        value_type a = codepoint_to_lower(m_code);
-        value_type b = codepoint_to_lower(code);
-
-        return a == b;
-    }
-
-    int rune::compare(const rune& that) const
-    {
-        return m_code > that.m_code ? 1 : m_code < that.m_code ? -1 : 0;
-    }
-
-    int rune::compare(value_type code) const
-    {
-        return m_code > code ? 1 : m_code < code ? -1 : 0;
-    }
-
-    int rune::compare_icase(const rune& that) const
-    {
-        value_type a = codepoint_to_lower(m_code);
-        value_type b = codepoint_to_lower(that.m_code);
-
-        return a > b ? 1 : a < b ? -1 : 0;
-    }
-
-    int rune::compare_icase(value_type code) const
-    {
-        value_type a = codepoint_to_lower(m_code);
-        value_type b = codepoint_to_lower(code);
-
-        return a > b ? 1 : a < b ? -1 : 0;
-    }
-
-    rune rune::to_lower() const
-    {
-        return rune(codepoint_to_lower(m_code));
-    }
-
     rune rune::to_upper() const
     {
-        return rune(codepoint_to_upper(m_code));
+        return rune(to_upper(m_code));
     }
 
-    bool rune::is_alnum() const
+    bool rune::is_alnum(value_type code)
     {
         static const value_type alnum_table[436][2] =
         {
@@ -426,7 +423,7 @@ namespace peelo
 
         for (int i = 0; i < 436; ++i)
         {
-            if (m_code >= alnum_table[i][0] && m_code <= alnum_table[i][1])
+            if (code >= alnum_table[i][0] && code <= alnum_table[i][1])
             {
                 return true;
             }
@@ -435,7 +432,12 @@ namespace peelo
         return false;
     }
 
-    bool rune::is_alpha() const
+    bool rune::is_alnum() const
+    {
+        return is_alnum(m_code);
+    }
+
+    bool rune::is_alpha(value_type code)
     {
         static const value_type alpha_table[418][2] =
         {
@@ -583,7 +585,7 @@ namespace peelo
 
         for (int i = 0; i < 418; ++i)
         {
-            if (m_code >= alpha_table[i][0] && m_code <= alpha_table[i][1])
+            if (code >= alpha_table[i][0] && code <= alpha_table[i][1])
             {
                 return true;
             }
@@ -592,12 +594,22 @@ namespace peelo
         return false;
     }
 
-    bool rune::is_ascii() const
+    bool rune::is_alpha() const
     {
-        return m_code < 128;
+        return is_alpha(m_code);
     }
 
-    bool rune::is_blank() const
+    bool rune::is_ascii(value_type code)
+    {
+        return code < 128;
+    }
+
+    bool rune::is_ascii() const
+    {
+        return is_ascii(m_code);
+    }
+
+    bool rune::is_blank(value_type code)
     {
         static const value_type blank_table[9][2] =
         {
@@ -608,7 +620,7 @@ namespace peelo
 
         for (int i = 0; i < 9; ++i)
         {
-            if (m_code >= blank_table[i][0] && m_code <= blank_table[i][1])
+            if (code >= blank_table[i][0] && code <= blank_table[i][1])
             {
                 return true;
             }
@@ -617,7 +629,12 @@ namespace peelo
         return false;
     }
 
-    bool rune::is_cntrl() const
+    bool rune::is_blank() const
+    {
+        return is_blank(m_code);
+    }
+
+    bool rune::is_cntrl(value_type code)
     {
         static const value_type cntrl_table[19][2] =
         {
@@ -632,7 +649,7 @@ namespace peelo
 
         for (int i = 0; i < 19; ++i)
         {
-            if (m_code >= cntrl_table[i][0] && m_code <= cntrl_table[i][1])
+            if (code >= cntrl_table[i][0] && code <= cntrl_table[i][1])
             {
                 return true;
             }
@@ -641,12 +658,22 @@ namespace peelo
         return false;
     }
 
-    bool rune::is_digit() const
+    bool rune::is_cntrl() const
     {
-        return m_code >= '0' && m_code <= '9';
+        return is_cntrl(m_code);
     }
 
-    bool rune::is_graph() const
+    bool rune::is_digit(value_type code)
+    {
+        return code >= '0' && code <= '9';
+    }
+
+    bool rune::is_digit() const
+    {
+        return is_digit(m_code);
+    }
+
+    bool rune::is_graph(value_type code)
     {
         static const value_type graph_table[424][2] =
         {
@@ -796,7 +823,7 @@ namespace peelo
 
         for (int i = 0; i < 424; ++i)
         {
-            if (m_code >= graph_table[i][0] && m_code <= graph_table[i][1])
+            if (code >= graph_table[i][0] && code <= graph_table[i][1])
             {
                 return true;
             }
@@ -805,7 +832,12 @@ namespace peelo
         return false;
     }
 
-    bool rune::is_lower() const
+    bool rune::is_graph() const
+    {
+        return is_graph(m_code);
+    }
+
+    bool rune::is_lower(value_type code)
     {
         static const value_type lower_table[480][2] =
         {
@@ -973,7 +1005,7 @@ namespace peelo
 
         for (int i = 0; i < 480; ++i)
         {
-            if (m_code >= lower_table[i][0] && m_code <= lower_table[i][1])
+            if (code >= lower_table[i][0] && code <= lower_table[i][1])
             {
                 return true;
             }
@@ -982,7 +1014,12 @@ namespace peelo
         return false;
     }
 
-    bool rune::is_number() const
+    bool rune::is_lower() const
+    {
+        return is_lower(m_code);
+    }
+
+    bool rune::is_number(value_type code)
     {
         static const value_type number_table[23][2] =
         {
@@ -998,7 +1035,7 @@ namespace peelo
 
         for (int i = 0; i < 23; ++i)
         {
-            if (m_code >= number_table[i][0] && m_code <= number_table[i][1])
+            if (code >= number_table[i][0] && code <= number_table[i][1])
             {
                 return true;
             }
@@ -1007,7 +1044,12 @@ namespace peelo
         return false;
     }
 
-    bool rune::is_print() const
+    bool rune::is_number() const
+    {
+        return is_number(m_code);
+    }
+
+    bool rune::is_print(value_type code)
     {
         static const value_type print_table[423][2] =
         {
@@ -1156,7 +1198,7 @@ namespace peelo
 
         for (int i = 0; i < 423; ++i)
         {
-            if (m_code >= print_table[i][0] && m_code <= print_table[i][1])
+            if (code >= print_table[i][0] && code <= print_table[i][1])
             {
                 return true;
             }
@@ -1165,7 +1207,12 @@ namespace peelo
         return false;
     }
 
-    bool rune::is_punct() const
+    bool rune::is_print() const
+    {
+        return is_print(m_code);
+    }
+
+    bool rune::is_punct(value_type code)
     {
         static const value_type punct_table[96][2] =
         {
@@ -1205,7 +1252,7 @@ namespace peelo
 
         for (int i = 0; i < 96; ++i)
         {
-            if (m_code >= punct_table[i][0] && m_code <= punct_table[i][1])
+            if (code >= punct_table[i][0] && code <= punct_table[i][1])
             {
                 return true;
             }
@@ -1214,7 +1261,12 @@ namespace peelo
         return false;
     }
 
-    bool rune::is_space() const
+    bool rune::is_punct() const
+    {
+        return is_punct(m_code);
+    }
+
+    bool rune::is_space(value_type code)
     {
         static const value_type space_table[11][2] =
         {
@@ -1228,7 +1280,7 @@ namespace peelo
 
         for (int i = 0; i < 11; ++i)
         {
-            if (m_code >= space_table[i][0] && m_code <= space_table[i][1])
+            if (code >= space_table[i][0] && code <= space_table[i][1])
             {
                 return true;
             }
@@ -1237,7 +1289,12 @@ namespace peelo
         return false;
     }
 
-    bool rune::is_upper() const
+    bool rune::is_space() const
+    {
+        return is_space(m_code);
+    }
+
+    bool rune::is_upper(value_type code)
     {
         static const value_type upper_table[476][2] =
         {
@@ -1404,7 +1461,7 @@ namespace peelo
 
         for (int i = 0; i < 476; ++i)
         {
-            if (m_code >= upper_table[i][0] && m_code <= upper_table[i][1])
+            if (code >= upper_table[i][0] && code <= upper_table[i][1])
             {
                 return true;
             }
@@ -1413,7 +1470,12 @@ namespace peelo
         return false;
     }
 
-    bool rune::is_word() const
+    bool rune::is_upper() const
+    {
+        return is_upper(m_code);
+    }
+
+    bool rune::is_word(value_type code)
     {
         static const value_type word_table[464][2] =
         {
@@ -1576,7 +1638,7 @@ namespace peelo
 
         for (int i = 0; i < 464; ++i)
         {
-            if (m_code >= word_table[i][0] && m_code <= word_table[i][1])
+            if (code >= word_table[i][0] && code <= word_table[i][1])
             {
                 return true;
             }
@@ -1585,11 +1647,21 @@ namespace peelo
         return false;
     }
 
+    bool rune::is_word() const
+    {
+        return is_word(m_code);
+    }
+
+    bool rune::is_xdigit(value_type code)
+    {
+        return (code >= '0' && code <= '9')
+            || (code >= 'a' && code <= 'f')
+            || (code >= 'A' && code <= 'F');
+    }
+
     bool rune::is_xdigit() const
     {
-        return (m_code >= '0' && m_code <= '9')
-            || (m_code >= 'a' && m_code <= 'f')
-            || (m_code >= 'A' && m_code <= 'F');
+        return is_xdigit(m_code);
     }
 
     rune& rune::operator++()
@@ -1647,50 +1719,39 @@ namespace peelo
     std::ostream& operator<<(std::ostream& stream, const rune& r)
     {
         const rune::value_type c = r.code();
-        const std::streamsize size = stream.width();
 
-        if (c > rune::max.code()
-            || (c & 0xfffe) == 0xfffe
-            || (c >= 0xd800 && c <= 0xdfff)
-            || (c >= 0xffd0 && c <= 0xfdef))
+        if (c < rune::max.code()
+            && (c & 0xfffe) != 0xfffe
+            && !(c >= 0xd800 && c <= 0xdfff)
+            && !(c >= 0xffd0 && c <= 0xfdef))
         {
-            return stream;
-        }
-        if (((stream.flags() & std::ios_base::right)
-            || (stream.flags() & std::ios_base::internal))
-            && size > 1)
-        {
-            for (std::streamsize i = 1; i < size; ++i)
+            char s[5];
+
+            if (c < 0x80)
             {
-                stream << stream.fill();
+                s[0] = static_cast<unsigned char>(c);
+                s[1] = 0;
             }
-        }
-        if (c < 0x80)
-        {
-            stream << static_cast<unsigned char>(c);
-        }
-        else if (c < 0x800)
-        {
-            stream << static_cast<unsigned char>(0xc0 | ((c & 0x7c0) >> 6))
-                   << static_cast<unsigned char>(0x80 | (c & 0x3f));
-        }
-        else if (c < 0x10000)
-        {
-            stream << static_cast<unsigned char>(0xe0 | ((c & 0xf000) >> 12))
-                   << static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6))
-                   << static_cast<unsigned char>(0x80 | (c & 0x3f));
-        } else {
-            stream << static_cast<unsigned char>(0xf0 | ((c & 0x1c0000) >> 18))
-                   << static_cast<unsigned char>(0x80 | ((c & 0x3f000) >> 12))
-                   << static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6))
-                   << static_cast<unsigned char>(0x80 | (c & 0x3f));
-        }
-        if ((stream.flags() & std::ios_base::left) && size > 1)
-        {
-            for (std::streamsize i = 1; i < size; ++i)
+            else if (c < 0x800)
             {
-                stream << stream.fill();
+                s[0] = static_cast<unsigned char>(0xc0 | ((c & 0x7c0)) >> 6);
+                s[1] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+                s[2] = 0;
             }
+            else if (c < 0x10000)
+            {
+                s[0] = static_cast<unsigned char>(0xe0 | ((c & 0xf000) >> 12));
+                s[1] = static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6));
+                s[2] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+                s[3] = 0;
+            } else {
+                s[0] = static_cast<unsigned char>(0xf0 | ((c & 0x1c0000) >> 18));
+                s[1] = static_cast<unsigned char>(0x80 | ((c & 0x3f000) >> 12));
+                s[2] = static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6));
+                s[3] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+                s[4] = 0;
+            }
+            stream << s;
         }
 
         return stream;
@@ -1699,31 +1760,42 @@ namespace peelo
     std::wostream& operator<<(std::wostream& stream, const rune& r)
     {
         const rune::value_type c = r.code();
-        const std::streamsize size = stream.width();
 
-        if (c > rune::max.code()
-            || (c & 0xfffe) == 0xfffe
-            || (c >= 0xd800 && c <= 0xdfff)
-            || (c >= 0xffd0 && c <= 0xfdef))
+        if (c < rune::max.code()
+            && (c & 0xfffe) != 0xfffe
+            && !(c >= 0xd800 && c <= 0xdfff)
+            && !(c >= 0xffd0 && c <= 0xfdef))
         {
-            return stream;
-        }
-        if (((stream.flags() & std::ios_base::right)
-            || (stream.flags() & std::ios_base::internal))
-            && size > 1)
-        {
-            for (std::streamsize i = 1; i < size; ++i)
+#if defined(_WIN32)
+            if (c > 0xfff)
             {
-                stream << stream.fill();
+                stream << static_cast<wchar_t>(0xd800 + (c >> 10))
+                       << static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
+            } else {
+                stream << static_cast<wchar_t>(c);
             }
-        }
-        stream << static_cast<wchar_t>(c);
-        if ((stream.flags() & std::ios_base::left) && size > 1)
-        {
-            for (std::streamsize i = 1; i < size; ++i)
+#else
+            if (c < 0x80)
             {
-                stream << stream.fill();
+                stream << static_cast<wchar_t>(c);
             }
+            else if (c < 0x800)
+            {
+                stream << static_cast<wchar_t>(0xc0 | ((c & 0x7c0)) >> 6)
+                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
+            }
+            else if (c < 0x10000)
+            {
+                stream << static_cast<wchar_t>(0xe0 | ((c & 0xf000) >> 12))
+                       << static_cast<wchar_t>(0x80 | ((c & 0xfc0) >> 6))
+                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
+            } else {
+                stream << static_cast<wchar_t>(0xf0 | ((c & 0x1c0000) >> 18))
+                       << static_cast<wchar_t>(0x80 | ((c & 0x3f000) >> 12))
+                       << static_cast<wchar_t>(0x80 | ((c & 0xfc0) >> 6))
+                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
+            }
+#endif
         }
 
         return stream;

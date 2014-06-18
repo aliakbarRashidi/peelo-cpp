@@ -43,17 +43,12 @@ namespace peelo
         /** Maximum value for rune. */
         static const rune max;
 
-        /**
-         * Empty constructor. Value of the rune is set to zero.
-         */
-        rune();
+        explicit rune(value_type code = 0);
 
         /**
          * Copy constructor.
          */
         rune(const rune& that);
-
-        explicit rune(value_type code);
 
         /**
          * Returns <code>true</code> if rune value is not zero.
@@ -132,9 +127,21 @@ namespace peelo
         }
 
         /**
+         * Returns lower case equivalent of given code point if it's upper
+         * case.
+         */
+        static value_type to_lower(value_type code);
+
+        /**
          * Returns lower case equivalent if character is upper case.
          */
         rune to_lower() const;
+
+        /**
+         * Returns upper case equivalent of given code point if it's lower
+         * case.
+         */
+        static value_type to_upper(value_type code);
 
         /**
          * Returns upper case equivalent if character is lower case.
@@ -142,18 +149,45 @@ namespace peelo
         rune to_upper() const;
 
         /**
+         * Returns <code>true</code> if given code point is alphanumeric
+         * character.
+         */
+        static bool is_alnum(value_type code);
+
+        /**
          * Returns <code>true</code> if rune is alphanumeric character.
          */
         bool is_alnum() const;
+
+        /**
+         * Returns <code>true</code> if given code point is alphabetic
+         * character.
+         */
+        static bool is_alpha(value_type code);
 
         /**
          * Returns <code>true</code> if rune is alphabetic character.
          */
         bool is_alpha() const;
 
+        /**
+         * Returns <code>true</code> if given code point is in ASCII range.
+         */
+        static bool is_ascii(value_type code);
+
+        /**
+         * Returns <code>true</code> if rune is in ASCII range.
+         */
         bool is_ascii() const;
 
+        static bool is_blank(value_type code);
+
         bool is_blank() const;
+
+        /**
+         * Returns <code>true</code> if given code point is control sequence.
+         */
+        static bool is_cntrl(value_type code);
 
         /**
          * Returns <code>true</code> if rune is control sequence.
@@ -161,20 +195,44 @@ namespace peelo
         bool is_cntrl() const;
 
         /**
+         * Returns <code>true</code> if given code point is ASCII decimal digit
+         * character.
+         */
+        static bool is_digit(value_type code);
+
+        /**
          * Returns <code>true</code> if rune is ASCII decimal digit character.
          */
         bool is_digit() const;
 
         /**
+         * Returns <code>true</code> if given code point is any printing
+         * character, except space and other locale specific space like
+         * characters.
+         */
+        static bool is_graph(value_type code);
+
+        /**
          * Returns <code>true</code> if rune is any printing character, except
-         * space and other locale specific space like character.
+         * space and other locale specific space like characters.
          */
         bool is_graph() const;
+
+        /**
+         * Returns <code>true</code> if given code point is lower case letter.
+         */
+        static bool is_lower(value_type code);
 
         /**
          * Returns <code>true</code> if rune is lower case letter.
          */
         bool is_lower() const;
+
+        /**
+         * Returns <code>true</code> if given code point is any number
+         * character in any locale.
+         */
+        static bool is_number(value_type code);
 
         /**
          * Returns <code>true</code> if rune is any number character in any
@@ -183,10 +241,22 @@ namespace peelo
         bool is_number() const;
 
         /**
+         * Returns <code>true</code> if given code point is any printable
+         * character, including space.
+         */
+        static bool is_print(value_type code);
+
+        /**
          * Returns <code>true</code> if rune is any printable character,
          * including space.
          */
         bool is_print() const;
+
+        /**
+         * Returns <code>true</code> if given code point is any punctuation
+         * character, except space or alphanumeric character.
+         */
+        static bool is_punct(value_type code);
 
         /**
          * Returns <code>true</code> if rune is any punctuation character,
@@ -195,16 +265,35 @@ namespace peelo
         bool is_punct() const;
 
         /**
+         * Returns <code>true</code> if given code point is whitespace
+         * character.
+         */
+        static bool is_space(value_type code);
+
+        /**
          * Returns <code>true</code> if rune is whitespace character.
          */
         bool is_space() const;
+
+        /**
+         * Returns <code>true</code> if given code point is upper case letter.
+         */
+        static bool is_upper(value_type code);
 
         /**
          * Returns <code>true</code> if rune is upper case letter.
          */
         bool is_upper() const;
 
+        static bool is_word(value_type code);
+
         bool is_word() const;
+
+        /**
+         * Returns <code>true</code> if given code point is hexadecimal
+         * character.
+         */
+        static bool is_xdigit(value_type code);
 
         /**
          * Returns <code>true</code> if rune is hexadecimal character.

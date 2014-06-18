@@ -52,13 +52,13 @@ namespace peelo
          * Constructs new array.
          */
         array()
-            : m_data(N ? new value_type[N] : NULL) {}
+            : m_data(N ? new value_type[N] : 0) {}
 
         /**
          * Copy constructor.
          */
         array(const array<T, N>& that)
-            : m_data(N ? new value_type[N] : NULL)
+            : m_data(N ? new value_type[N] : 0)
         {
             for (size_type i = 0; i < N; ++i)
             {

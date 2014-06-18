@@ -15,6 +15,7 @@ ADD_LIBRARY(
     src/chrono/month.cpp
     src/chrono/time.cpp
     src/chrono/weekday.cpp
+    src/io/filename.cpp
     src/net/uri.cpp
     src/text/rune.cpp
     src/text/string.cpp
@@ -28,3 +29,14 @@ INSTALL(
 INSTALL(
     TARGETS peelo-cpp ARCHIVE DESTINATION lib
 )
+
+ENABLE_TESTING()
+AUX_SOURCE_DIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/test TEST_SRCS)
+FOREACH(i ${TEST_SRCS})
+    GET_FILENAME_COMPONENT(name ${i} NAME_WE)
+    SET(name "test_${name}")
+    ADD_EXECUTABLE(${name} ${i})
+    TARGET_LINK_LIBRARIES(${name} peelo-cpp)
+    ADD_TEST(${name} ${EXECUTABLE_OUTPUT_PATH}/${name})
+    ADD_DEPENDENCIES(${name} peelo-cpp)
+ENDFOREACH()

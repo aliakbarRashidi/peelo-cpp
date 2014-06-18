@@ -4,7 +4,6 @@
 # Iterators
 - container/array
 - container/vector
-- container/set
 - text/string
 
 # Hash

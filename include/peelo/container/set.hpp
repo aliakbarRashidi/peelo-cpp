@@ -28,6 +28,7 @@
 
 #include <peelo/functional/equal_to.hpp>
 #include <peelo/functional/hash.hpp>
+#include <iterator>
 #include <memory>
 
 namespace peelo
@@ -345,6 +346,183 @@ namespace peelo
             entry* prev;
             entry* child;
         };
+
+    public:
+        class iterator : public std::iterator<
+                         std::bidirectional_iterator_tag,
+                         value_type
+        >
+        {
+        public:
+            iterator()
+                : m_current(0) {}
+
+            iterator(const iterator& that)
+                : m_current(that.m_current) {}
+
+            iterator& operator=(const iterator& that)
+            {
+                m_current = that.m_current;
+
+                return *this;
+            }
+
+            iterator& operator++()
+            {
+                if (m_current)
+                {
+                    m_current = m_current->next;
+                }
+
+                return *this;
+            }
+
+            iterator operator++(int)
+            {
+                iterator tmp(*this);
+
+                operator++();
+
+                return tmp;
+            }
+
+            iterator& operator--()
+            {
+                if (m_current)
+                {
+                    m_current = m_current->prev;
+                }
+
+                return *this;
+            }
+
+            iterator& operator--(int)
+            {
+                iterator tmp(*this);
+
+                operator--();
+
+                return tmp;
+            }
+
+            inline bool operator==(const iterator& that) const
+            {
+                return m_current == that.m_current;
+            }
+
+            inline bool operator!=(const iterator& that) const
+            {
+                return m_current != that.m_current;
+            }
+
+            inline reference operator*()
+            {
+                return m_current->data;
+            }
+
+            inline const_reference operator*() const
+            {
+                return m_current->data;
+            }
+
+            inline reference operator->()
+            {
+                return m_current->data;
+            }
+
+            inline const_reference operator->() const
+            {
+                return m_current->data;
+            }
+
+        private:
+            entry* m_current;
+            friend class set;
+        };
+
+        typedef iterator const_iterator;
+
+        inline iterator begin()
+        {
+            iterator i;
+
+            i.m_current = m_front;
+
+            return i;
+        }
+
+        inline const_iterator begin() const
+        {
+            const_iterator i;
+
+            i.m_current = m_front;
+
+            return i;
+        }
+
+        inline const_iterator cbegin() const
+        {
+            const_iterator i;
+
+            i.m_current = m_front;
+
+            return i;
+        }
+
+        inline iterator end()
+        {
+            return iterator();
+        }
+
+        inline const_iterator end() const
+        {
+            return const_iterator();
+        }
+
+        inline const_iterator cend() const
+        {
+            return const_iterator();
+        }
+
+        iterator find(const_reference value)
+        {
+            const typename hasher::result_type hash = m_hash(value);
+            const size_type index = static_cast<size_type>(hash % m_bucket_count);
+
+            for (entry* e = m_bucket[index]; e; e = e->child)
+            {
+                if (e->hash == hash && m_equal(e->data, value))
+                {
+                    iterator i;
+
+                    i.m_current = e;
+
+                    return i;
+                }
+            }
+
+            return iterator();
+        }
+
+        const_iterator find(const_reference value) const
+        {
+            const typename hasher::result_type hash = m_hash(value);
+            const size_type index = static_cast<size_type>(hash % m_bucket_count);
+
+            for (entry* e = m_bucket[index]; e; e = e->child)
+            {
+                if (e->hash == hash && m_equal(e->data, value))
+                {
+                    const_iterator i;
+
+                    i.m_current = e;
+
+                    return i;
+                }
+            }
+
+            return const_iterator();
+        }
 
     private:
         const size_type m_bucket_count;

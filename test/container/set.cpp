@@ -7,7 +7,8 @@ int main()
 
     container << 2 << 3 << 6;
     assert(container.size() == 3);
-    assert(container.count(3) == 1);
+    assert(container.find(3) != container.end());
+    assert(container.find(8) == container.end());
 
     container.erase(6);
     assert(container.size() == 2);

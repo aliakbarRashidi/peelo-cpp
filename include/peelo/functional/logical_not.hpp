@@ -23,24 +23,22 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef PEELO_FUNCTIONAL_EQUAL_TO_HPP_GUARD
-#define PEELO_FUNCTIONAL_EQUAL_TO_HPP_GUARD
+#ifndef PEELO_FUNCTIONAL_LOGICAL_NOT_HPP_GUARD
+#define PEELO_FUNCTIONAL_LOGICAL_NOT_HPP_GUARD
 
 namespace peelo
 {
     template< class T = void >
-    struct equal_to
+    struct logical_not
     {
         typedef bool result_type;
-        typedef T first_argument_type;
-        typedef T second_argument_type;
+        typedef T argument_type;
 
-        result_type operator()(const first_argument_type& lhs,
-                               const second_argument_type& rhs) const
+        result_type operator()(const argument_type& arg) const
         {
-            return lhs == rhs;
+            return !arg;
         }
     };
 }
 
-#endif /* !PEELO_FUNCTIONAL_EQUAL_TO_HPP_GUARD */
+#endif /* !PEELO_FUNCTIONAL_LOGICAL_NOT_HPP_GUARD */

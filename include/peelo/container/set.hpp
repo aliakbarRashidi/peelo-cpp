@@ -28,6 +28,7 @@
 
 #include <peelo/functional/equal_to.hpp>
 #include <peelo/functional/hash.hpp>
+#include <cstdlib>
 #include <iterator>
 #include <memory>
 
@@ -152,6 +153,94 @@ namespace peelo
             friend class set;
         };
 
+        struct const_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+        {
+        public:
+            const_iterator()
+                : m_pointer(0) {}
+
+            const_iterator(const const_iterator& that)
+                : m_pointer(that.m_pointer) {}
+
+            const_iterator& operator=(const const_iterator& that)
+            {
+                m_pointer = that.m_pointer;
+
+                return *this;
+            }
+
+            const_iterator& operator++()
+            {
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->next;
+                }
+
+                return *this;
+            }
+
+            const_iterator operator++(int)
+            {
+                const_iterator tmp(*this);
+
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->next;
+                }
+
+                return tmp;
+            }
+
+            const_iterator& operator--()
+            {
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->prev;
+                }
+
+                return *this;
+            }
+
+            const_iterator operator--(int)
+            {
+                const_iterator tmp(*this);
+
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->prev;
+                }
+
+                return tmp;
+            }
+
+            inline bool operator==(const const_iterator& that) const
+            {
+                return m_pointer == that.m_pointer;
+            }
+
+            inline bool operator!=(const const_iterator& that) const
+            {
+                return m_pointer != that.m_pointer;
+            }
+
+            inline const_reference operator*()
+            {
+                return m_pointer->data;
+            }
+
+            inline const_reference operator->()
+            {
+                return m_pointer->data;
+            }
+
+        private:
+            entry* m_pointer;
+            friend class set;
+        };
+
+        typedef std::reverse_iterator<iterator> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+
         explicit set(size_type bucket_count = 8,
                      const hasher& hash = hasher(),
                      const key_equal& equal = key_equal(),
@@ -257,6 +346,74 @@ namespace peelo
         inline size_type size() const
         {
             return m_size;
+        }
+
+        iterator begin()
+        {
+            iterator i;
+
+            i.m_pointer = m_front;
+
+            return i;
+        }
+
+        const_iterator begin() const
+        {
+            const_iterator i;
+
+            i.m_pointer = m_front;
+
+            return i;
+        }
+
+        inline const_iterator cbegin() const
+        {
+            return begin();
+        }
+
+        iterator end()
+        {
+            return iterator();
+        }
+
+        const_iterator end() const
+        {
+            return const_iterator();
+        }
+
+        inline const_iterator cend() const
+        {
+            return end();
+        }
+
+        inline reverse_iterator rbegin()
+        {
+            return reverse_iterator(end());
+        }
+
+        inline const_reverse_iterator rbegin() const
+        {
+            return const_reverse_iterator(end());
+        }
+
+        inline const_reverse_iterator crbegin() const
+        {
+            return rbegin();
+        }
+
+        inline reverse_iterator rend()
+        {
+            return reverse_iterator(begin());
+        }
+
+        inline const_reverse_iterator rend() const
+        {
+            return const_reverse_iterator(begin());
+        }
+
+        inline const_reverse_iterator crend() const
+        {
+            return rend();
         }
 
         set& assign(const set<Key>& that)
@@ -433,50 +590,6 @@ namespace peelo
             return 0;
         }
 
-        typedef iterator const_iterator;
-
-        inline iterator begin()
-        {
-            iterator i;
-
-            i.m_current = m_front;
-
-            return i;
-        }
-
-        inline const_iterator begin() const
-        {
-            const_iterator i;
-
-            i.m_current = m_front;
-
-            return i;
-        }
-
-        inline const_iterator cbegin() const
-        {
-            const_iterator i;
-
-            i.m_current = m_front;
-
-            return i;
-        }
-
-        inline iterator end()
-        {
-            return iterator();
-        }
-
-        inline const_iterator end() const
-        {
-            return const_iterator();
-        }
-
-        inline const_iterator cend() const
-        {
-            return const_iterator();
-        }
-
         iterator find(const_reference value)
         {
             const typename hasher::result_type hash = m_hash(value);
@@ -488,7 +601,7 @@ namespace peelo
                 {
                     iterator i;
 
-                    i.m_current = e;
+                    i.m_pointer = e;
 
                     return i;
                 }
@@ -508,7 +621,7 @@ namespace peelo
                 {
                     const_iterator i;
 
-                    i.m_current = e;
+                    i.m_pointer = e;
 
                     return i;
                 }

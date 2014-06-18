@@ -238,6 +238,7 @@ namespace peelo
     };
 
     std::ostream& operator<<(std::ostream&, const string&);
+    std::wostream& operator<<(std::wostream&, const string&);
 }
 
 #endif /* !PEELO_TEXT_STRING_HPP_GUARD */

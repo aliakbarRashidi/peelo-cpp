@@ -502,6 +502,8 @@ namespace peelo
 
     std::ostream& operator<<(std::ostream& stream, const string& s)
     {
+        string::size_type size = 0;
+
         for (string::size_type i = 0; i < s.length(); ++i)
         {
             const rune::value_type c = s[i].code();
@@ -513,26 +515,78 @@ namespace peelo
             {
                 continue;
             }
-            if (c < 0x80)
+            else if (c < 0x80)
             {
-                stream << static_cast<unsigned char>(c);
+                ++size;
             }
             else if (c < 0x800)
             {
-                stream << static_cast<unsigned char>(0xc0 | ((c & 0x7c0) >> 6))
-                       << static_cast<unsigned char>(0x80 | (c & 0x3f));
+                size += 2;
             }
             else if (c < 0x10000)
             {
-                stream << static_cast<unsigned char>(0xe0 | ((c & 0xf000) >> 12))
-                       << static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6))
-                       << static_cast<unsigned char>(0x80 | (c & 0x3f));
+                size += 3;
             } else {
-                stream << static_cast<unsigned char>(0xf0 | ((c & 0x1c0000) >> 18))
-                       << static_cast<unsigned char>(0x80 | ((c & 0x3f000) >> 12))
-                       << static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6))
-                       << static_cast<unsigned char>(0x80 | (c & 0x3f));
+                size += 4;
             }
+        }
+        if (size > 0)
+        {
+            vector<unsigned char> v;
+
+            v.reserve(size + 1);
+            for (std::string::size_type i = 0; i < s.length(); ++i)
+            {
+                const rune::value_type c = s[i].code();
+
+                if (c > rune::max.code()
+                    || (c & 0xfffe) == 0xfffe
+                    || (c >= 0xd800 && c <= 0xdfff)
+                    || (c >= 0xffd0 && c <= 0xfdef))
+                {
+                    continue;
+                }
+                else if (c < 0x80)
+                {
+                    v << static_cast<unsigned char>(c);
+                }
+                else if (c < 0x800)
+                {
+                    v << static_cast<unsigned char>(0xc0 | ((c & 0x7c0)) >> 6)
+                      << static_cast<unsigned char>(0x80 | (c & 0x3f));
+                }
+                else if (c < 0x10000)
+                {
+                    v << static_cast<unsigned char>(0xe0 | ((c & 0xf000) >> 12))
+                      << static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6))
+                      << static_cast<unsigned char>(0x80 | (c & 0x3f));
+                } else {
+                    v << static_cast<unsigned char>(0xf0 | ((c & 0x1c0000) >> 18))
+                      << static_cast<unsigned char>(0x80 | ((c & 0x3f000) >> 12))
+                      << static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6))
+                      << static_cast<unsigned char>(0x80 | (c & 0x3f));
+                }
+            }
+            v.push_back(static_cast<unsigned char>(0));
+            stream << v.data();
+        }
+
+        return stream;
+    }
+
+    std::wostream& operator<<(std::wostream& stream, const string& s)
+    {
+        if (s)
+        {
+            vector<wchar_t> v;
+
+            v.reserve(s.length() + 1);
+            for (string::size_type i = 0; i < s.length(); ++i)
+            {
+                v.push_back(static_cast<wchar_t>(s[i].code()));
+            }
+            v.push_back(static_cast<wchar_t>(0));
+            stream << v.data();
         }
 
         return stream;

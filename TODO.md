@@ -1,5 +1,4 @@
 # Containers
-- container/set
 - container/hashmap
 
 # Iterators

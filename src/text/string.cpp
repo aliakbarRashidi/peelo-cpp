@@ -476,54 +476,178 @@ namespace peelo
 
         for (size_type i = 0; i < m_length; ++i)
         {
-            unsigned int r = m_runes[m_offset + i].code();
+            const rune::value_type c = m_runes[m_offset + i].code();
 
-            if (!(r & 0xffffff80))
+            if (c > rune::max.code()
+                || (c & 0xfffe) == 0xfffe
+                || (c >= 0xd800 && c <= 0xdfff)
+                || (c >= 0xffd0 && c <= 0xfdef))
+            {
+                continue;
+            }
+            else if (c < 0x80)
             {
                 ++size;
             }
-            else if (!(r & 0xfffff800))
+            else if (c < 0x800)
             {
                 size += 2;
             }
-            else if (!(r & 0xffff0000))
+            else if (c < 0x10000)
             {
                 size += 3;
-            }
-            else if (!(r & 0xffe00000))
-            {
+            } else {
                 size += 4;
             }
         }
         result.reserve(size);
         for (size_type i = 0; i < m_length; ++i)
         {
-            unsigned int r = m_runes[m_offset + i].code();
+            const rune::value_type c = m_runes[m_offset + i].code();
 
-            if (!(r & 0xffffff80))
+            if (c > rune::max.code()
+                || (c & 0xfffe) == 0xfffe
+                || (c >= 0xd800 && c <= 0xdfff)
+                || (c >= 0xffd0 && c <= 0xfdef))
             {
-                result << static_cast<char>(r);
+                continue;
             }
-            else if (!(r & 0xfffff800))
+            else if (c < 0x80)
             {
-                result << static_cast<char>(0xc0 | (r >> 6))
-                       << static_cast<char>(0x80 | (r & 0x3f));
+                result << static_cast<char>(c);
             }
-            else if (!(r & 0xffff0000))
+            else if (c < 0x800)
             {
-                result << static_cast<char>(0xe0 | (r >> 12))
-                       << static_cast<char>(0x80 | ((r >> 6) & 0x3f))
-                       << static_cast<char>(0x80 | (r & 0x3f));
+                result << static_cast<char>(0xc0 | ((c & 0x7c0)) >> 6)
+                       << static_cast<char>(0x80 | (c & 0x3f));
             }
-            else if (!(r & 0xffe00000))
+            else if (c < 0x10000)
             {
-                result << static_cast<char>(0xf0 | (r >> 18))
-                       << static_cast<char>(0x80 | ((r >> 12) & 0x3f))
-                       << static_cast<char>(0x80 | ((r >> 6) & 0x3f))
-                       << static_cast<char>(0x80 | (r & 0x3f));
+                result << static_cast<char>(0xe0 | ((c & 0xf000) >> 12))
+                       << static_cast<char>(0x80 | ((c & 0xfc0) >> 6))
+                       << static_cast<char>(0x80 | (c & 0x3f));
+            } else {
+                result << static_cast<char>(0xf0 | ((c & 0x1c0000) >> 18))
+                       << static_cast<char>(0x80 | ((c & 0x3f000) >> 12))
+                       << static_cast<char>(0x80 | ((c & 0xfc0) >> 6))
+                       << static_cast<char>(0x80 | (c & 0x3f));
             }
         }
-        result.push_back(0);
+        result << static_cast<char>(0);
+
+        return result;
+    }
+
+    vector<char> string::utf16be() const
+    {
+        vector<char> result;
+        size_type size = 0;
+
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (m_runes[m_offset + i] > 0xffff)
+            {
+                size += 4;
+            } else {
+                size += 2;
+            }
+        }
+        result.reserve(size);
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            const rune::value_type c = m_runes[m_offset + i].code();
+
+            if (c > 0xffff)
+            {
+                const rune::value_type plane = c >> 16;
+                const rune::value_type high = (c & 0xff00) >> 8;
+
+                result << static_cast<char>((plane >> 2) + 0xd8)
+                       << static_cast<char>(((plane & 0x3) << 6) + (high >> 2))
+                       << static_cast<char>((high & 0x2) + 0xdc)
+                       << static_cast<char>(c & 0xff);
+            } else {
+                result << static_cast<char>((c & 0xff00) >> 8)
+                       << static_cast<char>(c & 0xff);
+            }
+        }
+        result << static_cast<char>(0);
+
+        return result;
+    }
+
+    vector<char> string::utf16le() const
+    {
+        vector<char> result;
+        size_type size = 0;
+
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (m_runes[m_offset + i] > 0xffff)
+            {
+                size += 4;
+            } else {
+                size += 2;
+            }
+        }
+        result.reserve(size);
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            const rune::value_type c = m_runes[m_offset + i].code();
+
+            if (c > 0xffff)
+            {
+                const rune::value_type plane = c >> 16;
+                const rune::value_type high = (c & 0xff00) >> 8;
+
+                result << static_cast<char>(((plane & 0x3) << 6) + (high >> 2))
+                       << static_cast<char>((plane >> 2) + 0xd8)
+                       << static_cast<char>(c & 0xff)
+                       << static_cast<char>((high & 0x2) + 0xdc);
+            } else {
+                result << static_cast<char>(c & 0xff)
+                       << static_cast<char>((c & 0xff00) >> 8);
+            }
+        }
+        result << static_cast<char>(0);
+
+        return result;
+    }
+
+    vector<char> string::utf32be() const
+    {
+        vector<char> result;
+
+        result.reserve(m_length * 4);
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            const rune::value_type c = m_runes[m_offset + i].code();
+
+            result << static_cast<char>((c & 0xff000000) >> 24)
+                   << static_cast<char>((c & 0xff0000) >> 16)
+                   << static_cast<char>((c & 0xff00) >> 8)
+                   << static_cast<char>(c & 0xff);
+        }
+        result << static_cast<char>(0);
+
+        return result;
+    }
+
+    vector<char> string::utf32le() const
+    {
+        vector<char> result;
+
+        result.reserve(m_length * 4);
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            const rune::value_type c = m_runes[m_offset + i].code();
+
+            result << static_cast<char>(c & 0xff)
+                   << static_cast<char>((c & 0xff00) >> 8)
+                   << static_cast<char>((c & 0xff0000) >> 16)
+                   << static_cast<char>((c & 0xff000000) >> 24);
+        }
+        result << static_cast<char>(0);
 
         return result;
     }
@@ -531,19 +655,58 @@ namespace peelo
     vector<wchar_t> string::widen() const
     {
         vector<wchar_t> result;
+        size_type size = 0;
 
 #if defined(_WIN32)
-        result.reserve(m_length + 1);
         for (size_type i = 0; i < m_length; ++i)
         {
-            const_reference r = m_runes[m_offset + i];
-
-            if (r > 0xffff)
+            if (m_runes[m_offset + i] > 0xffff)
             {
-                result << static_cast<wchar_t>(0xd800 + (r.code() >> 10))
-                       << static_cast<wchar_t>(0xdc00 + (r.code() & 0x3ff));
+                size += 2;
             } else {
-                result << static_cast<wchar_t>(r.code());
+                ++size;
+            }
+        }
+#else
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            const rune::value_type c = m_runes[m_offset + i].code();
+
+            if (c > rune::max.code()
+                || (c & 0xfffe) == 0xfffe
+                || (c >= 0xd800 && c <= 0xdfff)
+                || (c >= 0xffd0 && c <= 0xfdef))
+            {
+                continue;
+            }
+            else if (c < 0x80)
+            {
+                ++size;
+            }
+            else if (c < 0x800)
+            {
+                size += 2;
+            }
+            else if (c < 0x10000)
+            {
+                size += 3;
+            } else {
+                size += 4;
+            }
+        }
+#endif
+        result.reserve(size);
+#if defined(_WIN32)
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            const rune::value_type c = m_runes[m_offset + i].code();
+
+            if (c > 0xffff)
+            {
+                result << static_cast<wchar_t>(0xd800 + (c >> 10))
+                       << static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
+            } else {
+                result << static_cast<wchar_t>(c);
             }
         }
 #else

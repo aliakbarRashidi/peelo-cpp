@@ -246,7 +246,10 @@ namespace peelo
         bool is_space() const;
 
         vector<char> utf8() const;
-
+        vector<char> utf16be() const;
+        vector<char> utf16le() const;
+        vector<char> utf32be() const;
+        vector<char> utf32le() const;
         vector<wchar_t> widen() const;
 
         size_type find(const_reference needle, size_type pos = 0) const;

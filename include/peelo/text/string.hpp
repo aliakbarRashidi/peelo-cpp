@@ -41,7 +41,7 @@ namespace peelo
         typedef const rune& const_reference;
         typedef rune* pointer;
         typedef const rune* const_pointer;
-        class iterator;
+        struct iterator;
         typedef iterator const_iterator;
         typedef std::reverse_iterator<iterator> reverse_iterator;
         typedef std::reverse_iterator<const_iterator> const_reverse_iterator;

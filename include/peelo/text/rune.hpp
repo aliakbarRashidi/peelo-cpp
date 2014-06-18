@@ -51,14 +51,6 @@ namespace peelo
         rune(const rune& that);
 
         /**
-         * Returns <code>true</code> if rune value is not zero.
-         */
-        inline operator bool() const
-        {
-            return m_code;
-        }
-
-        /**
          * Returns <code>true</code> if rune value is zero.
          */
         inline bool operator!() const
@@ -95,9 +87,19 @@ namespace peelo
             return equals(that);
         }
 
+        inline bool operator==(value_type code) const
+        {
+            return equals(code);
+        }
+
         inline bool operator!=(const rune& that) const
         {
             return !equals(that);
+        }
+
+        inline bool operator!=(value_type code) const
+        {
+            return !equals(code);
         }
 
         int compare(const rune& that) const;
@@ -111,9 +113,19 @@ namespace peelo
             return compare(that) < 0;
         }
 
+        inline bool operator<(value_type code) const
+        {
+            return compare(code) < 0;
+        }
+
         inline bool operator>(const rune& that) const
         {
             return compare(that) > 0;
+        }
+
+        inline bool operator>(value_type code) const
+        {
+            return compare(code) > 0;
         }
 
         inline bool operator<=(const rune& that) const
@@ -121,9 +133,19 @@ namespace peelo
             return compare(that) <= 0;
         }
 
+        inline bool operator<=(value_type code) const
+        {
+            return compare(code) <= 0;
+        }
+
         inline bool operator>=(const rune& that) const
         {
             return compare(that) >= 0;
+        }
+
+        inline bool operator>=(value_type code) const
+        {
+            return compare(code) >= 0;
         }
 
         /**

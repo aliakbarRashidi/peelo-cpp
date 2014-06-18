@@ -1,6 +1,3 @@
-# Containers
-- container/map
-
 # Iterators
 - container/array
 - container/vector

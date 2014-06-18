@@ -1,6 +1,3 @@
-# Iterators
-- text/string
-
 # Hash
 - long long
 - unsigned long long

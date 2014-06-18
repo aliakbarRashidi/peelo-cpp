@@ -35,11 +35,16 @@ namespace peelo
     {
     public:
         typedef std::size_t size_type;
+        typedef std::ptrdiff_t difference_type;
         typedef rune value_type;
         typedef rune& reference;
         typedef const rune& const_reference;
         typedef rune* pointer;
         typedef const rune* const_pointer;
+        class iterator;
+        typedef iterator const_iterator;
+        typedef std::reverse_iterator<iterator> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
         static const size_type npos;
 
@@ -118,6 +123,14 @@ namespace peelo
             return m_runes[m_offset + pos];
         }
 
+        iterator begin() const;
+
+        iterator end() const;
+
+        reverse_iterator rbegin() const;
+
+        reverse_iterator rend() const;
+
         string& assign(const string& that);
         string& assign(const_reference rune);
 
@@ -154,6 +167,29 @@ namespace peelo
         inline bool operator!=(const string& that) const
         {
             return !equals(that);
+        }
+
+        int compare(const string& that) const;
+        int compare_icase(const string& that) const;
+
+        inline bool operator<(const string& that) const
+        {
+            return compare(that) < 0;
+        }
+
+        inline bool operator>(const string& that) const
+        {
+            return compare(that) > 0;
+        }
+
+        inline bool operator<=(const string& that) const
+        {
+            return compare(that) <= 0;
+        }
+
+        inline bool operator>=(const string& that) const
+        {
+            return compare(that) >= 0;
         }
 
         string concat(const string& that) const;
@@ -235,6 +271,83 @@ namespace peelo
         size_type m_length;
         pointer m_runes;
         unsigned* m_counter;
+    };
+
+    struct string::iterator : public std::iterator<std::random_access_iterator_tag, value_type>
+    {
+    public:
+        iterator();
+
+        iterator(const iterator& that);
+
+        iterator& operator=(const iterator& that);
+
+        inline const_reference operator*() const
+        {
+            return *m_pointer;
+        }
+
+        inline const_pointer operator->() const
+        {
+            return m_pointer;
+        }
+
+        iterator& operator++();
+
+        iterator operator++(int);
+
+        iterator& operator--();
+
+        iterator operator--(int);
+
+        inline bool operator==(const iterator& that) const
+        {
+            return m_pointer == that.m_pointer;
+        }
+
+        inline bool operator!=(const iterator& that) const
+        {
+            return m_pointer != that.m_pointer;
+        }
+
+        inline bool operator<(const iterator& that) const
+        {
+            return m_pointer < that.m_pointer;
+        }
+
+        inline bool operator>(const iterator& that) const
+        {
+            return m_pointer > that.m_pointer;
+        }
+
+        inline bool operator<=(const iterator& that) const
+        {
+            return m_pointer <= that.m_pointer;
+        }
+
+        inline bool operator>=(const iterator& that) const
+        {
+            return m_pointer >= that.m_pointer;
+        }
+
+        inline reference operator[](size_type n)
+        {
+            return m_pointer[n];
+        }
+
+        iterator operator+(size_type n) const;
+
+        iterator operator-(size_type n) const;
+
+        iterator& operator+=(size_type n);
+
+        iterator& operator-=(size_type n);
+
+        difference_type operator-(const iterator& that) const;
+
+    private:
+        pointer m_pointer;
+        friend class string;
     };
 
     std::ostream& operator<<(std::ostream&, const string&);

@@ -23,6 +23,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <peelo/algorithm/min.hpp>
 #include <peelo/text/string.hpp>
 #include <stdexcept>
 #include <cstring>
@@ -235,6 +236,72 @@ namespace peelo
         }
 
         return true;
+    }
+
+    int string::compare(const string& that) const
+    {
+        if (m_runes != that.m_runes)
+        {
+            const size_type n = min(m_length, that.m_length);
+
+            for (size_type i = 0; i < n; ++i)
+            {
+                const_reference a = m_runes[m_offset + i];
+                const_reference b = that.m_runes[that.m_offset + i];
+
+                if (a > b)
+                {
+                    return 1;
+                }
+                else if (a < b)
+                {
+                    return -1;
+                }
+            }
+        }
+        if (m_length > that.m_length)
+        {
+            return 1;
+        }
+        else if (m_length < that.m_length)
+        {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+
+    int string::compare_icase(const string& that) const
+    {
+        if (m_runes != that.m_runes)
+        {
+            const size_type n = min(m_length, that.m_length);
+
+            for (size_type i = 0; i < n; ++i)
+            {
+                const value_type a = m_runes[m_offset + i].to_lower();
+                const value_type b = that.m_runes[that.m_offset + i].to_lower();
+
+                if (a > b)
+                {
+                    return 1;
+                }
+                else if (a < b)
+                {
+                    return -1;
+                }
+            }
+        }
+        if (m_length > that.m_length)
+        {
+            return 1;
+        }
+        else if (m_length < that.m_length)
+        {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
     string string::concat(const string& that) const
@@ -685,5 +752,87 @@ namespace peelo
         stream << result.data();
 
         return stream;
+    }
+
+    string::iterator::iterator()
+        : m_pointer(0) {}
+
+    string::iterator::iterator(const iterator& that)
+        : m_pointer(that.m_pointer) {}
+
+    string::iterator& string::iterator::operator=(const iterator& that)
+    {
+        m_pointer = that.m_pointer;
+
+        return *this;
+    }
+
+    string::iterator& string::iterator::operator++()
+    {
+        ++m_pointer;
+
+        return *this;
+    }
+
+    string::iterator string::iterator::operator++(int)
+    {
+        iterator tmp(*this);
+
+        ++m_pointer;
+
+        return tmp;
+    }
+
+    string::iterator& string::iterator::operator--()
+    {
+        --m_pointer;
+
+        return *this;
+    }
+
+    string::iterator string::iterator::operator--(int)
+    {
+        iterator tmp(*this);
+
+        --m_pointer;
+
+        return tmp;
+    }
+
+    string::iterator string::iterator::operator+(size_type n) const
+    {
+        iterator result;
+
+        result.m_pointer = m_pointer + n;
+
+        return result;
+    }
+
+    string::iterator string::iterator::operator-(size_type n) const
+    {
+        iterator result;
+
+        result.m_pointer = m_pointer - n;
+
+        return *this;
+    }
+
+    string::iterator& string::iterator::operator+=(size_type n)
+    {
+        m_pointer += n;
+
+        return *this;
+    }
+
+    string::iterator& string::iterator::operator-=(size_type n)
+    {
+        m_pointer -= n;
+
+        return *this;
+    }
+
+    string::difference_type string::iterator::operator-(const iterator& that) const
+    {
+        return m_pointer - that.m_pointer;
     }
 }

@@ -29,6 +29,7 @@
 #include <peelo/container/pair.hpp>
 #include <peelo/functional/equal_to.hpp>
 #include <peelo/functional/hash.hpp>
+#include <cstdlib>
 #include <iterator>
 #include <memory>
 
@@ -58,6 +59,190 @@ namespace peelo
         typedef const value_type& const_reference;
         typedef value_type* pointer;
         typedef const value_type* const_pointer;
+
+    private:
+        struct entry
+        {
+            typename hasher::result_type hash;
+            value_type data;
+            entry* next;
+            entry* prev;
+            entry* child;
+        };
+
+    public:
+        struct iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+        {
+        public:
+            iterator()
+                : m_pointer(0) {}
+
+            iterator(const iterator& that)
+                : m_pointer(that.m_pointer) {}
+
+            iterator& operator=(const iterator& that)
+            {
+                m_pointer = that.m_pointer;
+
+                return *this;
+            }
+
+            iterator& operator++()
+            {
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->next;
+                }
+
+                return *this;
+            }
+
+            iterator operator++(int)
+            {
+                iterator tmp(*this);
+
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->next;
+                }
+
+                return tmp;
+            }
+
+            iterator& operator--()
+            {
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->prev;
+                }
+
+                return *this;
+            }
+
+            iterator operator--(int)
+            {
+                iterator tmp(*this);
+
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->prev;
+                }
+
+                return tmp;
+            }
+
+            inline bool operator==(const iterator& that) const
+            {
+                return m_pointer == that.m_pointer;
+            }
+
+            inline bool operator!=(const iterator& that) const
+            {
+                return m_pointer != that.m_pointer;
+            }
+
+            inline reference operator*()
+            {
+                return m_pointer->data;
+            }
+
+            inline reference operator->()
+            {
+                return m_pointer->data;
+            }
+
+        private:
+            entry* m_pointer;
+            friend class map;
+        };
+
+        struct const_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+        {
+        public:
+            const_iterator()
+                : m_pointer(0) {}
+
+            const_iterator(const const_iterator& that)
+                : m_pointer(that.m_pointer) {}
+
+            const_iterator& operator=(const const_iterator& that)
+            {
+                m_pointer = that.m_pointer;
+
+                return *this;
+            }
+
+            const_iterator& operator++()
+            {
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->next;
+                }
+
+                return *this;
+            }
+
+            const_iterator operator++(int)
+            {
+                const_iterator tmp(*this);
+
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->next;
+                }
+
+                return tmp;
+            }
+
+            const_iterator& operator--()
+            {
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->prev;
+                }
+
+                return *this;
+            }
+
+            const_iterator operator--(int)
+            {
+                const_iterator tmp(*this);
+
+                if (m_pointer)
+                {
+                    m_pointer = m_pointer->prev;
+                }
+
+                return tmp;
+            }
+
+            inline bool operator==(const const_iterator& that) const
+            {
+                return m_pointer == that.m_pointer;
+            }
+
+            inline bool operator!=(const const_iterator& that) const
+            {
+                return m_pointer != that.m_pointer;
+            }
+
+            inline const_reference operator*()
+            {
+                return m_pointer->data;
+            }
+
+            inline const_reference operator->()
+            {
+                return m_pointer->data;
+            }
+
+        private:
+            entry* m_pointer;
+            friend class set;
+        };
+
+        typedef std::reverse_iterator<iterator> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
         explicit map(size_type bucket_count = 8,
                      const hasher& hash = hasher(),
@@ -227,6 +412,74 @@ namespace peelo
             ++m_size;
 
             return e->data.second();
+        }
+
+        iterator begin()
+        {
+            iterator i;
+
+            i.m_pointer = m_front;
+
+            return i;
+        }
+
+        const_iterator begin() const
+        {
+            const_iterator i;
+
+            i.m_pointer = m_front;
+
+            return i;
+        }
+
+        inline const_iterator cbegin() const
+        {
+            return begin();
+        }
+
+        iterator end()
+        {
+            return iterator();
+        }
+
+        const_iterator end() const
+        {
+            return const_iterator();
+        }
+
+        inline const_iterator cend() const
+        {
+            return end();
+        }
+
+        inline reverse_iterator rbegin()
+        {
+            return reverse_iterator(end());
+        }
+
+        inline const_reverse_iterator rbegin() const
+        {
+            return const_reverse_iterator(end());
+        }
+
+        inline const_reverse_iterator crbegin() const
+        {
+            return rbegin();
+        }
+
+        inline reverse_iterator rend()
+        {
+            return reverse_iterator(begin());
+        }
+
+        inline const_reverse_iterator rend() const
+        {
+            return const_reverse_iterator(begin());
+        }
+
+        inline const_reverse_iterator crend() const
+        {
+            return rend();
         }
 
         map& assign(const map<Key, T>& that)
@@ -417,153 +670,6 @@ namespace peelo
             return 0;
         }
 
-    private:
-        struct entry
-        {
-            typename hasher::result_type hash;
-            value_type data;
-            entry* next;
-            entry* prev;
-            entry* child;
-        };
-
-    public:
-        class iterator : public std::iterator<
-                         std::bidirectional_iterator_tag,
-                         value_type
-        >
-        {
-        public:
-            iterator()
-                : m_current(0) {}
-
-            iterator(const iterator& that)
-                : m_current(that.m_current) {}
-
-            iterator& operator=(const iterator& that)
-            {
-                m_current = that.m_current;
-
-                return *this;
-            }
-
-            iterator& operator++()
-            {
-                if (m_current)
-                {
-                    m_current = m_current->next;
-                }
-
-                return *this;
-            }
-
-            iterator operator++(int)
-            {
-                iterator tmp(*this);
-
-                operator++();
-
-                return tmp;
-            }
-
-            iterator& operator--()
-            {
-                if (m_current)
-                {
-                    m_current = m_current->prev;
-                }
-
-                return *this;
-            }
-
-            iterator& operator--(int)
-            {
-                iterator tmp(*this);
-
-                operator--();
-
-                return tmp;
-            }
-
-            inline bool operator==(const iterator& that) const
-            {
-                return m_current == that.m_current;
-            }
-
-            inline bool operator!=(const iterator& that) const
-            {
-                return m_current != that.m_current;
-            }
-
-            inline reference operator*()
-            {
-                return m_current->data;
-            }
-
-            inline const_reference operator*() const
-            {
-                return m_current->data;
-            }
-
-            inline reference operator->()
-            {
-                return m_current->data;
-            }
-
-            inline const_reference operator->() const
-            {
-                return m_current->data;
-            }
-
-        private:
-            entry* m_current;
-            friend class map;
-        };
-
-        typedef iterator const_iterator;
-
-        inline iterator begin()
-        {
-            iterator i;
-
-            i.m_current = m_front;
-
-            return i;
-        }
-
-        inline const_iterator begin() const
-        {
-            const_iterator i;
-
-            i.m_current = m_front;
-
-            return i;
-        }
-
-        inline const_iterator cbegin() const
-        {
-            const_iterator i;
-
-            i.m_current = m_front;
-
-            return i;
-        }
-
-        inline iterator end()
-        {
-            return iterator();
-        }
-
-        inline const_iterator end() const
-        {
-            return const_iterator();
-        }
-
-        inline const_iterator cend() const
-        {
-            return const_iterator();
-        }
-
         iterator find(const key_type& key)
         {
             const typename hasher::result_type hash = m_hash(key);
@@ -575,7 +681,7 @@ namespace peelo
                 {
                     iterator i;
 
-                    i.m_current = e;
+                    i.m_pointer = e;
 
                     return i;
                 }
@@ -595,7 +701,7 @@ namespace peelo
                 {
                     const_iterator i;
 
-                    i.m_current = e;
+                    i.m_pointer = e;
 
                     return i;
                 }

@@ -646,48 +646,72 @@ namespace peelo
          */
         void insert(size_type i, const_reference value)
         {
+            insert(i, 1, value);
+        }
+
+        void insert(size_type i, size_type count, const_reference value)
+        {
             if (i >= m_size)
             {
                 throw std::out_of_range("vector index out of range");
             }
+            else if (!count)
+            {
+                return;
+            }
             else if (!i)
             {
-                push_front(value);
+                push_front(count, value);
             }
             else if (i == m_size)
             {
-                push_back(value);
+                push_back(count, value);
             } else {
-                if (m_capacity >= m_size + 1)
+                if (m_capacity >= m_size + count)
                 {
                     std::memmove(
-                            static_cast<void*>(m_data + i + 1),
+                            static_cast<void*>(m_data + i + count),
                             static_cast<const void*>(m_data + i),
                             sizeof(value_type) * (m_size - i)
                     );
                 } else {
                     pointer old = m_data;
 
-                    m_data = m_allocator.allocate(m_size + 1);
-                    for (size_type j = 0; j < i - 1; ++j)
+                    m_data = m_allocator.allocate(m_size + count);
+                    for (size_type j = 0; j < i - count; ++j)
                     {
                         m_allocator.construct(m_data + j, old[j]);
                         m_allocator.destroy(old + j);
                     }
-                    for (size_type j = i; j < m_size; ++j)
+                    for (size_type j = i; j < m_size; ++i)
                     {
-                        m_allocator.construct(m_data + j + 1, old[j]);
+                        m_allocator.construct(m_data + j + count, old[j]);
                         m_allocator.destroy(old + j);
                     }
                     if (old)
                     {
                         m_allocator.destroy(old, m_capacity);
                     }
-                    m_capacity = m_size + 1;
+                    m_capacity = m_size + count;
                 }
-                m_allocator.construct(m_data + i, value);
-                ++m_size;
+                for (size_type j = 0; j < count; ++j)
+                {
+                    m_allocator.construct(m_data + i + j, value);
+                }
+                m_size += count;
             }
+        }
+
+        void insert(const const_iterator& pos, const_reference& value)
+        {
+            insert(pos.m_pointer - m_data, value);
+        }
+
+        void insert(const const_iterator& pos,
+                    size_type count,
+                    const_reference& value)
+        {
+            insert(pos.m_pointer - m_data, count, value);
         }
 
         /**

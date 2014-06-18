@@ -26,6 +26,7 @@
 #ifndef PEELO_CONTAINER_VECTOR_HPP_GUARD
 #define PEELO_CONTAINER_VECTOR_HPP_GUARD
 
+#include <cstring>
 #include <iostream>
 #include <iterator>
 #include <stdexcept>

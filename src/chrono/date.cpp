@@ -197,9 +197,13 @@ namespace peelo
 #else
         std::tm tm;
 
-        tm.tm_year = m_year - 1900;
-        tm.tm_mon = m_month.index() - 1;
+        tm.tm_sec = 0;
+        tm.tm_min = 0;
+        tm.tm_hour = 0;
         tm.tm_mday = m_day;
+        tm.tm_mon = m_month.index() - 1;
+        tm.tm_year = m_year - 1900;
+        tm.tm_isdst = -1;
         if (std::mktime(&tm) == -1)
         {
             throw std::runtime_error("mktime() failed");

@@ -27,6 +27,7 @@
 #define PEELO_TEXT_STRING_HPP_GUARD
 
 #include <peelo/container/vector.hpp>
+#include <peelo/memory/array_ptr.hpp>
 #include <peelo/text/rune.hpp>
 
 namespace peelo
@@ -35,14 +36,13 @@ namespace peelo
     {
     public:
         typedef std::size_t size_type;
-        typedef std::ptrdiff_t difference_type;
         typedef rune value_type;
         typedef rune& reference;
         typedef const rune& const_reference;
         typedef rune* pointer;
         typedef const rune* const_pointer;
-        struct iterator;
-        typedef iterator const_iterator;
+        struct const_iterator;
+        typedef const_iterator iterator;
         typedef std::reverse_iterator<iterator> reverse_iterator;
         typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -57,6 +57,203 @@ namespace peelo
          * Copy constructor.
          */
         string(const string& that);
+
+        //TODO:string(size_type count, const_reference ch);
+        //TODO:string(const string& that, size_type pos, size_type count = npos);
+        //TODO:string(const_pointer s, size_type count);
+        //TODO:string(const_pointer s);
+        //TODO:string(const char* input);
+        
+        //TODO:string& assign(size_type count, const_reference ch);
+        //TODO:string& assign(const string& that);
+        //TODO:string& assign(const string& that, size_type pos, size_type count = npos);
+        //TODO:string& assign(const_pointer s, size_type count);
+        //TODO:string& assign(const_pointer s);
+
+        //TODO:string& operator=(const string& that);
+        //TODO:string& operator=(const_pointer s);
+        //TODO:string& operator=(const_reference ch);
+
+        /**
+         * Returns a reference to the rune at specified location.
+         *
+         * \throw std::out_of_range If given index is out of bounds
+         */
+        const_reference at(size_type pos) const;
+
+        /**
+         * Returns reference to the rune at specified location. No bounds
+         * checking is performed.
+         */
+        inline const_reference operator[](size_type pos) const
+        {
+            return m_runes[m_offset + pos];
+        }
+
+        /**
+         * Returns reference to the first rune in the string.
+         *
+         * \throw std::out_of_range If string is empty
+         */
+        const_reference front() const;
+
+        /**
+         * Returns reference to the last rune in the string.
+         *
+         * \throw std::out_of_range If string is empty
+         */
+        const_reference back() const;
+
+        /**
+         * Returns pointer to the underlying array serving as character
+         * storage. Returned pointer could be <code>NULL</code> if the
+         * string is empty.
+         */
+        inline const_pointer data() const
+        {
+            return m_runes ? m_runes.get() : 0;
+        }
+
+        // TODO: iterators: begin(), end(), rbegin(), rend()
+
+        /**
+         * Returns <code>true</code> if the string is empty.
+         */
+        inline bool empty() const
+        {
+            return !m_length;
+        }
+
+        /**
+         * Returns the number of runes in the string.
+         */
+        inline size_type length() const
+        {
+            return m_length;
+        }
+
+        int compare(const string& that);
+        int compare(size_type pos1, size_type count1, const string& that);
+        int compare(size_type pos1, size_type count1, const string& that, size_type pos2, size_type count2 = npos) const;
+        int compare(const_pointer s) const;
+        int compare(size_type pos1, size_type count1, const_pointer s) const;
+        int compare(size_type pos1, size_type count1, const_pointer s, size_type count2) const;
+
+        /**
+         * Returns a substring based on given index and length.
+         */
+        string substr(size_type pos = 0, size_type count = npos) const;
+
+        /**
+         * Copies a substring to rune array pointd to by <em>dest</em>. If the
+         * requested substring lasts past the end of the string, or if
+         * <code>count == npos</code>, the copied substring is [pos, length()].
+         */
+        size_type copy(pointer dest, size_type count, size_type pos = 0) const;
+
+        /**
+         * Exchanges the contents of the string with another string.
+         */
+        void swap(string& that);
+
+        size_type find(const string& that, size_type pos = 0) const;
+        size_type find(const_pointer s, size_type pos, size_type count) const;
+        size_type find(const_pointer s, size_type pos = 0) const;
+        size_type find(const_reference ch, size_type pos = 0) const;
+
+        size_type rfind(const string& that, size_type pos = npos) const;
+        size_type rfind(const_pointer s, size_type pos, size_type count) const;
+        size_type rfind(const_pointer s, size_type pos = npos) const;
+        size_type rfind(const_reference ch, size_type pos = pos) const;
+
+        size_type find_first_of(const string& that, size_type pos = 0) const;
+        size_type find_first_of(const_pointer s, size_type pos, size_type count) const;
+        size_type find_first_of(const_pointer s, size_type pos = 0) const;
+        size_type find_first_of(const_reference ch, size_type pos = 0) const;
+
+        size_type find_first_not_of(const string& that, size_type pos = 0) const;
+        size_type find_first_not_of(const_pointer s, size_type pos, size_type count) const;
+        size_type find_first_not_of(const_pointer s, size_type pos = 0) const;
+        size_type find_first_not_of(const_reference ch, size_type pos = 0) const;
+
+        size_type find_last_of(const string& that, size_type pos = npos) const;
+        size_type find_last_of(const_pointer s, size_type pos, size_type count) const;
+        size_type find_last_of(const_pointer s, size_type pos = npos) const;
+        size_type find_last_of(const_reference ch, size_type pos = npos) const;
+
+        size_type find_last_not_of(const string& that, size_type pos = npos) const;
+        size_type find_last_not_of(const_pointer s, size_type pos, size_type count) const;
+        size_type find_last_not_of(const_pointer s, size_type pos = npos) const;
+        size_type find_last_not_of(const_reference ch, size_type pos = npos) const;
+
+        string concat(const string& that) const;
+        string concat(const_pointer s) const;
+        string concat(const_reference ch);
+
+        inline operator+(const string& that) const
+        {
+            return concat(that);
+        }
+
+        inline operator+(const_pointer s) const
+        {
+            return concat(s);
+        }
+
+        inline operator+(const_reference ch) const
+        {
+            return concat(ch);
+        }
+
+        bool equals(const string& that) const;
+
+        /**
+         * Equality testing operator.
+         */
+        inline bool operator==(const string& that) const
+        {
+            return equals(that);
+        }
+
+        /**
+         * Non-equality testing operator.
+         */
+        inline bool operator!=(const string& that) const
+        {
+            return !equals(that);
+        }
+
+        inline bool operator<(const string& that) const
+        {
+            return compare(that) < 0;
+        }
+
+        inline bool operator>(const string& that) const
+        {
+            return compare(that) > 0;
+        }
+
+        inline bool operator<=(const string& that) const
+        {
+            return compare(that) <= 0;
+        }
+
+        inline bool operator>=(const string& that) const
+        {
+            return compare(that) >= 0;
+        }
+
+    private:
+        size_type m_offset;
+        size_type m_length;
+        array_ptr<value_type> m_runes;
+    };
+
+#if 0
+    class string
+    {
+    public:
+        typedef std::ptrdiff_t difference_type;
 
         string(const_pointer runes, size_type n);
 
@@ -116,13 +313,6 @@ namespace peelo
 
         const_reference back() const;
 
-        const_reference at(size_type pos) const;
-
-        inline const_reference operator[](size_type pos) const
-        {
-            return m_runes[m_offset + pos];
-        }
-
         iterator begin() const;
 
         iterator end() const;
@@ -153,44 +343,8 @@ namespace peelo
         bool equals(const string& that) const;
         bool equals_icase(const string& that) const;
 
-        /**
-         * Equality testing operator.
-         */
-        inline bool operator==(const string& that) const
-        {
-            return equals(that);
-        }
-
-        /**
-         * Non-equality testing operator.
-         */
-        inline bool operator!=(const string& that) const
-        {
-            return !equals(that);
-        }
-
         int compare(const string& that) const;
         int compare_icase(const string& that) const;
-
-        inline bool operator<(const string& that) const
-        {
-            return compare(that) < 0;
-        }
-
-        inline bool operator>(const string& that) const
-        {
-            return compare(that) > 0;
-        }
-
-        inline bool operator<=(const string& that) const
-        {
-            return compare(that) <= 0;
-        }
-
-        inline bool operator>=(const string& that) const
-        {
-            return compare(that) >= 0;
-        }
 
         string concat(const string& that) const;
         string concat(const_reference c) const;
@@ -352,6 +506,7 @@ namespace peelo
         pointer m_pointer;
         friend class string;
     };
+#endif
 
     std::ostream& operator<<(std::ostream&, const string&);
     std::wostream& operator<<(std::wostream&, const string&);

@@ -34,22 +34,13 @@ namespace peelo
 
     string::string()
         : m_offset(0)
-        , m_length(0)
-        , m_runes(0)
-        , m_counter(0) {}
+        , m_length(0) {}
 
     string::string(const string& that)
         : m_offset(that.m_offset)
-        , m_length(that.m_length)
-        , m_runes(that.m_runes)
-        , m_counter(that.m_counter)
-    {
-        if (m_counter)
-        {
-            ++(*m_counter);
-        }
-    }
+        , m_length(that.m_length) {}
 
+#if 0
     string::string(const_pointer runes, size_type n)
         : m_offset(0)
         , m_length(n)
@@ -1032,4 +1023,5 @@ namespace peelo
     {
         return m_pointer - that.m_pointer;
     }
+#endif
 }

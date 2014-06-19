@@ -90,23 +90,23 @@ namespace peelo
         const string& query = uri.query();
         const string& fragment = uri.fragment();
 
-        if (scheme)
+        if (!scheme.empty())
         {
             const string& scheme_specific = uri.scheme_specific();
 
             os << scheme << ':';
-            if (scheme_specific)
+            if (!scheme_specific.empty())
             {
                 os << scheme_specific;
             }
         }
-        if (hostname)
+        if (!hostname.empty())
         {
             const string& username = uri.username();
             const string& password = uri.password();
             int port = uri.port();
 
-            if (username && password)
+            if (!username.empty() && !password.empty())
             {
                 os << username << ':' << password << '@';
             }
@@ -115,20 +115,20 @@ namespace peelo
             {
                 os << ':' << port;
             }
-            if (path && !path[0].equals('/'))
+            if (!path.empty() && path[0] == '/')
             {
                 os << '/';
             }
         }
-        if (path)
+        if (!path.empty())
         {
             os << path;
         }
-        if (query)
+        if (!query.empty())
         {
             os << '?' << query;
         }
-        if (fragment)
+        if (!fragment.empty())
         {
             os << '#' << fragment;
         }

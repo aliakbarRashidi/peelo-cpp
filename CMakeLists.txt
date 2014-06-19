@@ -15,7 +15,6 @@ ADD_LIBRARY(
     src/chrono/month.cpp
     src/chrono/time.cpp
     src/chrono/weekday.cpp
-    src/io/filename.cpp
     src/net/uri.cpp
     src/text/rune.cpp
     src/text/string.cpp

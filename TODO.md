@@ -6,8 +6,11 @@
 - long double
 
 # File I/O
-- io/filename
-- io/filepath
+- Filename parsing.
+- Filepath parsing.
+
+# Net
+- URI parsing
 
 # Text
 - Update to Unicode 7.0

@@ -27,6 +27,7 @@
 #define PEELO_TEXT_RUNE_HPP_GUARD
 
 #include <iostream>
+#include <peelo/functional/hash.hpp>
 
 namespace peelo
 {
@@ -348,6 +349,17 @@ namespace peelo
 
     std::ostream& operator<<(std::ostream&, const rune&);
     std::wostream& operator<<(std::wostream&, const rune&);
+
+    template<>
+    struct hash<rune>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(const rune& key) const
+        {
+            return static_cast<result_type>(key.code());
+        }
+    };
 }
 
 #endif /* !PEELO_TEXT_RUNE_HPP_GUARD */

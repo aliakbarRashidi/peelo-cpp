@@ -355,6 +355,24 @@ namespace peelo
 
     std::ostream& operator<<(std::ostream&, const string&);
     std::wostream& operator<<(std::wostream&, const string&);
+
+    template<>
+    struct hash<string>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(const string& key) const
+        {
+            result_type result = 5381;
+
+            for (string::size_type i = 0; i < key.length(); ++i)
+            {
+                result = ((result << 5) + result) + key[i].code();
+            }
+
+            return result;
+        }
+    };
 }
 
 #endif /* !PEELO_TEXT_STRING_HPP_GUARD */

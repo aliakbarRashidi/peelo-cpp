@@ -26,7 +26,7 @@
 #ifndef PEELO_FUNCTIONAL_HASH_HPP_GUARD
 #define PEELO_FUNCTIONAL_HASH_HPP_GUARD
 
-#include <peelo/text/string.hpp>
+#include <cstddef>
 
 namespace peelo
 {
@@ -149,35 +149,6 @@ namespace peelo
         result_type operator()(unsigned long key) const
         {
             return static_cast<result_type>(key);
-        }
-    };
-
-    template<>
-    struct hash<rune>
-    {
-        typedef std::size_t result_type;
-
-        result_type operator()(const rune& key) const
-        {
-            return static_cast<result_type>(key.code());
-        }
-    };
-
-    template<>
-    struct hash<string>
-    {
-        typedef std::size_t result_type;
-
-        result_type operator()(const string& key) const
-        {
-            result_type result = 5381;
-
-            for (string::size_type i = 0; i < key.length(); ++i)
-            {
-                result = ((result << 5) + result) + key[i].code();
-            }
-
-            return result;
         }
     };
 }

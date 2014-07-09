@@ -450,6 +450,39 @@ namespace peelo
             return assign(that);
         }
 
+        bool equals(const set<Key>& that) const
+        {
+            if (m_size != that.size())
+            {
+                return false;
+            }
+            for (entry* e = m_front; e; e = e->next)
+            {
+                if (that.find(e->data) == that.end())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /**
+         * Equality testing operator.
+         */
+        inline bool operator==(const set<Key>& that) const
+        {
+            return equals(that);
+        }
+
+        /**
+         * Non-equality testing operator.
+         */
+        inline bool operator!=(const set<Key>& that) const
+        {
+            return !equals(that);
+        }
+
         /**
          * Removes all entries from the set.
          */

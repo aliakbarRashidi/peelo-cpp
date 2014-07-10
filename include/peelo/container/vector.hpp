@@ -683,7 +683,7 @@ namespace peelo
                         m_allocator.construct(m_data + j, old[j]);
                         m_allocator.destroy(old + j);
                     }
-                    for (size_type j = i; j < m_size; ++i)
+                    for (size_type j = i; j < m_size; ++j)
                     {
                         m_allocator.construct(m_data + j + count, old[j]);
                         m_allocator.destroy(old + j);

@@ -20,6 +20,7 @@ ADD_LIBRARY(
     src/net/uri.cpp
     src/text/rune.cpp
     src/text/string.cpp
+    src/text/stringbuilder.cpp
 )
 
 INSTALL(

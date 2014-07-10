@@ -1164,13 +1164,13 @@ namespace peelo
         magnitude = static_cast<unsigned int>(abs(n));
         do
         {
-            sb.prepend(rune(digitmap[magnitude % base]));
+            sb.prepend(digitmap[magnitude % base]);
             magnitude /= base;
         }
         while (magnitude != 0);
         if (n < 0)
         {
-            sb.prepend(rune('-'));
+            sb.prepend('-');
         }
 
         return sb.str();
@@ -1190,7 +1190,7 @@ namespace peelo
         }
         do
         {
-            sb.prepend(rune(digitmap[n % base]));
+            sb.prepend(digitmap[n % base]);
             n /= base;
         }
         while (n != 0);
@@ -1214,13 +1214,13 @@ namespace peelo
         magnitude = static_cast<unsigned long>(abs(n));
         do
         {
-            sb.prepend(rune(digitmap[magnitude % base]));
+            sb.prepend(digitmap[magnitude % base]);
             magnitude /= base;
         }
         while (magnitude != 0);
         if (n < 0)
         {
-            sb.prepend(rune('-'));
+            sb.prepend('-');
         }
 
         return sb.str();
@@ -1240,7 +1240,7 @@ namespace peelo
         }
         do
         {
-            sb.prepend(rune(digitmap[n % base]));
+            sb.prepend(digitmap[n % base]);
             n /= base;
         }
         while (n != 0);

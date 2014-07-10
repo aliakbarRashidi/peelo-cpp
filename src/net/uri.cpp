@@ -115,7 +115,7 @@ namespace peelo
             {
                 os << ':' << port;
             }
-            if (path && !path[0].equals('/'))
+            if (!path.empty() && path[0] != '/')
             {
                 os << '/';
             }

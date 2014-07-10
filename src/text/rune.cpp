@@ -31,7 +31,25 @@ namespace peelo
     const rune rune::min(0);
     const rune rune::max(0x10ffff);
 
-    rune::rune(value_type code)
+    rune::rune()
+        : m_code(0) {}
+
+    rune::rune(char code)
+        : m_code(code) {}
+
+    rune::rune(unsigned char code)
+        : m_code(code) {}
+
+    rune::rune(int code)
+        : m_code(code)
+    {
+        if (code < 0 || code > 0x10ffff)
+        {
+            throw std::out_of_range("code point too large");
+        }
+    }
+
+    rune::rune(unsigned int code)
         : m_code(code)
     {
         if (code > 0x10ffff)

@@ -44,7 +44,15 @@ namespace peelo
         /** Maximum value for rune. */
         static const rune max;
 
-        explicit rune(value_type code = 0);
+        rune();
+
+        rune(char code);
+
+        rune(unsigned char code);
+
+        rune(int code);
+
+        rune(unsigned int code);
 
         /**
          * Copy constructor.

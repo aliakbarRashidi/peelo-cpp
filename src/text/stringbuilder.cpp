@@ -108,6 +108,11 @@ namespace peelo
         }
     }
 
+    void stringbuilder::clear()
+    {
+        m_length = 0;
+    }
+
     void stringbuilder::insert(size_type i, const_reference value)
     {
         insert(i, 1, value);
@@ -374,6 +379,23 @@ namespace peelo
         for (size_type i = 0; i < m_length; ++i)
         {
             if (m_runes[i] != that.m_runes[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool stringbuilder::equals(const string& str) const
+    {
+        if (m_length != str.length())
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (m_runes[i] != str[i])
             {
                 return false;
             }

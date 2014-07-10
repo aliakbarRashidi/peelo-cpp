@@ -58,7 +58,7 @@ namespace peelo
         /**
          * Constructs string builder from contents of the given string.
          */
-        stringbuilder(const string& str);
+        explicit stringbuilder(const string& str);
 
         /**
          * Destructor.
@@ -263,6 +263,11 @@ namespace peelo
         bool equals(const stringbuilder& that) const;
 
         /**
+         * Tests whether string builders contents are equal with given string.
+         */
+        bool equals(const string& str) const;
+
+        /**
          * Equality testing operator.
          */
         inline bool operator==(const stringbuilder& that) const
@@ -276,6 +281,22 @@ namespace peelo
         inline bool operator!=(const stringbuilder& that) const
         {
             return !equals(that);
+        }
+
+        /**
+         * Equality testing operator.
+         */
+        inline bool operator==(const string& str) const
+        {
+            return equals(str);
+        }
+
+        /**
+         * Non-equality testing operator.
+         */
+        inline bool operator!=(const string& str) const
+        {
+            return !equals(str);
         }
 
         stringbuilder& assign(const stringbuilder& that);

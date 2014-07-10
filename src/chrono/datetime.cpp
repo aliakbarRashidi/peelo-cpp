@@ -24,6 +24,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <peelo/chrono/datetime.hpp>
+#if defined(_WIN32)
+# include <windows.h>
+#else
+# include <ctime>
+#endif
 
 namespace peelo
 {
@@ -49,6 +54,31 @@ namespace peelo
 
     datetime::datetime(const class time& time)
         : m_time(time) {}
+
+    datetime::datetime(long timestamp)
+    {
+#if defined(_WIN32)
+        FILETIME ft;
+        SYSTEMTIME st;
+        LONGLONG ll = Int32x32To64(timestamp, 10000000) + 116444736000000000;
+
+        ft.dwLowDateTime = static_cast<DWORD>(ll);
+        ft.dwHighDateTime = ll >> 32;
+        ::FileTimeToSystemTime(&ft, &st);
+        m_date.assign(st.wYear, peelo::month(st.wMonth), st.wDay);
+        m_time.assign(st.wHour, st.wMinute, st.wSecond);
+#else
+        std::time_t ts = static_cast<std::time_t>(timestamp);
+        std::tm* tm = std::localtime(&ts);
+
+        if (!tm)
+        {
+            throw std::runtime_error("localtime() failed");
+        }
+        m_date.assign(tm->tm_year + 1900, peelo::month(tm->tm_mon + 1), tm->tm_mday);
+        m_time.assign(tm->tm_hour, tm->tm_min, tm->tm_sec);
+#endif
+    }
 
     datetime datetime::now()
     {

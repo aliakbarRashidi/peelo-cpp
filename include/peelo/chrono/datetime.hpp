@@ -53,6 +53,11 @@ namespace peelo
         datetime(const time& time);
 
         /**
+         * Constructs datetime instance from UNIX timestamp.
+         */
+        datetime(long timestamp);
+
+        /**
          * Returns current date and time based on system clock.
          */
         static datetime now();

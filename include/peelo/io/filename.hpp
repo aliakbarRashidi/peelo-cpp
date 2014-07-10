@@ -141,6 +141,42 @@ namespace peelo
         bool is_absolute() const;
 
         /**
+         * Returns <code>true</code> if file name is pointing to a regular file
+         * in the file system.
+         */
+        bool is_file() const;
+
+        /**
+         * Returns <code>true</code> if file name is pointing to a directory in
+         * the file system.
+         */
+        bool is_dir() const;
+
+        /**
+         * Returns <code>true</code> if file name is pointing to a pipe in the
+         * file system.
+         */
+        bool is_pipe() const;
+
+        /**
+         * Returns <code>true</code> if file name is pointing to a socket in
+         * the file system.
+         */
+        bool is_socket() const;
+
+        /**
+         * Returns <code>true</code> if file name is pointing to a file which
+         * has sticky bit set.
+         */
+        bool is_sticky() const;
+
+        /**
+         * Returns <code>true</code> if file name is pointing to a symbolic
+         * link in the file system.
+         */
+        bool is_symlink() const;
+
+        /**
          * Returns <code>true</code> if the file exists in the file system.
          */
         bool exists() const;

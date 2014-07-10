@@ -105,6 +105,119 @@ namespace peelo
         return !m_root.empty();
     }
 
+    bool filename::is_file() const
+    {
+        if (empty())
+        {
+            return false;
+        }
+#if defined(_WIN32)
+        return ::GetFileAttributesW(m_filename.widen().data())
+            == FILE_ATTRIBUTE_NORMAL;
+#else
+        struct stat st;
+
+        if (::stat(m_filename.utf8().data(), &st) < 0)
+        {
+            return false; // File does not exist
+        } else {
+            return S_ISREG(st.st_mode);
+        }
+#endif
+    }
+
+    bool filename::is_dir() const
+    {
+        if (empty())
+        {
+            return false;
+        }
+#if defined(_WIN32)
+        return ::GetFileAttributesW(m_filename.widen().data())
+            & FILE_ATTRIBUTE_DIRECTORY;
+#else
+        struct stat st;
+
+        if (::stat(m_filename.utf8().data(), &st) < 0)
+        {
+            return false; // File does not exist
+        } else {
+            return S_ISDIR(st.st_mode);
+        }
+#endif
+    }
+
+    bool filename::is_pipe() const
+    {
+#if !defined(_WIN32) && defined(S_IFIFO)
+# if !defined(S_ISFIFO)
+#  define S_ISFIFO(x) (((x) & S_IFMT) == S_IFIFO)
+# endif
+        if (!empty())
+        {
+            struct stat st;
+
+            if (::stat(m_filename.utf8().data(), &st) >= 0)
+            {
+                return S_ISFIFO(st.st_mode);
+            }
+        }
+#endif
+
+        return false;
+    }
+
+    bool filename::is_socket() const
+    {
+#if !defined(_WIN32) && defined(S_ISSOCK)
+        if (!empty())
+        {
+            struct stat st;
+
+            if (::stat(m_filename.utf8().data(), &st) >= 0)
+            {
+                return S_ISSOCK(st.st_mode);
+            }
+        }
+#endif
+
+        return false;
+    }
+
+    bool filename::is_sticky() const
+    {
+#if !defined(_WIN32) && defined(S_ISVTX)
+        if (!empty())
+        {
+            struct stat st;
+
+            if (::stat(m_filename.utf8().data(), &st) >= 0)
+            {
+                return st.st_mode & S_ISVTX;
+            }
+        }
+#endif
+
+        return false;
+    }
+
+    bool filename::is_symlink() const
+    {
+#if !defined(_WIN32) && defined(S_ISLNK)
+        if (!empty())
+        {
+            struct stat st;
+
+            if (::stat(m_filename.utf8().data(), &st) >= 0)
+            {
+                return S_ISLNK(st.st_mode);
+            }
+        }
+#endif
+
+        return false;
+    }
+
     bool filename::exists() const
     {
         if (empty())

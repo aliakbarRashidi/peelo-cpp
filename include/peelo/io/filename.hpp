@@ -33,6 +33,8 @@ namespace peelo
     class filename
     {
     public:
+        static const rune separator;
+
         /**
          * Constructs empty invalid file name.
          */
@@ -42,6 +44,11 @@ namespace peelo
          * Constructs copy of existing file name.
          */
         filename(const filename& that);
+
+        /**
+         * Parses an string into a file name.
+         */
+        filename(const string& str);
 
         static bool is_separator(const rune& r);
 
@@ -56,6 +63,11 @@ namespace peelo
         filename& assign(const filename& that);
 
         /**
+         * Parses file name from given string.
+         */
+        filename& assign(const string& str);
+
+        /**
          * Copy constructor.
          */
         inline filename& operator=(const filename& that)
@@ -63,6 +75,17 @@ namespace peelo
             return assign(that);
         }
 
+        /**
+         * Copy constructor.
+         */
+        inline filename& operator=(const string& str)
+        {
+            return assign(str);
+        }
+
+        /**
+         * Tests whether two file names point to the same file.
+         */
         bool equals(const filename& that) const;
 
         /**
@@ -81,6 +104,9 @@ namespace peelo
             return !equals(that);
         }
 
+        /**
+         * Compares two file names lexicographically against each other.
+         */
         int compare(const filename& that) const;
 
         inline bool operator<(const filename& that) const
@@ -103,9 +129,9 @@ namespace peelo
             return compare(that) >= 0;
         }
 
-        inline const string& path() const
+        inline const string& file() const
         {
-            return m_path;
+            return m_filename;
         }
 
         /**
@@ -119,11 +145,9 @@ namespace peelo
         bool exists() const;
 
     private:
-        string m_path;
-        string m_device;
-        string m_location;
-        string m_file;
-        string m_extension;
+        string m_filename;
+        string m_root;
+        vector<string> m_path;
     };
 
     template<>
@@ -133,7 +157,7 @@ namespace peelo
 
         result_type operator()(const filename& key) const
         {
-            return hash<string>()(key.path());
+            return hash<string>()(key.file());
         }
     };
 }

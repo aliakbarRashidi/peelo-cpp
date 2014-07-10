@@ -6,8 +6,9 @@
 - long double
 
 # File I/O
-- Filename parsing.
-- Filepath parsing.
+- Filename parsing:
+    - Support for home directories.
+    - Support for network shares.
 
 # Net
 - URI parsing

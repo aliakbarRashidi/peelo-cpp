@@ -34,6 +34,8 @@ namespace peelo
     class filepath
     {
     public:
+        static const rune separator;
+
         /**
          * Constructs empty file path.
          */
@@ -49,10 +51,16 @@ namespace peelo
          */
         filepath(const set<filename>& filenames);
 
+        /**
+         * Parses file path from a string.
+         */
+        filepath(const string& str);
+
         static bool is_separator(const rune& r);
 
         filepath& assign(const filepath& that);
         filepath& assign(const set<filename>& filenames);
+        filepath& assign(const string& str);
 
         /**
          * Assignment operator.
@@ -68,6 +76,14 @@ namespace peelo
         inline filepath& operator=(const set<filename>& filenames)
         {
             return assign(filenames);
+        }
+
+        /**
+         * Assignment operator.
+         */
+        inline filepath& operator=(const string& str)
+        {
+            return assign(str);
         }
 
         bool equals(const filepath& that) const;

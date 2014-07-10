@@ -33,14 +33,25 @@
 
 namespace peelo
 {
+#if defined(_WIN32)
+    const rune filename::separator('\\');
+#else
+    const rune filename::separator('/');
+#endif
+
+    static void parse(const string&, string&, string&, vector<string>&);
+
     filename::filename() {}
 
     filename::filename(const filename& that)
-        : m_path(that.m_path)
-        , m_device(that.m_device)
-        , m_location(that.m_location)
-        , m_file(that.m_file)
-        , m_extension(that.m_extension) {}
+        : m_filename(that.m_filename)
+        , m_root(that.m_root)
+        , m_path(that.m_path) {}
+
+    filename::filename(const string& str)
+    {
+        parse(str, m_filename, m_root, m_path);
+    }
 
     bool filename::is_separator(const rune& r)
     {
@@ -49,37 +60,49 @@ namespace peelo
 
     bool filename::empty() const
     {
-        return m_path.empty();
+        return m_filename.empty();
     }
 
     filename& filename::assign(const filename& that)
     {
-        m_path = that.m_path;
-        m_device = that.m_device;
-        m_location = that.m_location;
-        m_file = that.m_file;
-        m_extension = that.m_extension;
+        m_filename.assign(that.m_filename);
+        m_root.assign(that.m_root);
+        m_path.assign(that.m_path);
+
+        return *this;
+    }
+
+    filename& filename::assign(const string& str)
+    {
+        m_filename.clear();
+        m_root.clear();
+        m_path.clear();
+        parse(str, m_filename, m_root, m_path);
 
         return *this;
     }
 
     bool filename::equals(const filename& that) const
     {
-        return m_path == that.m_path;
+#if defined(_WIN32)
+        return m_filename.equals_icase(that.m_filename);
+#else
+        return m_filename.equals(that.m_filename);
+#endif
     }
 
     int filename::compare(const filename& that) const
     {
 #if defined(_WIN32)
-        return m_path.compare_icase(that.m_path);
+        return m_filename.compare_icase(that.m_filename);
 #else
-        return m_path.compare(that.m_path);
+        return m_filename.compare(that.m_filename);
 #endif
     }
 
     bool filename::is_absolute() const
     {
-        return !m_location.empty() && is_separator(m_location[0]);
+        return !m_root.empty();
     }
 
     bool filename::exists() const
@@ -89,10 +112,126 @@ namespace peelo
             return false;
         }
 #if defined(_WIN32)
-        return ::GetFileAttributesW(m_path.widen().data())
+        return ::GetFileAttributesW(m_filename.widen().data())
             != INVALID_FILE_ATTRIBUTES;
 #else
-        return !::access(m_path.utf8().data(), F_OK);
+        return !::access(m_filename.utf8().data(), F_OK);
 #endif
+    }
+
+    static void append(const string& input, vector<string>& path)
+    {
+        if (input.empty())
+        {
+            return;
+        }
+        else if (input[0] == '.')
+        {
+            if (input.length() == 2 && input[1] == '.')
+            {
+                if (!path.empty())
+                {
+                    path.erase(path.size() - 1);
+                    return;
+                }
+            }
+            else if (input.length() == 1)
+            {
+                if (!path.empty())
+                {
+                    return;
+                }
+            }
+        }
+        path.push_back(input);
+    }
+
+    static string compile(const string& root, const vector<string>& path)
+    {
+        vector<rune> result;
+
+        if (!root.empty())
+        {
+            result.reserve(root.length());
+            for (string::size_type i = 0; i < root.length(); ++i)
+            {
+                result.push_back(root[i]);
+            }
+        }
+        for (vector<string>::size_type i = 0; i < path.size(); ++i)
+        {
+            if (i > 0 && !filename::is_separator(result[result.size() - 1]))
+            {
+                result.push_back(filename::separator);
+            }
+            result.reserve(result.size() + path[i].length());
+            for (string::size_type j = 0; j < path[i].length(); ++j)
+            {
+                result.push_back(path[i][j]);
+            }
+        }
+
+        return string(result.data(), result.size());
+    }
+
+    static void parse(const string& source,
+                      string& filename,
+                      string& root,
+                      vector<string>& path)
+    {
+        string::size_type begin = 0;
+        string::size_type end = 0;
+
+        if (source.empty())
+        {
+            return;
+        }
+        else if (filename::is_separator(source[0]))
+        {
+            root.assign(source.substr(0, 1));
+            if (source.length() == 1)
+            {
+                filename.assign(root);
+                return;
+            }
+            begin = 1;
+        }
+#if defined(_WIN32)
+        else if (source.length() > 1
+                && source[0].is_alpha()
+                && source[1] == ':')
+        {
+            if (source.length() == 2)
+            {
+                root.assign(source);
+                filename.assign(root);
+                return;
+            }
+            else if (filename::is_separator(source[2]))
+            {
+                root.assign(source.substr(0, 2));
+                begin = 3;
+            }
+        }
+#endif
+        for (string::size_type i = begin; i < source.length(); ++i)
+        {
+            if (filename::is_separator(source[i]))
+            {
+                if (end)
+                {
+                    append(source.substr(begin, end), path);
+                }
+                begin = i + 1;
+                end = 0;
+            } else {
+                ++end;
+            }
+        }
+        if (end)
+        {
+            append(source.substr(begin, end), path);
+        }
+        filename.assign(compile(root, path));
     }
 }

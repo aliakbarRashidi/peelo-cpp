@@ -27,6 +27,14 @@
 
 namespace peelo
 {
+    static void parse(const string&, set<filename>&);
+
+#if defined(_WIN32)
+    const rune filepath::separator(';');
+#else
+    const rune filepath::separator(':');
+#endif
+
     filepath::filepath() {}
 
     filepath::filepath(const filepath& that)
@@ -34,6 +42,11 @@ namespace peelo
 
     filepath::filepath(const set<filename>& filenames)
         : m_filenames(filenames) {}
+
+    filepath::filepath(const string& str)
+    {
+        parse(str, m_filenames);
+    }
 
     bool filepath::is_separator(const rune& r)
     {
@@ -54,8 +67,54 @@ namespace peelo
         return *this;
     }
 
+    filepath& filepath::assign(const string& str)
+    {
+        m_filenames.clear();
+        parse(str, m_filenames);
+
+        return *this;
+    }
+
     bool filepath::equals(const filepath& that) const
     {
         return m_filenames == that.m_filenames;
+    }
+
+    static void parse(const string& source, set<filename>& filenames)
+    {
+        string::size_type begin = 0;
+        string::size_type end = 0;
+
+        if (source.empty())
+        {
+            return;
+        }
+        for (string::size_type i = 0; i < source.length(); ++i)
+        {
+            if (source[i] == filepath::separator)
+            {
+                if (end - begin > 0)
+                {
+                    string str = source.substr(begin, end - begin);
+
+                    if (!str.empty() && !str.is_space())
+                    {
+                        filenames.insert(str);
+                    }
+                }
+                begin = end = i + 1;
+            } else {
+                ++end;
+            }
+        }
+        if (end - begin > 0)
+        {
+            string str = source.substr(begin, end - begin);
+
+            if (!str.empty() && !str.is_space())
+            {
+                filenames.insert(str);
+            }
+        }
     }
 }

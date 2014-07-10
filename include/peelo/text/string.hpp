@@ -363,6 +363,11 @@ namespace peelo
          */
         vector<string> words() const;
 
+        static string to_string(int n, int base = 10);
+        static string to_string(unsigned int n, int base = 10);
+        static string to_string(long n, int base = 10);
+        static string to_string(unsigned long n, int base = 10);
+
     private:
         size_type m_offset;
         size_type m_length;

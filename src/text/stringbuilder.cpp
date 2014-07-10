@@ -27,10 +27,10 @@
 
 namespace peelo
 {
-    stringbuilder::stringbuilder()
-        : m_capacity(0)
+    stringbuilder::stringbuilder(size_type capacity)
+        : m_capacity(capacity)
         , m_length(0)
-        , m_runes(0) {}
+        , m_runes(m_capacity ? new rune[m_capacity] : 0) {}
 
     stringbuilder::stringbuilder(const stringbuilder& that)
         : m_capacity(that.m_length)

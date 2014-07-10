@@ -46,9 +46,9 @@ namespace peelo
         /**
          * Constructs empty string builder.
          *
-         * \param allocator Allocator used for allocating memory
+         * \param capacity Initial capacity of the string builder
          */
-        stringbuilder();
+        explicit stringbuilder(size_type capacity = 16);
 
         /**
          * Constructs copy of existing string builder.

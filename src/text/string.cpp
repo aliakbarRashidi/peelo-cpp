@@ -23,13 +23,16 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <peelo/algorithm/abs.hpp>
 #include <peelo/algorithm/min.hpp>
-#include <peelo/text/string.hpp>
+#include <peelo/text/stringbuilder.hpp>
 #include <stdexcept>
 #include <cstring>
 
 namespace peelo
 {
+    static const char digitmap[] = "0123456789abcdefghijklmnopqrstuvwxyz";
+
     const string::size_type string::npos = -1;
 
     string::string()
@@ -1143,6 +1146,106 @@ namespace peelo
         }
 
         return result;
+    }
+
+    string string::to_string(int n, int base)
+    {
+        stringbuilder sb;
+        unsigned int magnitude;
+
+        if (base < 2 || base > 36)
+        {
+            throw std::invalid_argument("base");
+        }
+        if (n == 0)
+        {
+            return "0";
+        }
+        magnitude = static_cast<unsigned int>(abs(n));
+        do
+        {
+            sb.prepend(rune(digitmap[magnitude % base]));
+            magnitude /= base;
+        }
+        while (magnitude != 0);
+        if (n < 0)
+        {
+            sb.prepend(rune('-'));
+        }
+
+        return sb.str();
+    }
+
+    string string::to_string(unsigned int n, int base)
+    {
+        stringbuilder sb;
+
+        if (base < 2 || base > 36)
+        {
+            throw std::invalid_argument("base");
+        }
+        if (n == 0)
+        {
+            return "0";
+        }
+        do
+        {
+            sb.prepend(rune(digitmap[n % base]));
+            n /= base;
+        }
+        while (n != 0);
+
+        return sb.str();
+    }
+
+    string string::to_string(long n, int base)
+    {
+        stringbuilder sb;
+        unsigned long magnitude;
+
+        if (base < 2 || base > 36)
+        {
+            throw std::invalid_argument("base");
+        }
+        if (n == 0)
+        {
+            return "0";
+        }
+        magnitude = static_cast<unsigned long>(abs(n));
+        do
+        {
+            sb.prepend(rune(digitmap[magnitude % base]));
+            magnitude /= base;
+        }
+        while (magnitude != 0);
+        if (n < 0)
+        {
+            sb.prepend(rune('-'));
+        }
+
+        return sb.str();
+    }
+
+    string string::to_string(unsigned long n, int base)
+    {
+        stringbuilder sb;
+
+        if (base < 2 || base > 36)
+        {
+            throw std::invalid_argument("base");
+        }
+        if (n == 0)
+        {
+            return "0";
+        }
+        do
+        {
+            sb.prepend(rune(digitmap[n % base]));
+            n /= base;
+        }
+        while (n != 0);
+
+        return sb.str();
     }
 
     std::ostream& operator<<(std::ostream& stream, const string& s)

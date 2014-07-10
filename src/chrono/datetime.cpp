@@ -170,6 +170,16 @@ namespace peelo
         }
     }
 
+    datetime datetime::operator+(const class duration& duration) const
+    {
+        return datetime(timestamp() + duration.seconds());
+    }
+
+    datetime datetime::operator-(const class duration& duration) const
+    {
+        return datetime(timestamp() - duration.seconds());
+    }
+
     std::ostream& operator<<(std::ostream& os, const datetime& dt)
     {
         os << dt.date() << ' ' << dt.time() << " UTC";

@@ -27,6 +27,7 @@
 #define PEELO_CHRONO_DATETIME_HPP_GUARD
 
 #include <peelo/chrono/date.hpp>
+#include <peelo/chrono/duration.hpp>
 #include <peelo/chrono/time.hpp>
 
 namespace peelo
@@ -170,6 +171,9 @@ namespace peelo
         {
             return compare(that) >= 0;
         }
+
+        datetime operator+(const class duration& duration) const;
+        datetime operator-(const class duration& duration) const;
 
     private:
         class date m_date;

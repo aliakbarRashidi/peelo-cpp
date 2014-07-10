@@ -230,6 +230,18 @@ namespace peelo
         return *this;
     }
 
+    void string::clear()
+    {
+        if (m_counter && !--(*m_counter))
+        {
+            delete m_counter;
+            delete[] m_runes;
+        }
+        m_offset = m_length = 0;
+        m_runes = 0;
+        m_counter = 0;
+    }
+
     bool string::equals(const string& that) const
     {
         if (m_runes == that.m_runes)

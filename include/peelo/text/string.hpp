@@ -212,6 +212,11 @@ namespace peelo
         }
 
         /**
+         * Clears contents of the string.
+         */
+        void clear();
+
+        /**
          * Converts string into lower case and returns result.
          */
         string to_lower() const;

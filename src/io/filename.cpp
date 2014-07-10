@@ -68,6 +68,15 @@ namespace peelo
         return m_path == that.m_path;
     }
 
+    int filename::compare(const filename& that) const
+    {
+#if defined(_WIN32)
+        return m_path.compare_icase(that.m_path);
+#else
+        return m_path.compare(that.m_path);
+#endif
+    }
+
     bool filename::is_absolute() const
     {
         return !m_location.empty() && is_separator(m_location[0]);

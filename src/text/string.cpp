@@ -422,6 +422,23 @@ namespace peelo
         }
     }
 
+    bool string::is_alnum() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_alnum())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     bool string::is_alpha() const
     {
         if (!m_length)
@@ -452,6 +469,142 @@ namespace peelo
         return true;
     }
 
+    bool string::is_blank() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_blank())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::is_cntrl() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_cntrl())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::is_digit() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_digit())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::is_graph() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_graph())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::is_lower() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_lower())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::is_number() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_number())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::is_print() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_print())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::is_punct() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_punct())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     bool string::is_space() const
     {
         if (!m_length)
@@ -461,6 +614,57 @@ namespace peelo
         for (size_type i = 0; i < m_length; ++i)
         {
             if (!m_runes[m_offset + i].is_space())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::is_upper() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_upper())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::is_word() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_word())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::is_xdigit() const
+    {
+        if (!m_length)
+        {
+            return false;
+        }
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_xdigit())
             {
                 return false;
             }

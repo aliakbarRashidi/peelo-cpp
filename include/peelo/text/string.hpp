@@ -222,6 +222,14 @@ namespace peelo
         string to_upper() const;
 
         /**
+         * Returns <code>true</code> if every character in the string is either
+         * alphabetic or ASCII decimal digit character.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_alnum() const;
+
+        /**
          * Returns <code>true</code> if every character in the string is
          * alphabetic character.
          *
@@ -237,6 +245,65 @@ namespace peelo
          */
         bool is_ascii() const;
 
+        bool is_blank() const;
+
+        /**
+         * Returns <code>true</code> if every character in the string is a
+         * control sequence.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_cntrl() const;
+
+        /**
+         * Returns <code>true</code> if every character in the string is ASCII
+         * decimal digit character.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_digit() const;
+
+        /**
+         * Returns <code>true</code> if every character in the string is any
+         * printing character, except space and other locale specific space
+         * like characters.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_graph() const;
+
+        /**
+         * Returns <code>true</code> if every character in the string is a
+         * lower case letter.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_lower() const;
+
+        /**
+         * Returns <code>true</code> if every character in the string is any
+         * number character in any locale.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_number() const;
+
+        /**
+         * Returns <code>true</code> if every character in the string is any
+         * printable character, including space.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_print() const;
+
+        /**
+         * Returns <code>true</code> if every character in the string is any
+         * punctuation character, except space or alphanumeric character.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_punct() const;
+
         /**
          * Returns <code>true</code> if every character in the string is a
          * whitespace character.
@@ -244,6 +311,24 @@ namespace peelo
          * Returns <code>false</code> if the string is empty.
          */
         bool is_space() const;
+
+        /**
+         * Returns <code>true</code> if every character in the string is upper
+         * case letter.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_upper() const;
+
+        bool is_word() const;
+
+        /**
+         * Returns <code>true</code> if every character in the string is
+         * hexadecimal character.
+         *
+         * Returns <code>false</code> if the string is empty.
+         */
+        bool is_xdigit() const;
 
         vector<char> utf8() const;
         vector<char> utf16be() const;

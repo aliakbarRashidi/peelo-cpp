@@ -33,6 +33,7 @@ namespace peelo
     class filename
     {
     public:
+        /** Platform specific file name separator. */
         static const rune separator;
 
         /**
@@ -149,6 +150,8 @@ namespace peelo
         string m_root;
         vector<string> m_path;
     };
+
+    std::ostream& operator<<(std::ostream&, const filename&);
 
     template<>
     struct hash<filename>

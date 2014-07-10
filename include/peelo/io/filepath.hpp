@@ -34,6 +34,7 @@ namespace peelo
     class filepath
     {
     public:
+        /** Platform specific file path separator. */
         static const rune separator;
 
         /**
@@ -57,6 +58,14 @@ namespace peelo
         filepath(const string& str);
 
         static bool is_separator(const rune& r);
+
+        /**
+         * Returns all file names which the file path contains.
+         */
+        inline const set<filename>& filenames() const
+        {
+            return m_filenames;
+        }
 
         filepath& assign(const filepath& that);
         filepath& assign(const set<filename>& filenames);
@@ -106,6 +115,29 @@ namespace peelo
 
     private:
         set<filename> m_filenames;
+    };
+
+    std::ostream& operator<<(std::ostream&, const filepath&);
+
+    template<>
+    struct hash<filepath>
+    {
+        typedef std::size_t result_type;
+
+        result_type operator()(const filepath& key) const
+        {
+            const set<filename>& filenames = key.filenames();
+            result_type result = 0;
+
+            for (set<filename>::const_iterator i = filenames.begin();
+                 i != filenames.end();
+                 ++i)
+            {
+                result += hash<filename>()(*i);
+            }
+
+            return result;
+        }
     };
 }
 

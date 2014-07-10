@@ -234,4 +234,11 @@ namespace peelo
         }
         filename.assign(compile(root, path));
     }
+
+    std::ostream& operator<<(std::ostream& os, const class filename& filename)
+    {
+        os << filename.file();
+
+        return os;
+    }
 }

@@ -945,6 +945,37 @@ namespace peelo
         return result;
     }
 
+    string::size_type string::find(const string& str, size_type pos) const
+    {
+        if (!str.m_length || str.m_length > m_length)
+        {
+            return npos;
+        }
+        for (size_type i = pos; i < m_length; ++i)
+        {
+            bool found = true;
+
+            if (i + str.m_length > m_length)
+            {
+                return npos;
+            }
+            for (size_type j = 0; j < str.m_length; ++j)
+            {
+                if (m_runes[m_offset + i + j] != str.m_runes[str.m_offset + j])
+                {
+                    found = false;
+                    break;
+                }
+            }
+            if (found)
+            {
+                return i;
+            }
+        }
+
+        return npos;
+    }
+
     string::size_type string::find(const_reference needle, size_type pos) const
     {
         while (pos < m_length)
@@ -954,6 +985,61 @@ namespace peelo
                 return pos;
             } else {
                 ++pos;
+            }
+        }
+
+        return npos;
+    }
+
+    string::size_type string::rfind(const string& str, size_type pos) const
+    {
+        if (pos == npos)
+        {
+            pos = m_length;
+        }
+        else if (pos > m_length || str.m_length > m_length)
+        {
+            return npos;
+        }
+        for (size_type i = m_length; i > 0; --i)
+        {
+            if (i > str.m_length)
+            {
+                bool found = true;
+
+                for (size_type j = 0; j < str.m_length; ++j)
+                {
+                    if (m_runes[m_offset + i - str.m_length + j - 1] != str.m_runes[str.m_offset + j])
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    return i - str.m_length - 1;
+                }
+            }
+        }
+
+        return npos;
+    }
+
+    string::size_type string::rfind(const_reference needle, size_type pos) const
+    {
+        if (pos == npos)
+        {
+            pos = m_length;
+        }
+        else if (pos > m_length)
+        {
+            return npos;
+        }
+        for (size_type i = pos; i > 0; --i)
+        {
+            if (m_runes[m_offset + i - 1] == needle)
+            {
+                return i - 1;
             }
         }
 
@@ -982,6 +1068,66 @@ namespace peelo
         if ((result.m_counter = m_counter))
         {
             ++m_counter[0];
+        }
+
+        return result;
+    }
+
+    vector<string> string::lines() const
+    {
+        vector<string> result;
+        size_type begin = 0;
+        size_type end = 0;
+
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (i + 1 < m_length
+                && m_runes[m_offset + i] == '\r'
+                && m_runes[m_offset + i + 1] == '\n')
+            {
+                result.push_back(substr(begin, end - begin));
+                begin = end = i + 2;
+                ++i;
+            }
+            else if (m_runes[m_offset + i] == '\n'
+                    || m_runes[m_offset + i] == '\r')
+            {
+                result.push_back(substr(begin, end - begin));
+                begin = end = i + 1;
+            } else {
+                ++end;
+            }
+        }
+        if (end - begin > 0)
+        {
+            result.push_back(substr(begin, end - begin));
+        }
+
+        return result;
+    }
+
+    vector<string> string::words() const
+    {
+        vector<string> result;
+        size_type begin = 0;
+        size_type end = 0;
+
+        for (size_type i = 0; i < m_length; ++i)
+        {
+            if (m_runes[m_offset + i].is_space())
+            {
+                if (end - begin > 0)
+                {
+                    result.push_back(substr(begin, end - begin));
+                }
+                begin = end = i + 1;
+            } else {
+                ++end;
+            }
+        }
+        if (end - begin > 0)
+        {
+            result.push_back(substr(begin, end - begin));
         }
 
         return result;

@@ -337,7 +337,11 @@ namespace peelo
         vector<char> utf32le() const;
         vector<wchar_t> widen() const;
 
+        size_type find(const string& str, size_type pos = 0) const;
         size_type find(const_reference needle, size_type pos = 0) const;
+
+        size_type rfind(const string& str, size_type pos = npos) const;
+        size_type rfind(const_reference needle, size_type pos = npos) const;
 
         string substr(size_type pos = 0, size_type count = npos) const;
 

@@ -46,6 +46,11 @@ namespace peelo
         static bool is_separator(const rune& r);
 
         /**
+         * Returns <code>true</code> if the file name is empty.
+         */
+        bool empty() const;
+
+        /**
          * Copies contents from another file name.
          */
         filename& assign(const filename& that);
@@ -76,6 +81,28 @@ namespace peelo
             return !equals(that);
         }
 
+        int compare(const filename& that) const;
+
+        inline bool operator<(const filename& that) const
+        {
+            return compare(that) < 0;
+        }
+
+        inline bool operator>(const filename& that) const
+        {
+            return compare(that) > 0;
+        }
+
+        inline bool operator<=(const filename& that) const
+        {
+            return compare(that) <= 0;
+        }
+
+        inline bool operator>=(const filename& that) const
+        {
+            return compare(that) >= 0;
+        }
+
         inline const string& path() const
         {
             return m_path;
@@ -85,6 +112,11 @@ namespace peelo
          * Returns <code>true</code> if file name is absolute.
          */
         bool is_absolute() const;
+
+        /**
+         * Returns <code>true</code> if the file exists in the file system.
+         */
+        bool exists() const;
 
     private:
         string m_path;

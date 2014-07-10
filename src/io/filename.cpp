@@ -24,6 +24,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <peelo/io/filename.hpp>
+#if defined(_WIN32)
+# include <windows.h>
+#else
+# include <unistd.h>
+# include <sys/stat.h>
+#endif
 
 namespace peelo
 {
@@ -39,6 +45,11 @@ namespace peelo
     bool filename::is_separator(const rune& r)
     {
         return r == '/' || r == '\\';
+    }
+
+    bool filename::empty() const
+    {
+        return m_path.empty();
     }
 
     filename& filename::assign(const filename& that)
@@ -60,5 +71,19 @@ namespace peelo
     bool filename::is_absolute() const
     {
         return !m_location.empty() && is_separator(m_location[0]);
+    }
+
+    bool filename::exists() const
+    {
+        if (empty())
+        {
+            return false;
+        }
+#if defined(_WIN32)
+        return ::GetFileAttributesW(m_path.widen().data())
+            != INVALID_FILE_ATTRIBUTES;
+#else
+        return !::access(m_path.utf8().data(), F_OK);
+#endif
     }
 }

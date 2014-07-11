@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <peelo/functional/hash.hpp>
+#include <peelo/number/inttypes.hpp>
 
 namespace peelo
 {
@@ -37,7 +38,7 @@ namespace peelo
     class rune
     {
     public:
-        typedef unsigned int value_type;
+        typedef uint32_t value_type;
 
         /** Minimum value for rune (zero). */
         static const rune min;

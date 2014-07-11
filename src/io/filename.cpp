@@ -24,6 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <peelo/io/filename.hpp>
+#include <peelo/text/stringbuilder.hpp>
 #if defined(_WIN32)
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
@@ -262,30 +263,22 @@ namespace peelo
 
     static string compile(const string& root, const vector<string>& path)
     {
-        vector<rune> result;
+        stringbuilder sb;
 
         if (!root.empty())
         {
-            result.reserve(root.length());
-            for (string::size_type i = 0; i < root.length(); ++i)
-            {
-                result.push_back(root[i]);
-            }
+            sb << root;
         }
         for (vector<string>::size_type i = 0; i < path.size(); ++i)
         {
-            if (i > 0 && !filename::is_separator(result[result.size() - 1]))
+            if (i > 0 && !filename::is_separator(sb.back()))
             {
-                result.push_back(filename::separator);
+                sb << filename::separator;
             }
-            result.reserve(result.size() + path[i].length());
-            for (string::size_type j = 0; j < path[i].length(); ++j)
-            {
-                result.push_back(path[i][j]);
-            }
+            sb << path[i];
         }
 
-        return string(result.data(), result.size());
+        return sb.str();
     }
 
     static void parse(const string& source,

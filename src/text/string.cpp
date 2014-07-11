@@ -233,18 +233,6 @@ namespace peelo
         return *this;
     }
 
-    void string::clear()
-    {
-        if (m_counter && !--(*m_counter))
-        {
-            delete m_counter;
-            delete[] m_runes;
-        }
-        m_offset = m_length = 0;
-        m_runes = 0;
-        m_counter = 0;
-    }
-
     bool string::equals(const string& that) const
     {
         if (m_runes == that.m_runes)
@@ -395,6 +383,44 @@ namespace peelo
         result.m_runes[m_length] = c;
 
         return result;
+    }
+
+    void string::clear()
+    {
+        if (m_counter && !--(*m_counter))
+        {
+            delete m_counter;
+            delete[] m_runes;
+        }
+        m_offset = m_length = 0;
+        m_runes = 0;
+        m_counter = 0;
+    }
+
+    string string::trim() const
+    {
+        size_type i, j;
+
+        for (i = 0; i < m_length; ++i)
+        {
+            if (!m_runes[m_offset + i].is_space())
+            {
+                break;
+            }
+        }
+        for (j = m_length; j > 0; --j)
+        {
+            if (!m_runes[m_offset + j - 1].is_space())
+            {
+                break;
+            }
+        }
+        if (i == 0 && j == m_length)
+        {
+            return *this;
+        } else {
+            return substr(i, j - i);
+        }
     }
 
     string string::to_lower() const

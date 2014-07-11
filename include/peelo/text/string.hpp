@@ -217,6 +217,11 @@ namespace peelo
         void clear();
 
         /**
+         * Trims all whitespace from beginning and end of the string.
+         */
+        string trim() const;
+
+        /**
          * Converts string into lower case and returns result.
          */
         string to_lower() const;

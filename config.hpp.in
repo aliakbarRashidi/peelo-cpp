@@ -1,0 +1,7 @@
+#ifndef PEELO_CONFIG_HPP_GUARD
+#define PEELO_CONFIG_HPP_GUARD
+
+#cmakedefine PEELO_HAVE_CSTDINT 1
+#cmakedefine PEELO_HAVE_STDINT_H 1
+
+#endif /* !PEELO_CONFIG_HPP_GUARD */

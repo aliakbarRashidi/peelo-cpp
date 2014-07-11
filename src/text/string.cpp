@@ -1017,6 +1017,43 @@ namespace peelo
         return npos;
     }
 
+    string::size_type string::find(const_pointer s,
+                                   size_type pos,
+                                   size_type count) const
+    {
+        if (!count)
+        {
+            return pos;
+        }
+        else if (count > m_length)
+        {
+            return npos;
+        }
+        for (size_type i = pos; i < m_length; ++i)
+        {
+            bool found = true;
+
+            if (i + count > m_length)
+            {
+                return npos;
+            }
+            for (size_type j = 0; j < count; ++j)
+            {
+                if (m_runes[m_offset + i + j] != s[j])
+                {
+                    found = false;
+                    break;
+                }
+            }
+            if (found)
+            {
+                return i;
+            }
+        }
+
+        return npos;
+    }
+
     string::size_type string::find(const_reference needle, size_type pos) const
     {
         while (pos < m_length)
@@ -1059,6 +1096,42 @@ namespace peelo
                 if (found)
                 {
                     return i - str.m_length - 1;
+                }
+            }
+        }
+
+        return npos;
+    }
+
+    string::size_type string::rfind(const_pointer s,
+                                    size_type pos,
+                                    size_type count) const
+    {
+        if (pos == npos)
+        {
+            pos = m_length;
+        }
+        else if (pos > m_length || count > m_length)
+        {
+            return npos;
+        }
+        for (size_type i = m_length; i > 0; --i)
+        {
+            if (i > count)
+            {
+                bool found = true;
+
+                for (size_type j = 0; j < count; ++j)
+                {
+                    if (m_runes[m_offset + i - count + j - 1] != s[j])
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    return i - count - 1;
                 }
             }
         }

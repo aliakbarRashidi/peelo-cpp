@@ -1,4 +1,5 @@
 /build
 /doxygen
+/include/peelo/config.hpp
 *.o
 *.swp

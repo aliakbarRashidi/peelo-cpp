@@ -133,6 +133,7 @@ namespace peelo
 
         string& assign(const string& that);
         string& assign(const_reference rune);
+        string& assign(const char* input);
 
         /**
          * Assignment operator.
@@ -148,6 +149,14 @@ namespace peelo
         inline string& operator=(const_reference rune)
         {
             return assign(rune);
+        }
+
+        /**
+         * Assignment operator.
+         */
+        inline string& operator=(const char* input)
+        {
+            return assign(input);
         }
 
         bool equals(const string& that) const;

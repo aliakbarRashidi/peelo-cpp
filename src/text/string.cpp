@@ -71,53 +71,134 @@ namespace peelo
         , m_runes(0)
         , m_counter(0)
     {
-        static const unsigned char utf8_length[256] =
-        {
-            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-            2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-            3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
-        };
-        static const unsigned char utf8_mask[6] =
-        {
-            0x7f,
-            0x1f,
-            0x0f,
-            0x07,
-            0x03,
-            0x01
-        };
-
         if (input)
         {
-            const char* p = input;
-
-            while (*p)
+            for (const char* p = input; *p;)
             {
-                p += utf8_length[static_cast<int>(*p)];
-                ++m_length;
+                size_type size;
+                char c = *p;
+                bool valid = true;
+
+                if ((c & 0x80) == 0x00)
+                {
+                    size = 1;
+                }
+                else if ((c & 0xc0) == 0x80)
+                {
+                    size = 0;
+                }
+                else if ((c & 0xe0) == 0xc0)
+                {
+                    size = 2;
+                }
+                else if ((c & 0xf0) == 0xe0)
+                {
+                    size = 3;
+                }
+                else if ((c & 0xf8) == 0xf0)
+                {
+                    size = 4;
+                }
+                else if ((c & 0xfc) == 0xf8)
+                {
+                    size = 5;
+                }
+                else if ((c & 0xfe) == 0xfc)
+                {
+                    size = 6;
+                } else {
+                    size = 0;
+                }
+                if (!size)
+                {
+                    break;
+                }
+                for (size_type i = 1; i < size; ++i)
+                {
+                    if ((p[i] & 0xc0) != 0x80)
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid)
+                {
+                    ++m_length;
+                    p += size;
+                } else {
+                    break;
+                }
             }
             if (m_length)
             {
-                m_counter = new unsigned(1);
-                m_runes = new value_type[m_length];
-                for (size_type i = 0; i < m_length; ++i)
-                {
-                    const size_type size = utf8_length[static_cast<int>(*input)];
-                    const unsigned char mask = utf8_mask[size - 1];
-                    unsigned int result = input[0] & mask;
+                size_type index = 0;
 
-                    for (size_type j = 1; j < size; ++j)
+                m_runes = new rune[m_length];
+                m_counter = new unsigned(1);
+                for (const char* p = input; *p;)
+                {
+                    size_type size;
+                    char c = *p;
+                    bool valid = true;
+                    value_type::value_type result;
+
+                    if ((c & 0x80) == 0x00)
                     {
-                        result <<= 6;
-                        result |= input[j] & 0x3f;
+                        size = 1;
+                        result = c;
                     }
-                    m_runes[i] = result;
-                    input += size;
+                    else if ((c & 0xc0) == 0x80)
+                    {
+                        size = 0;
+                    }
+                    else if ((c & 0xe0) == 0xc0)
+                    {
+                        size = 2;
+                        result = c & 0x1f;
+                    }
+                    else if ((c & 0xf0) == 0xe0)
+                    {
+                        size = 3;
+                        result = c & 0x0f;
+                    }
+                    else if ((c & 0xf8) == 0xf0)
+                    {
+                        size = 4;
+                        result = c & 0x07;
+                    }
+                    else if ((c & 0xfc) == 0xf8)
+                    {
+                        size = 5;
+                        result = c & 0x03;
+                    }
+                    else if ((c & 0xfe) == 0xfc)
+                    {
+                        size = 6;
+                        result = c & 0x01;
+                    } else {
+                        size = 0;
+                    }
+                    if (!size)
+                    {
+                        break;
+                    }
+                    for (size_type i = 1; i < size; ++i)
+                    {
+                        if ((p[i] & 0xc0) == 0x80)
+                        {
+                            result = (result << 6) | (p[i] & 0x3f);
+                        } else {
+                            valid = false;
+                            break;
+                        }
+                    }
+                    if (valid)
+                    {
+                        m_runes[index++] = result;
+                        p += size;
+                    } else {
+                        break;
+                    }
                 }
             }
         }
@@ -229,6 +310,151 @@ namespace peelo
         m_runes = new value_type[1];
         m_counter = new unsigned(1);
         m_runes[0] = rune;
+
+        return *this;
+    }
+
+    string& string::assign(const char* input)
+    {
+        if (m_counter && !--(*m_counter))
+        {
+            delete m_counter;
+            delete[] m_runes;
+        }
+        m_offset = m_length = 0;
+        m_runes = 0;
+        m_counter = 0;
+        if (input)
+        {
+            for (const char* p = input; *p;)
+            {
+                size_type size;
+                char c = *p;
+                bool valid = true;
+
+                if ((c & 0x80) == 0x00)
+                {
+                    size = 1;
+                }
+                else if ((c & 0xc0) == 0x80)
+                {
+                    size = 0;
+                }
+                else if ((c & 0xe0) == 0xc0)
+                {
+                    size = 2;
+                }
+                else if ((c & 0xf0) == 0xe0)
+                {
+                    size = 3;
+                }
+                else if ((c & 0xf8) == 0xf0)
+                {
+                    size = 4;
+                }
+                else if ((c & 0xfc) == 0xf8)
+                {
+                    size = 5;
+                }
+                else if ((c & 0xfe) == 0xfc)
+                {
+                    size = 6;
+                } else {
+                    size = 0;
+                }
+                if (!size)
+                {
+                    break;
+                }
+                for (size_type i = 1; i < size; ++i)
+                {
+                    if ((p[i] & 0xc0) != 0x80)
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid)
+                {
+                    ++m_length;
+                    p += size;
+                } else {
+                    break;
+                }
+            }
+            if (m_length)
+            {
+                size_type index = 0;
+
+                m_runes = new rune[m_length];
+                m_counter = new unsigned(1);
+                for (const char* p = input; *p;)
+                {
+                    size_type size;
+                    char c = *p;
+                    bool valid = true;
+                    value_type::value_type result;
+
+                    if ((c & 0x80) == 0x00)
+                    {
+                        size = 1;
+                        result = c;
+                    }
+                    else if ((c & 0xc0) == 0x80)
+                    {
+                        size = 0;
+                    }
+                    else if ((c & 0xe0) == 0xc0)
+                    {
+                        size = 2;
+                        result = c & 0x1f;
+                    }
+                    else if ((c & 0xf0) == 0xe0)
+                    {
+                        size = 3;
+                        result = c & 0x0f;
+                    }
+                    else if ((c & 0xf8) == 0xf0)
+                    {
+                        size = 4;
+                        result = c & 0x07;
+                    }
+                    else if ((c & 0xfc) == 0xf8)
+                    {
+                        size = 5;
+                        result = c & 0x03;
+                    }
+                    else if ((c & 0xfe) == 0xfc)
+                    {
+                        size = 6;
+                        result = c & 0x01;
+                    } else {
+                        size = 0;
+                    }
+                    if (!size)
+                    {
+                        break;
+                    }
+                    for (size_type i = 1; i < size; ++i)
+                    {
+                        if ((p[i] & 0xc0) == 0x80)
+                        {
+                            result = (result << 6) | (p[i] & 0x3f);
+                        } else {
+                            valid = false;
+                            break;
+                        }
+                    }
+                    if (valid)
+                    {
+                        m_runes[index++] = result;
+                        p += size;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
 
         return *this;
     }

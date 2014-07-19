@@ -148,6 +148,18 @@ namespace peelo
         ratio operator/(const ratio& that) const;
         ratio operator/(int64_t n) const;
 
+        ratio& operator+=(const ratio& that);
+        ratio& operator+=(int64_t n);
+
+        ratio& operator-=(const ratio& that);
+        ratio& operator-=(int64_t n);
+
+        ratio& operator*=(const ratio& that);
+        ratio& operator*=(int64_t n);
+
+        ratio& operator/=(const ratio& that);
+        ratio& operator/=(int64_t n);
+
     private:
         /** Numerator. */
         int64_t m_numerator;

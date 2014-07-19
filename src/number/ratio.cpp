@@ -130,6 +130,46 @@ namespace peelo
         );
     }
 
+    ratio& ratio::operator+=(const ratio& that)
+    {
+        return *this;
+    }
+
+    ratio& ratio::operator+=(int64_t n)
+    {
+        return operator+=(ratio(n));
+    }
+
+    ratio& ratio::operator-=(const ratio& that)
+    {
+        return *this;
+    }
+
+    ratio& ratio::operator-=(int64_t n)
+    {
+        return operator-=(ratio(n));
+    }
+
+    ratio& ratio::operator*=(const ratio& that)
+    {
+        return *this;
+    }
+
+    ratio& ratio::operator*=(int64_t n)
+    {
+        return operator*=(ratio(n));
+    }
+
+    ratio& ratio::operator/=(const ratio& that)
+    {
+        return *this;
+    }
+
+    ratio& ratio::operator/=(int64_t n)
+    {
+        return operator/=(ratio(n));
+    }
+
     std::ostream& operator<<(std::ostream& os, const class ratio& ratio)
     {
         os << ratio.numerator() << '/' << ratio.denominator();

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /*
  * Copyright (c) 2014, peelo.net
  * All rights reserved.
@@ -24,8 +23,6 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-=======
->>>>>>> 5737b302e01415bc184bbafec81f7cc19e8f2fd6
 #include <peelo/number/ratio.hpp>
 
 namespace peelo

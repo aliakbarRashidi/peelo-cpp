@@ -29,6 +29,7 @@ ADD_LIBRARY(
     src/io/filename.cpp
     src/io/filepath.cpp
     src/net/uri.cpp
+    src/number/ratio.cpp
     src/text/rune.cpp
     src/text/string.cpp
     src/text/stringbuilder.cpp

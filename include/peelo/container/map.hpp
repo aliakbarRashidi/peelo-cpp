@@ -626,6 +626,63 @@ namespace peelo
             return *this;
         }
 
+        size_type erase(const key_type& key)
+        {
+            const typename hasher::result_type hash = m_hash(key);
+            const size_type index = static_cast<size_type>(hash % m_bucket_count);
+            entry* e = m_bucket[index];
+
+            if (e)
+            {
+                size_type result = 0;
+                entry* ancestor = 0;
+                entry* child;
+
+                do
+                {
+                    child = e->child;
+                    if (e->hash == hash && m_equal(e->data.first(), key))
+                    {
+                        if (e->next && e->prev)
+                        {
+                            e->next->prev = e->prev;
+                            e->prev->next = e->next;
+                        }
+                        else if (e->next)
+                        {
+                            e->next->prev = 0;
+                            m_front = e->next;
+                        }
+                        else if (e->prev)
+                        {
+                            e->prev->next = 0;
+                            m_back = e->prev;
+                        } else {
+                            m_front = m_back = 0;
+                        }
+                        m_allocator.destroy(&e->data);
+                        std::free(static_cast<void*>(e));
+                        ++result;
+                        --m_size;
+                        if (ancestor)
+                        {
+                            ancestor->child = child;
+                        } else {
+                            m_bucket[index] = child;
+                        }
+                    } else {
+                        ancestor = e;
+                    }
+                    e = child;
+                }
+                while (e);
+
+                return result;
+            }
+
+            return 0;
+        }
+
         size_type erase(const_reference value)
         {
             const typename hasher::result_type hash = m_hash(value.first());

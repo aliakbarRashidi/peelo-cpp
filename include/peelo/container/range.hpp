@@ -201,12 +201,16 @@ namespace peelo
     std::ostream& operator<<(std::ostream& os, const range<T>& r)
     {
         os << r.front() << "..." << r.back();
+
+        return os;
     }
 
     template< class T >
     std::wostream& operator<<(std::wostream& os, const range<T>& r)
     {
         os << r.front() << L"..." << r.back();
+
+        return os;
     }
 }
 

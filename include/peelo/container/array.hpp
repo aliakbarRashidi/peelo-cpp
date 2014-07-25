@@ -50,7 +50,13 @@ namespace peelo
         typedef value_type* pointer;
         typedef const value_type* const_pointer;
 
-        struct iterator : public std::iterator<std::random_access_iterator_tag, value_type>
+        struct iterator : public std::iterator<
+                          std::random_access_iterator_tag,
+                          value_type,
+                          difference_type,
+                          pointer,
+                          reference
+        >
         {
         public:
             iterator()
@@ -185,7 +191,13 @@ namespace peelo
             friend class array;
         };
 
-        struct const_iterator : public std::iterator<std::random_access_iterator_tag, value_type>
+        struct const_iterator : public std::iterator<
+                                std::random_access_iterator_tag,
+                                value_type,
+                                difference_type,
+                                const_pointer,
+                                const_reference
+        >
         {
         public:
             const_iterator()

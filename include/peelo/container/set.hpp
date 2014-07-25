@@ -47,6 +47,7 @@ namespace peelo
         typedef Key key_type;
         typedef Key value_type;
         typedef std::size_t size_type;
+        typedef std::ptrdiff_t difference_type;
         typedef Hash hasher;
         typedef KeyEqual key_equal;
         typedef Allocator allocator_type;
@@ -66,7 +67,13 @@ namespace peelo
         };
 
     public:
-        struct iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+        struct iterator : public std::iterator<
+                          std::bidirectional_iterator_tag,
+                          value_type,
+                          difference_type,
+                          pointer,
+                          reference
+        >
         {
         public:
             iterator()
@@ -151,7 +158,13 @@ namespace peelo
             friend class set;
         };
 
-        struct const_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+        struct const_iterator : public std::iterator<
+                                std::bidirectional_iterator_tag,
+                                value_type,
+                                difference_type,
+                                const_pointer,
+                                const_reference
+        >
         {
         public:
             const_iterator()

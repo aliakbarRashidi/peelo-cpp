@@ -52,7 +52,13 @@ namespace peelo
         typedef typename Allocator::pointer pointer;
         typedef typename Allocator::const_pointer const_pointer;
 
-        struct iterator : public std::iterator<std::random_access_iterator_tag, value_type>
+        struct iterator : public std::iterator<
+                          std::random_access_iterator_tag,
+                          value_type,
+                          difference_type,
+                          pointer,
+                          reference
+        >
         {
         public:
             iterator()
@@ -187,7 +193,13 @@ namespace peelo
             friend class vector;
         };
 
-        struct const_iterator : public std::iterator<std::random_access_iterator_tag, value_type>
+        struct const_iterator : public std::iterator<
+                                std::random_access_iterator_tag,
+                                value_type,
+                                difference_type,
+                                const_pointer,
+                                const_reference
+        >
         {
         public:
             const_iterator()

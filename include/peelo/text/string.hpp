@@ -391,7 +391,13 @@ namespace peelo
         unsigned* m_counter;
     };
 
-    struct string::iterator : public std::iterator<std::random_access_iterator_tag, value_type>
+    struct string::iterator : public std::iterator<
+                              std::random_access_iterator_tag,
+                              value_type,
+                              difference_type,
+                              const_pointer,
+                              const_reference
+    >
     {
     public:
         iterator();

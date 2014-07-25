@@ -327,10 +327,19 @@ namespace peelo
 
         /**
          * Constructs empty vector.
+         */
+        vector()
+            : m_allocator(allocator_type())
+            , m_capacity(0)
+            , m_size(0)
+            , m_data(0) {}
+
+        /**
+         * Constructs empty vector.
          *
          * \param allocator Allocator used for allocating memory
          */
-        vector(const allocator_type& allocator = allocator_type())
+        explicit vector(const allocator_type& allocator)
             : m_allocator(allocator)
             , m_capacity(0)
             , m_size(0)
@@ -360,9 +369,9 @@ namespace peelo
          * \param value The value to store in the vector
          * \param allocator Allocator used for allocating memory
          */
-        explicit vector(size_type count,
-                        const_reference value,
-                        const allocator_type& allocator = allocator_type())
+        vector(size_type count,
+               const_reference value,
+               const allocator_type& allocator = allocator_type())
             : m_allocator(allocator)
             , m_capacity(count)
             , m_size(count)
@@ -371,6 +380,43 @@ namespace peelo
             for (size_type i = 0; i < m_size; ++i)
             {
                 m_allocator.construct(m_data + i, value);
+            }
+        }
+
+        /**
+         * Constructs vector which with <i>count</i> value-initializeed
+         * instances of <i>value_type</i>. No copies are made.
+         */
+        explicit vector(size_type count,
+                        const allocator_type& allocator = allocator_type())
+            : m_allocator(allocator)
+            , m_capacity(count)
+            , m_size(count)
+            , m_data(m_size ? m_allocator.allocate(m_size) : 0)
+        {
+            for (size_type i = 0; i < m_size; ++i)
+            {
+                m_allocator.construct(m_data + i, value_type());
+            }
+        }
+
+        /**
+         * Constructs vector with contents of the range <i>[first, last]</i>.
+         */
+        template< class InputIt >
+        vector(InputIt first,
+               InputIt last,
+               const allocator_type& allocator = allocator_type())
+            : m_allocator(allocator)
+            , m_capacity(std::distance(first, last))
+            , m_size(m_capacity)
+            , m_data(m_size ? m_allocator.allocate(m_size) : 0)
+        {
+            size_type index = 0;
+
+            for (; first != last; ++first)
+            {
+                m_allocator.construct(m_data + index++, *first);
             }
         }
 

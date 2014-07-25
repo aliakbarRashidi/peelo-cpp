@@ -139,11 +139,30 @@ namespace peelo
         }
 
         /**
+         * Removes the top element from the stack and assigns it to the given
+         * slot.
+         */
+        stack& operator>>(reference slot)
+        {
+            slot = m_container.pop_back();
+
+            return *this;
+        }
+
+        /**
          * Exchanges contents of the queue with contents of another stack.
          */
         void swap(stack<T, Container>& that)
         {
             m_container.swap(that.m_container);
+        }
+
+        /**
+         * Removes all elements from the stack.
+         */
+        void clear()
+        {
+            m_container.clear();
         }
 
     private:

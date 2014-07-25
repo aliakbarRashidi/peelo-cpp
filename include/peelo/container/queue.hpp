@@ -149,11 +149,30 @@ namespace peelo
         }
 
         /**
+         * Removes an element from the front of the queue and assigns it to
+         * the given slot.
+         */
+        queue& operator>>(reference slot)
+        {
+            slot = m_container.pop_front();
+
+            return *this;
+        }
+
+        /**
          * Exchanges contents of the queue with contents of another queue.
          */
         void swap(queue<T, Container>& that)
         {
             m_container.swap(that.m_container);
+        }
+
+        /**
+         * Removes all elements from the queue.
+         */
+        void clear()
+        {
+            m_container.clear();
         }
 
     private:

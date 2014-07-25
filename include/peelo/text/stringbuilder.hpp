@@ -326,6 +326,9 @@ namespace peelo
         /** Pointer to the rune data. */
         pointer m_runes;
     };
+
+    std::ostream& operator<<(std::ostream&, const stringbuilder&);
+    std::wostream& operator<<(std::wostream&, const stringbuilder&);
 }
 
 #endif /* !PEELO_TEXT_STRINGBUILDER_HPP_GUARD */

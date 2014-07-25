@@ -197,10 +197,16 @@ namespace peelo
         value_type m_back;
     };
 
-    template <class T>
+    template< class T >
     std::ostream& operator<<(std::ostream& os, const range<T>& r)
     {
         os << r.front() << "..." << r.back();
+    }
+
+    template< class T >
+    std::wostream& operator<<(std::wostream& os, const range<T>& r)
+    {
+        os << r.front() << L"..." << r.back();
     }
 }
 

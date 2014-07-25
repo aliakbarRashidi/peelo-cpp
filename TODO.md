@@ -1,3 +1,7 @@
+# Containers
+- Make sure vector implements SequenceContainer:
+  http://en.cppreference.com/w/cpp/concept/SequenceContainer
+
 # Hash
 - long long
 - unsigned long long

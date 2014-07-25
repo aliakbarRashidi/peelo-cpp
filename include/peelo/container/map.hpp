@@ -720,6 +720,40 @@ namespace peelo
         entry* m_back;
         size_type m_size;
     };
+
+    template< class Key, class T >
+    std::ostream& operator<<(std::ostream& os, const map<Key, T>& m)
+    {
+        for (typename map<Key, T>::const_iterator i = m.begin();
+             i != m.end();
+             ++i)
+        {
+            if (i != m.begin())
+            {
+                os << ", ";
+            }
+            os << *i;
+        }
+
+        return os;
+    }
+
+    template< class Key, class T >
+    std::wostream& operator<<(std::wostream& os, const map<Key, T>& m)
+    {
+        for (typename map<Key, T>::const_iterator i = m.begin();
+             i != m.end();
+             ++i)
+        {
+            if (i != m.begin())
+            {
+                os << L", ";
+            }
+            os << *i;
+        }
+
+        return os;
+    }
 }
 
 #endif /* !PEELO_CONTAINER_MAP_HPP_GUARD */

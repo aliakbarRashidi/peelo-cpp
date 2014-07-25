@@ -28,9 +28,7 @@
 
 #include <peelo/functional/equal_to.hpp>
 #include <peelo/functional/hash.hpp>
-#include <cstdlib>
-#include <iterator>
-#include <memory>
+#include <iostream>
 
 namespace peelo
 {
@@ -673,6 +671,40 @@ namespace peelo
         entry* m_back;
         size_type m_size;
     };
+
+    template< class T >
+    std::ostream& operator<<(std::ostream& os, const set<T>& s)
+    {
+        for (typename set<T>::const_iterator i = s.begin();
+             i != s.end();
+             ++i)
+        {
+            if (i != s.begin())
+            {
+                os << ", ";
+            }
+            os << *i;
+        }
+
+        return os;
+    }
+
+    template< class T >
+    std::wostream& operator<<(std::wostream& os, const set<T>& s)
+    {
+        for (typename set<T>::const_iterator i = s.begin();
+             i != s.end();
+             ++i)
+        {
+            if (i != s.begin())
+            {
+                os << L", ";
+            }
+            os << *i;
+        }
+
+        return os;
+    }
 }
 
 #endif /* !PEELO_CONTAINER_SET_HPP_GUARD */

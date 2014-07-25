@@ -110,16 +110,24 @@ namespace peelo
         T2 m_second;
     };
 
-    template <class T1, class T2>
+    template< class T1, class T2 >
     inline pair<T1, T2> make_pair(const T1& first, const T2& second)
     {
         return pair<T1, T2>(first, second);
     }
 
-    template <class T1, class T2>
+    template< class T1, class T2 >
     inline std::ostream& operator<<(std::ostream& os, const pair<T1, T2>& p)
     {
-        os << p.first() << ", " << p.second();
+        os << p.first() << ": " << p.second();
+
+        return os;
+    }
+
+    template< class T1, class T2 >
+    inline std::wostream& operator<<(std::wostream& os, const pair<T1, T2>& p)
+    {
+        os << p.first() << L": " << p.second();
 
         return os;
     }

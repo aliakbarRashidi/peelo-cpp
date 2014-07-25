@@ -348,4 +348,11 @@ namespace peelo
 
         return os;
     }
+
+    std::wostream& operator<<(std::wostream& os, const class filename& filename)
+    {
+        os << filename.file();
+
+        return os;
+    }
 }

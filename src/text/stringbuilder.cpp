@@ -446,4 +446,24 @@ namespace peelo
 
         return *this;
     }
+
+    std::ostream& operator<<(std::ostream& os, const stringbuilder& sb)
+    {
+        for (stringbuilder::size_type i = 0; i < sb.length(); ++i)
+        {
+            os << sb[i];
+        }
+
+        return os;
+    }
+
+    std::wostream& operator<<(std::wostream& os, const stringbuilder& sb)
+    {
+        for (stringbuilder::size_type i = 0; i < sb.length(); ++i)
+        {
+            os << sb[i];
+        }
+
+        return os;
+    }
 }

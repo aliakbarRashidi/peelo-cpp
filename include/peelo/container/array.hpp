@@ -678,7 +678,7 @@ namespace peelo
         pointer m_data;
     };
 
-    template <class T, std::size_t N>
+    template< class T, std::size_t N >
     inline std::ostream& operator<<(std::ostream& os, const array<T, N>& a)
     {
         for (std::size_t i = 0; i < N; ++i)
@@ -686,6 +686,21 @@ namespace peelo
             if (i > 0)
             {
                 os << ", ";
+            }
+            os << a[i];
+        }
+
+        return os;
+    }
+
+    template< class T, std::size_t N >
+    inline std::wostream& operator<<(std::wostream& os, const array<T, N>& a)
+    {
+        for (std::size_t i = 0; i < N; ++i)
+        {
+            if (i > 0)
+            {
+                os << L", ";
             }
             os << a[i];
         }

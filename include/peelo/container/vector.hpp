@@ -971,7 +971,7 @@ namespace peelo
      * Outputs each element from the vector into the output stream, separated
      * by commas.
      */
-    template <class T>
+    template< class T >
     std::ostream& operator<<(std::ostream& os, const vector<T>& v)
     {
         for (typename vector<T>::size_type i = 0; i < v.size(); ++i)
@@ -979,6 +979,25 @@ namespace peelo
             if (i > 0)
             {
                 os << ", ";
+            }
+            os << v[i];
+        }
+
+        return os;
+    }
+
+    /**
+     * Outputs each element from the vector into the output stream, separated
+     * by commas.
+     */
+    template< class T >
+    std::wostream& operator<<(std::wostream& os, const vector<T>& v)
+    {
+        for (typename vector<T>::size_type i = 0; i < v.size(); ++i)
+        {
+            if (i > 0)
+            {
+                os << L", ";
             }
             os << v[i];
         }

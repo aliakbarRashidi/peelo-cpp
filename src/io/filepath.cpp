@@ -135,4 +135,22 @@ namespace peelo
 
         return os;
     }
+
+    std::wostream& operator<<(std::wostream& os, const class filepath& filepath)
+    {
+        const set<filename>& filenames = filepath.filenames();
+
+        for (set<filename>::const_iterator i = filenames.begin();
+             i != filenames.end();
+             ++i)
+        {
+            if (i != filenames.begin())
+            {
+                os << filepath::separator;
+            }
+            os << *i;
+        }
+
+        return os;
+    }
 }

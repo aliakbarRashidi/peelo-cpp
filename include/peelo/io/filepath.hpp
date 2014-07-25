@@ -118,6 +118,7 @@ namespace peelo
     };
 
     std::ostream& operator<<(std::ostream&, const filepath&);
+    std::wostream& operator<<(std::wostream&, const filepath&);
 
     template<>
     struct hash<filepath>

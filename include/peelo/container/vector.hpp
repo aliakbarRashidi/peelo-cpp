@@ -97,7 +97,7 @@ namespace peelo
 
                 ++m_pointer;
 
-                return *this;
+                return tmp;
             }
 
             iterator& operator--()
@@ -113,7 +113,7 @@ namespace peelo
 
                 --m_pointer;
 
-                return *this;
+                return tmp;
             }
 
             inline bool operator==(const iterator& that) const
@@ -238,7 +238,7 @@ namespace peelo
 
                 ++m_pointer;
 
-                return *this;
+                return tmp;
             }
 
             const_iterator& operator--()
@@ -254,7 +254,7 @@ namespace peelo
 
                 --m_pointer;
 
-                return *this;
+                return tmp;
             }
 
             inline bool operator==(const const_iterator& that) const

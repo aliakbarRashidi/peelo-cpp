@@ -148,9 +148,9 @@ namespace peelo
                 return m_pointer->data;
             }
 
-            inline reference operator->()
+            inline pointer operator->()
             {
-                return m_pointer->data;
+                return &m_pointer->data;
             }
 
         private:
@@ -239,7 +239,7 @@ namespace peelo
                 return m_pointer->data;
             }
 
-            inline const_reference operator->()
+            inline const_pointer operator->()
             {
                 return m_pointer->data;
             }

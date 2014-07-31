@@ -60,6 +60,8 @@ namespace peelo
 
         string(const_pointer runes, size_type n);
 
+        string(const iterator& begin, const iterator& end);
+
         /**
          * Constructs string from string literal. The input is expected to be
          * in UTF-8.

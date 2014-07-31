@@ -65,6 +65,18 @@ namespace peelo
         }
     }
 
+    string::string(const iterator& begin, const iterator& end)
+        : m_offset(0)
+        , m_length(std::distance(begin, end))
+        , m_runes(m_length ? new value_type[m_length] : 0)
+        , m_counter(m_length ? new unsigned(1) : 0)
+    {
+        for (iterator i = begin; i < end; ++i)
+        {
+            m_runes[end - i] = *i;
+        }
+    }
+
     string::string(const char* input)
         : m_offset(0)
         , m_length(0)

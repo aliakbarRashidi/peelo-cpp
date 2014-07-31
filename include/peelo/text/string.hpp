@@ -476,6 +476,12 @@ namespace peelo
 
     std::ostream& operator<<(std::ostream&, const string&);
     std::wostream& operator<<(std::wostream&, const string&);
+    std::istream& getline(std::istream&, string&);
+
+    inline string operator+(const char* a, const string& b)
+    {
+        return string(a).concat(b);
+    }
 
     template<>
     struct hash<string>

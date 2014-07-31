@@ -1741,6 +1741,30 @@ namespace peelo
         return stream;
     }
 
+    std::istream& getline(std::istream& stream, string& s)
+    {
+        rune r;
+        stringbuilder buffer;
+
+        do
+        {
+            stream >> r;
+            if (!stream.good())
+            {
+                return stream;
+            }
+            else if (r == '\n')
+            {
+                break;
+            }
+            buffer.append(r);
+        }
+        while (true);
+        s.assign(buffer.str());
+
+        return stream;
+    }
+
     string::iterator::iterator()
         : m_pointer(0) {}
 

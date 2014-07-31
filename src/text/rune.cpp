@@ -34,22 +34,7 @@ namespace peelo
     rune::rune()
         : m_code(0) {}
 
-    rune::rune(char code)
-        : m_code(code) {}
-
-    rune::rune(unsigned char code)
-        : m_code(code) {}
-
-    rune::rune(int code)
-        : m_code(code)
-    {
-        if (code < 0 || code > 0x10ffff)
-        {
-            throw std::out_of_range("code point too large");
-        }
-    }
-
-    rune::rune(unsigned int code)
+    rune::rune(value_type code)
         : m_code(code)
     {
         if (code > 0x10ffff)
@@ -84,23 +69,10 @@ namespace peelo
         return m_code == that.m_code;
     }
 
-    bool rune::equals(value_type code) const
-    {
-        return m_code == code;
-    }
-
     bool rune::equals_icase(const rune& that) const
     {
         value_type a = to_lower(m_code);
         value_type b = to_lower(that.m_code);
-
-        return a == b;
-    }
-
-    bool rune::equals_icase(value_type code) const
-    {
-        value_type a = to_lower(m_code);
-        value_type b = to_lower(code);
 
         return a == b;
     }
@@ -110,23 +82,10 @@ namespace peelo
         return m_code > that.m_code ? 1 : m_code < that.m_code ? -1 : 0;
     }
 
-    int rune::compare(value_type code) const
-    {
-        return m_code > code ? 1 : m_code < code ? -1 : 0;
-    }
-
     int rune::compare_icase(const rune& that) const
     {
         value_type a = to_lower(m_code);
         value_type b = to_lower(that.m_code);
-
-        return a > b ? 1 : a < b ? -1 : 0;
-    }
-
-    int rune::compare_icase(value_type code) const
-    {
-        value_type a = to_lower(m_code);
-        value_type b = to_lower(code);
 
         return a > b ? 1 : a < b ? -1 : 0;
     }

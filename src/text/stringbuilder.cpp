@@ -118,6 +118,11 @@ namespace peelo
         insert(i, 1, value);
     }
 
+    void stringbuilder::insert(size_type i, int code)
+    {
+        insert(i, 1, rune(code));
+    }
+
     void stringbuilder::insert(size_type i,
                                size_type count,
                                const_reference value)
@@ -169,6 +174,11 @@ namespace peelo
             }
             m_length += count;
         }
+    }
+
+    void stringbuilder::insert(size_type i, size_type count, int code)
+    {
+        insert(i, count, rune(code));
     }
 
     void stringbuilder::insert(size_type i, const string& str)
@@ -243,6 +253,12 @@ namespace peelo
         m_runes[m_length++] = value;
     }
 
+    void stringbuilder::append(int code)
+    {
+        reserve(m_length + 1);
+        m_runes[m_length++] = code;
+    }
+
     void stringbuilder::append(size_type count, const_reference value)
     {
         if (count)
@@ -254,6 +270,11 @@ namespace peelo
             }
             m_length += count;
         }
+    }
+
+    void stringbuilder::append(size_type count, int code)
+    {
+        append(count, rune(code));
     }
 
     void stringbuilder::append(const string& str)
@@ -298,6 +319,33 @@ namespace peelo
         ++m_length;
     }
 
+    void stringbuilder::prepend(int code)
+    {
+        if (m_capacity >= m_length + 1)
+        {
+            std::memmove(
+                    static_cast<void*>(m_runes + 1),
+                    static_cast<const void*>(m_runes),
+                    sizeof(value_type) * m_length
+            );
+        } else {
+            pointer old = m_runes;
+
+            m_runes = new rune[m_capacity + 1];
+            for (size_type i = 0; i < m_length; ++i)
+            {
+                m_runes[i] = old[i];
+            }
+            if (old)
+            {
+                delete[] m_runes;
+            }
+            ++m_capacity;
+        }
+        m_runes[0] = code;
+        ++m_length;
+    }
+
     void stringbuilder::prepend(size_type count, const_reference value)
     {
         if (!count)
@@ -329,6 +377,11 @@ namespace peelo
             m_runes[i] = value;
         }
         m_length += count;
+    }
+
+    void stringbuilder::prepend(size_type count, int code)
+    {
+        prepend(count, rune(code));
     }
 
     void stringbuilder::prepend(const string& str)

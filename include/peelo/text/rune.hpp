@@ -47,13 +47,7 @@ namespace peelo
 
         rune();
 
-        rune(char code);
-
-        rune(unsigned char code);
-
-        rune(int code);
-
-        rune(unsigned int code);
+        explicit rune(value_type code);
 
         /**
          * Copy constructor.
@@ -69,6 +63,11 @@ namespace peelo
         }
 
         inline value_type code() const
+        {
+            return m_code;
+        }
+
+        inline operator int() const
         {
             return m_code;
         }
@@ -97,35 +96,18 @@ namespace peelo
             return equals(that);
         }
 
-        inline bool operator==(value_type code) const
-        {
-            return equals(code);
-        }
-
         inline bool operator!=(const rune& that) const
         {
             return !equals(that);
         }
 
-        inline bool operator!=(value_type code) const
-        {
-            return !equals(code);
-        }
-
         int compare(const rune& that) const;
-        int compare(value_type code) const;
 
         int compare_icase(const rune& that) const;
-        int compare_icase(value_type code) const;
 
         inline bool operator<(const rune& that) const
         {
             return compare(that) < 0;
-        }
-
-        inline bool operator<(value_type code) const
-        {
-            return compare(code) < 0;
         }
 
         inline bool operator>(const rune& that) const
@@ -133,29 +115,14 @@ namespace peelo
             return compare(that) > 0;
         }
 
-        inline bool operator>(value_type code) const
-        {
-            return compare(code) > 0;
-        }
-
         inline bool operator<=(const rune& that) const
         {
             return compare(that) <= 0;
         }
 
-        inline bool operator<=(value_type code) const
-        {
-            return compare(code) <= 0;
-        }
-
         inline bool operator>=(const rune& that) const
         {
             return compare(that) >= 0;
-        }
-
-        inline bool operator>=(value_type code) const
-        {
-            return compare(code) >= 0;
         }
 
         /**

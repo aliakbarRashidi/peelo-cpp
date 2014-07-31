@@ -202,7 +202,19 @@ namespace peelo
          */
         void insert(size_type i, const_reference value);
 
+        /**
+         * Inserts given rune at index position <i>i</i> in the string builder.
+         * If <i>i</i> is <code>0</code>, then rune is prepended to the string
+         * builder. If <i>i</i> is length(), then rune is appended to the
+         * string builder.
+         *
+         * \throw std::out_of_range If index is out of bounds
+         */
+        void insert(size_type i, int code);
+
         void insert(size_type i, size_type count, const_reference value);
+
+        void insert(size_type i, size_type count, int code);
 
         void insert(size_type i, const string& str);
 
@@ -218,7 +230,14 @@ namespace peelo
          */
         void append(const_reference value);
 
+        /**
+         * Inserts given Unicode code point to the end of the string builder.
+         */
+        void append(int code);
+
         void append(size_type count, const_reference value);
+
+        void append(size_type count, int value);
 
         /**
          * Inserts given string to the end of the string builder.
@@ -231,6 +250,16 @@ namespace peelo
         inline stringbuilder& operator<<(const_reference value)
         {
             append(value);
+
+            return *this;
+        }
+
+        /**
+         * Inserts given Unicode code point to the end of the string builder.
+         */
+        inline stringbuilder& operator<<(int code)
+        {
+            append(code);
 
             return *this;
         }
@@ -250,7 +279,15 @@ namespace peelo
          */
         void prepend(const_reference value);
 
+        /**
+         * Inserts given Unicode code point at the beginning of the string
+         * builder.
+         */
+        void prepend(int code);
+
         void prepend(size_type count, const_reference value);
+
+        void prepend(size_type count, int value);
 
         /**
          * Inserts given string at the beginning of the string builder.

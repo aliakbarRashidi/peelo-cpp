@@ -28,6 +28,7 @@
 #include <peelo/text/stringbuilder.hpp>
 #include <stdexcept>
 #include <cstring>
+#include "utf8utils.hpp"
 
 namespace peelo
 {
@@ -87,58 +88,14 @@ namespace peelo
         {
             for (const char* p = input; *p;)
             {
-                size_type size;
-                char c = *p;
-                bool valid = true;
+                size_type size = utf8_size(*p);
 
-                if ((c & 0x80) == 0x00)
-                {
-                    size = 1;
-                }
-                else if ((c & 0xc0) == 0x80)
-                {
-                    size = 0;
-                }
-                else if ((c & 0xe0) == 0xc0)
-                {
-                    size = 2;
-                }
-                else if ((c & 0xf0) == 0xe0)
-                {
-                    size = 3;
-                }
-                else if ((c & 0xf8) == 0xf0)
-                {
-                    size = 4;
-                }
-                else if ((c & 0xfc) == 0xf8)
-                {
-                    size = 5;
-                }
-                else if ((c & 0xfe) == 0xfc)
-                {
-                    size = 6;
-                } else {
-                    size = 0;
-                }
-                if (!size)
+                if (size == 0)
                 {
                     break;
-                }
-                for (size_type i = 1; i < size; ++i)
-                {
-                    if ((p[i] & 0xc0) != 0x80)
-                    {
-                        valid = false;
-                        break;
-                    }
-                }
-                if (valid)
-                {
+                } else {
                     ++m_length;
                     p += size;
-                } else {
-                    break;
                 }
             }
             if (m_length)
@@ -149,50 +106,38 @@ namespace peelo
                 m_counter = new unsigned(1);
                 for (const char* p = input; *p;)
                 {
-                    size_type size;
-                    char c = *p;
-                    bool valid = true;
+                    size_type size = utf8_size(*p);
                     value_type::value_type result;
+                    bool valid = true;
 
-                    if ((c & 0x80) == 0x00)
-                    {
-                        size = 1;
-                        result = c;
-                    }
-                    else if ((c & 0xc0) == 0x80)
-                    {
-                        size = 0;
-                    }
-                    else if ((c & 0xe0) == 0xc0)
-                    {
-                        size = 2;
-                        result = c & 0x1f;
-                    }
-                    else if ((c & 0xf0) == 0xe0)
-                    {
-                        size = 3;
-                        result = c & 0x0f;
-                    }
-                    else if ((c & 0xf8) == 0xf0)
-                    {
-                        size = 4;
-                        result = c & 0x07;
-                    }
-                    else if ((c & 0xfc) == 0xf8)
-                    {
-                        size = 5;
-                        result = c & 0x03;
-                    }
-                    else if ((c & 0xfe) == 0xfc)
-                    {
-                        size = 6;
-                        result = c & 0x01;
-                    } else {
-                        size = 0;
-                    }
-                    if (!size)
+                    if (size == 0)
                     {
                         break;
+                    }
+                    switch (size)
+                    {
+                        case 1:
+                            result = *p;
+                            break;
+
+                        case 2:
+                            result = *p & 0x1f;
+                            break;
+
+                        case 3:
+                            result = *p & 0x0f;
+                            break;
+
+                        case 4:
+                            result = *p & 0x07;
+                            break;
+
+                        case 5:
+                            result = *p & 0x03;
+                            break;
+
+                        case 6:
+                            result = *p & 0x01;
                     }
                     for (size_type i = 1; i < size; ++i)
                     {
@@ -340,58 +285,14 @@ namespace peelo
         {
             for (const char* p = input; *p;)
             {
-                size_type size;
-                char c = *p;
-                bool valid = true;
+                size_type size = utf8_size(*p);
 
-                if ((c & 0x80) == 0x00)
-                {
-                    size = 1;
-                }
-                else if ((c & 0xc0) == 0x80)
-                {
-                    size = 0;
-                }
-                else if ((c & 0xe0) == 0xc0)
-                {
-                    size = 2;
-                }
-                else if ((c & 0xf0) == 0xe0)
-                {
-                    size = 3;
-                }
-                else if ((c & 0xf8) == 0xf0)
-                {
-                    size = 4;
-                }
-                else if ((c & 0xfc) == 0xf8)
-                {
-                    size = 5;
-                }
-                else if ((c & 0xfe) == 0xfc)
-                {
-                    size = 6;
-                } else {
-                    size = 0;
-                }
-                if (!size)
+                if (size == 0)
                 {
                     break;
-                }
-                for (size_type i = 1; i < size; ++i)
-                {
-                    if ((p[i] & 0xc0) != 0x80)
-                    {
-                        valid = false;
-                        break;
-                    }
-                }
-                if (valid)
-                {
+                } else {
                     ++m_length;
                     p += size;
-                } else {
-                    break;
                 }
             }
             if (m_length)
@@ -402,50 +303,38 @@ namespace peelo
                 m_counter = new unsigned(1);
                 for (const char* p = input; *p;)
                 {
-                    size_type size;
-                    char c = *p;
-                    bool valid = true;
+                    size_type size = utf8_size(*p);
                     value_type::value_type result;
+                    bool valid = true;
 
-                    if ((c & 0x80) == 0x00)
-                    {
-                        size = 1;
-                        result = c;
-                    }
-                    else if ((c & 0xc0) == 0x80)
-                    {
-                        size = 0;
-                    }
-                    else if ((c & 0xe0) == 0xc0)
-                    {
-                        size = 2;
-                        result = c & 0x1f;
-                    }
-                    else if ((c & 0xf0) == 0xe0)
-                    {
-                        size = 3;
-                        result = c & 0x0f;
-                    }
-                    else if ((c & 0xf8) == 0xf0)
-                    {
-                        size = 4;
-                        result = c & 0x07;
-                    }
-                    else if ((c & 0xfc) == 0xf8)
-                    {
-                        size = 5;
-                        result = c & 0x03;
-                    }
-                    else if ((c & 0xfe) == 0xfc)
-                    {
-                        size = 6;
-                        result = c & 0x01;
-                    } else {
-                        size = 0;
-                    }
-                    if (!size)
+                    if (size == 0)
                     {
                         break;
+                    }
+                    switch (size)
+                    {
+                        case 1:
+                            result = *p;
+                            break;
+
+                        case 2:
+                            result = *p & 0x1f;
+                            break;
+
+                        case 3:
+                            result = *p & 0x0f;
+                            break;
+
+                        case 4:
+                            result = *p & 0x07;
+                            break;
+
+                        case 5:
+                            result = *p & 0x03;
+                            break;
+
+                        case 6:
+                            result = *p & 0x01;
                     }
                     for (size_type i = 1; i < size; ++i)
                     {

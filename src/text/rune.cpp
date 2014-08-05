@@ -25,6 +25,7 @@
  */
 #include <peelo/text/rune.hpp>
 #include <stdexcept>
+#include "utf8utils.hpp"
 
 namespace peelo
 {
@@ -1784,52 +1785,41 @@ namespace peelo
 
         if (c != std::istream::traits_type::eof())
         {
-            int size;
+            std::size_t size = utf8_size(c);
             rune::value_type result;
 
-            if ((c & 0x80) == 0x00)
-            {
-                size = 1;
-                result = c;
-            }
-            else if ((c & 0xc0) == 0x80)
-            {
-                size = 0;
-            }
-            else if ((c & 0xe0) == 0xc0)
-            {
-                size = 2;
-                result = c & 0x1f;
-            }
-            else if ((c & 0xf0) == 0xe0)
-            {
-                size = 3;
-                result = c & 0x0f;
-            }
-            else if ((c & 0xf8) == 0xf0)
-            {
-                size = 4;
-                result = c & 0x07;
-            }
-            else if ((c & 0xfc) == 0xf8)
-            {
-                size = 5;
-                result = c & 0x03;
-            }
-            else if ((c & 0xfe) == 0xfc)
-            {
-                size = 6;
-                result = c & 0x01;
-            } else {
-                size = 0;
-            }
-            if (!size)
+            if (size == 0)
             {
                 stream.setstate(std::istream::failbit);
 
                 return stream;
             }
-            for (int i = 1; i < size; ++i)
+            switch (size)
+            {
+                case 1:
+                    result = c;
+                    break;
+
+                case 2:
+                    result = c & 0x1f;
+                    break;
+
+                case 3:
+                    result = c & 0x0f;
+                    break;
+
+                case 4:
+                    result = c & 0x07;
+                    break;
+
+                case 5:
+                    result = c & 0x03;
+                    break;
+
+                default:
+                    result = c & 0x01;
+            }
+            for (std::size_t i = 1; i < size; ++i)
             {
                 if ((c = stream.get()) == std::istream::traits_type::eof())
                 {

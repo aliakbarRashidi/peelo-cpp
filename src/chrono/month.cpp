@@ -190,4 +190,49 @@ namespace peelo
 
         return os;
     }
+
+    std::wostream& operator<<(std::wostream& os, const month& m)
+    {
+        switch (m.index())
+        {
+            case 1:
+                os << L"January";
+                break;
+            case 2:
+                os << L"February";
+                break;
+            case 3:
+                os << L"March";
+                break;
+            case 4:
+                os << L"April";
+                break;
+            case 5:
+                os << L"May";
+                break;
+            case 6:
+                os << L"June";
+                break;
+            case 7:
+                os << L"July";
+                break;
+            case 8:
+                os << L"August";
+                break;
+            case 9:
+                os << L"September";
+                break;
+            case 10:
+                os << L"October";
+                break;
+            case 11:
+                os << L"November";
+                break;
+            case 12:
+                os << L"December";
+                break;
+        }
+
+        return os;
+    }
 }

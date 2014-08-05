@@ -222,4 +222,11 @@ namespace peelo
 
         return os;
     }
+
+    std::wostream& operator<<(std::wostream& os, const datetime& dt)
+    {
+        os << dt.date() << L'T' << dt.time() << L'Z';
+
+        return os;
+    }
 }

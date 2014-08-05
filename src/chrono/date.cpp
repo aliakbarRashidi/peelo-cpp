@@ -497,4 +497,42 @@ namespace peelo
 
         return os;
     }
+
+    std::wostream& operator<<(std::wostream& os, const date& d)
+    {
+        int year = d.year();
+        const int month = d.month().index();
+        const int day = d.day();
+
+        if (year < 0)
+        {
+            year = -year - 1;
+            os << L'-';
+        }
+        if (year < 1000)
+        {
+            os << L'0';
+            if (year < 100)
+            {
+                os << L'0';
+                if (year < 10)
+                {
+                    os << L'0';
+                }
+            }
+        }
+        os << year << L'-';
+        if (month < 10)
+        {
+            os << L'0';
+        }
+        os << month << L'-';
+        if (day < 10)
+        {
+            os << L'0';
+        }
+        os << day;
+
+        return os;
+    }
 }

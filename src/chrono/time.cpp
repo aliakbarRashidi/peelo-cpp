@@ -231,4 +231,29 @@ namespace peelo
 
         return os;
     }
+
+    std::wostream& operator<<(std::wostream& os, const time& t)
+    {
+        const int hour = t.hour();
+        const int minute = t.minute();
+        const int second = t.second();
+
+        if (hour < 10)
+        {
+            os << L'0';
+        }
+        os << hour << L':';
+        if (minute < 10)
+        {
+            os << L'0';
+        }
+        os << minute << L':';
+        if (second < 0)
+        {
+            os << L'0';
+        }
+        os << second;
+
+        return os;
+    }
 }

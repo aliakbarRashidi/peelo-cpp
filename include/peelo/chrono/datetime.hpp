@@ -182,6 +182,7 @@ namespace peelo
     };
 
     std::ostream& operator<<(std::ostream&, const datetime&);
+    std::wostream& operator<<(std::wostream&, const datetime&);
 }
 
 #endif /* !PEELO_CHRONO_DATETIME_HPP_GUARD */

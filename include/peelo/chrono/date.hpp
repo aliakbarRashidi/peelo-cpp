@@ -26,6 +26,7 @@
 #ifndef PEELO_CHRONO_DATE_HPP_GUARD
 #define PEELO_CHRONO_DATE_HPP_GUARD
 
+#include <peelo/chrono/duration.hpp>
 #include <peelo/chrono/month.hpp>
 #include <peelo/chrono/weekday.hpp>
 #include <iostream>
@@ -55,6 +56,11 @@ namespace peelo
          * Copy constructor.
          */
         date(const date& that);
+
+        /**
+         * Constructs date value from UNIX timestamp.
+         */
+        date(long timestamp);
 
         /**
          * Returns date value based on system clock.
@@ -133,6 +139,11 @@ namespace peelo
          */
         static bool is_leap_year(int year);
 
+        /**
+         * Calculates UNIX timestamp from date.
+         */
+        long timestamp() const;
+
         date& assign(const date& that);
         date& assign(int year, const class month& month, int day);
 
@@ -199,6 +210,8 @@ namespace peelo
          * Decrements date by one day.
          */
         date operator--(int);
+
+        duration operator-(const date& that) const;
 
     private:
         /** Year of the date. */

@@ -181,9 +181,14 @@ namespace peelo
         return datetime(timestamp() - duration.seconds());
     }
 
+    duration datetime::operator-(const datetime& that) const
+    {
+        return duration(0, 0, 0, static_cast<int>(timestamp() - that.timestamp()));
+    }
+
     std::ostream& operator<<(std::ostream& os, const datetime& dt)
     {
-        os << dt.date() << ' ' << dt.time() << " UTC";
+        os << dt.date() << 'T' << dt.time() << 'Z';
 
         return os;
     }

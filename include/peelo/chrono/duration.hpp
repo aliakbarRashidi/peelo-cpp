@@ -34,13 +34,6 @@ namespace peelo
     class duration
     {
     public:
-        static const int hours_per_day;
-        static const int minutes_per_day;
-        static const int minutes_per_hour;
-        static const int seconds_per_day;
-        static const int seconds_per_hour;
-        static const int seconds_per_minute;
-
         explicit duration(int days = 0,
                           int hours = 0,
                           int minutes = 0,
@@ -54,28 +47,19 @@ namespace peelo
         /**
          * Returns duration in days. Incomplete days are discarded.
          */
-        inline int days() const
-        {
-            return m_seconds / seconds_per_day;
-        }
+        int days() const;
 
         /**
          * Returns duration in hours. Incomplete hours are discarded. The returned
          * value can be greater than 23.
          */
-        inline int hours() const
-        {
-            return m_seconds / seconds_per_hour;
-        }
+        int hours() const;
 
         /**
          * Returns duration in minutes. Incomplete minutes are discarded. The
          * returned value can be greater than 59.
          */
-        inline int minutes() const
-        {
-            return m_seconds / seconds_per_minute;
-        }
+        int minutes() const;
 
         /**
          * Returns duration in seconds. The returned value can be greater than
@@ -86,25 +70,49 @@ namespace peelo
             return m_seconds;
         }
 
+        /**
+         * Replaces value of the duration with value from another duration.
+         *
+         * \param that Other duration to copy value from
+         */
         duration& assign(const duration& that);
 
+        /**
+         * Assignment operator.
+         */
         inline duration& operator=(const duration& that)
         {
             return assign(that);
         }
 
+        /**
+         * Tests whether two duration values are equal.
+         *
+         * \param that Other duration value to test against
+         */
         bool equals(const duration& that) const;
 
+        /**
+         * Equality testing operator.
+         */
         inline bool operator==(const duration& that) const
         {
             return equals(that);
         }
 
+        /**
+         * Non-equality testing operator.
+         */
         inline bool operator!=(const duration& that) const
         {
             return !equals(that);
         }
 
+        /**
+         * Compares value of duration with another duration.
+         *
+         * \param that Other duration to compare value against
+         */
         int compare(const duration& that) const;
 
         inline bool operator<(const duration& that) const
@@ -133,6 +141,7 @@ namespace peelo
         duration operator/(int quotient) const;
 
     private:
+        /** Value of duration in seconds. */
         int m_seconds;
     };
 }

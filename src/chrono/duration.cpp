@@ -27,12 +27,12 @@
 
 namespace peelo
 {
-    const int duration::hours_per_day = 24;
-    const int duration::minutes_per_day = 1440;
-    const int duration::minutes_per_hour = 60;
-    const int duration::seconds_per_day = 86400;
-    const int duration::seconds_per_hour = 3600;
-    const int duration::seconds_per_minute = 60;
+    static const int hours_per_day = 24;
+    static const int minutes_per_day = 1440;
+    static const int minutes_per_hour = 60;
+    static const int seconds_per_day = 86400;
+    static const int seconds_per_hour = 3600;
+    static const int seconds_per_minute = 60;
 
     duration::duration(int days, int hours, int minutes, int seconds)
         : m_seconds(
@@ -44,6 +44,21 @@ namespace peelo
     
     duration::duration(const duration& that)
         : m_seconds(that.m_seconds) {}
+
+    int duration::days() const
+    {
+        return m_seconds / seconds_per_day;
+    }
+
+    int duration::hours() const
+    {
+        return m_seconds / seconds_per_hour;
+    }
+
+    int duration::minutes() const
+    {
+        return m_seconds / seconds_per_minute;
+    }
 
     duration& duration::assign(const duration& that)
     {

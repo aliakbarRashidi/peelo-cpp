@@ -50,6 +50,36 @@ namespace peelo
         , m_month(that.m_month)
         , m_day(that.m_day) {}
 
+    date::date(long timestamp)
+        : m_year(0)
+        , m_month(month::jan)
+        , m_day(1)
+    {
+#if defined(_WIN32)
+        FILETIME ft;
+        SYSTEMTIME st;
+        LONGLONG ll = Int32x32To64(timestamp, 10000000) + 116444736000000000;
+
+        ft.dwLowDateTime = static_cast<DWORD>(ll);
+        ft.dwHighDateTime = ll >> 32;
+        ::FileTimeToSystemTime(&ft, &st);
+        m_year = st.wYear;
+        m_month = peelo::month(st.wMonth);
+        m_day = st.wDay;
+#else
+        std::time_t ts = static_cast<std::time_t>(timestamp);
+        std::tm* tm = std::localtime(&ts);
+
+        if (!tm)
+        {
+            throw std::runtime_error("localtime() failed");
+        }
+        m_year = tm->tm_year + 1900;
+        m_month = peelo::month(tm->tm_mon + 1);
+        m_day = tm->tm_mday;
+#endif
+    }
+
     date date::today()
     {
 #if defined(_WIN32)
@@ -257,6 +287,41 @@ namespace peelo
         return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     }
 
+    long date::timestamp() const
+    {
+        static const int days_before_month[12] =
+        {
+            0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334
+        };
+
+        // Compute days in a year
+        long days = (m_day - 1) + (days_before_month[m_month.index() - 1]);
+
+        // Leap year adjustment
+        if (m_month > month::jan && days_in_year() == 366)
+        {
+            ++days;
+        }
+
+        // Compute days in other years
+        if (m_year > 1970)
+        {
+            for (int y = 1970; y < m_year; ++y)
+            {
+                days += days_in_year(y);
+            }
+        }
+        else if (m_year < 1970)
+        {
+            for (int y = 1969; y >= m_year; --y)
+            {
+                days -= days_in_year(y);
+            }
+        }
+
+        return days * 86400;
+    }
+
     date& date::assign(const date& that)
     {
         return assign(that.m_year, that.m_month, that.m_day);
@@ -390,12 +455,34 @@ namespace peelo
         return clone;
     }
 
+    duration date::operator-(const date& that) const
+    {
+        return duration(0, 0, 0, static_cast<int>(timestamp() - that.timestamp()));
+    }
+
     std::ostream& operator<<(std::ostream& os, const date& d)
     {
-        const int year = d.year();
+        int year = d.year();
         const int month = d.month().index();
         const int day = d.day();
 
+        if (year < 0)
+        {
+            year = -year - 1;
+            os << '-';
+        }
+        if (year < 1000)
+        {
+            os << '0';
+            if (year < 100)
+            {
+                os << '0';
+                if (year < 10)
+                {
+                    os << '0';
+                }
+            }
+        }
         os << year << '-';
         if (month < 10)
         {

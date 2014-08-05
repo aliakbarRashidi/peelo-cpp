@@ -130,6 +130,11 @@ namespace peelo
         );
     }
 
+    ratio ratio::operator/(int64_t n) const
+    {
+        return operator/(ratio(n));
+    }
+
     ratio& ratio::operator+=(const ratio& that)
     {
         return *this;

@@ -59,7 +59,7 @@ namespace peelo
 
         return time(local_time.wHour, local_time.wMinute, local_time.wSecond);
 #else
-        std::time_t ts = std::time(NULL);
+        std::time_t ts = std::time(0);
         std::tm* tm = std::localtime(&ts);
 
         if (!tm)

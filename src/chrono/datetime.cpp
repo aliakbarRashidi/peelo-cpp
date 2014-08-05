@@ -83,7 +83,37 @@ namespace peelo
 
     datetime datetime::now()
     {
-        return datetime(date::today(), time::now());
+#if defined(_WIN32)
+        SYSTEMTIME local_time;
+
+        ::GetLocalTime(&local_time);
+
+        return datetime(
+                local_time.wYear,
+                peelo::month(local_time.wMonth),
+                local_time.wDay,
+                local_time.wHour,
+                local_time.wMinute,
+                local_time.wSecond
+        );
+#else
+        std::time_t ts = std::time(0);
+        std::tm* tm = std::localtime(&ts);
+
+        if (!tm)
+        {
+            throw std::runtime_error("localtime() failed");
+        }
+
+        return datetime(
+                tm->tm_year + 1900,
+                peelo::month(tm->tm_mon + 1),
+                tm->tm_mday,
+                tm->tm_hour,
+                tm->tm_min,
+                tm->tm_sec
+        );
+#endif
     }
 
     bool datetime::is_valid(int year,

@@ -201,6 +201,38 @@ namespace peelo
         }
     }
 
+    datetime& datetime::operator++()
+    {
+        ++m_date;
+
+        return *this;
+    }
+
+    datetime datetime::operator++(int)
+    {
+        datetime clone(m_date, m_time);
+
+        ++m_date;
+
+        return clone;
+    }
+
+    datetime& datetime::operator--()
+    {
+        --m_date;
+
+        return *this;
+    }
+
+    datetime datetime::operator--(int)
+    {
+        datetime clone(m_date, m_time);
+
+        --m_date;
+
+        return *this;
+    }
+
     datetime datetime::operator+(const class duration& duration) const
     {
         return datetime(timestamp() + duration.seconds());

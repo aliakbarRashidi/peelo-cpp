@@ -77,14 +77,62 @@ namespace peelo
             return m_date;
         }
 
+        /**
+         * Returns year of the date.
+         */
         inline int year() const
         {
             return m_date.year();
         }
 
+        /**
+         * Returns month of the year.
+         */
         inline const class month& month() const
         {
             return m_date.month();
+        }
+
+        /**
+         * Returns day of the month (from 1 to 31) of the date.
+         */
+        inline int day() const
+        {
+            return m_date.day();
+        }
+
+        /**
+         * Returns weekday for this date.
+         */
+        inline const weekday& day_of_week() const
+        {
+            return m_date.day_of_week();
+        }
+
+        /**
+         * Returns the day of the year (from 1 to 365 or 366 on leap years) for
+         * this date.
+         */
+        inline int day_of_year() const
+        {
+            return m_date.day_of_year();
+        }
+
+        /**
+         * Returns the number of days in the year (365 or 366) for this date.
+         */
+        inline int days_in_year() const
+        {
+            return m_date.days_in_year();
+        }
+
+        /**
+         * Returns <code>true</code> if the year represented by the date is a
+         * leap year.
+         */
+        inline bool is_leap_year() const
+        {
+            return m_date.is_leap_year();
         }
 
         /**
@@ -93,11 +141,6 @@ namespace peelo
         inline const class time& time() const
         {
             return m_time;
-        }
-
-        inline int day() const
-        {
-            return m_date.day();
         }
 
         inline int hour() const
@@ -170,6 +213,26 @@ namespace peelo
         {
             return compare(that) >= 0;
         }
+
+        /**
+         * Increments date by one day.
+         */
+        datetime& operator++();
+
+        /**
+         * Increments date by one day.
+         */
+        datetime operator++(int);
+
+        /**
+         * Decrements date by one day.
+         */
+        datetime& operator--();
+
+        /**
+         * Decrements date by one day.
+         */
+        datetime operator--(int);
 
         datetime operator+(const class duration& duration) const;
         datetime operator-(const class duration& duration) const;

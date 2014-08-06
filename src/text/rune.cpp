@@ -1694,42 +1694,13 @@ namespace peelo
         return rune(original);
     }
 
-    std::ostream& operator<<(std::ostream& stream, const rune& r)
+    std::ostream& operator<<(std::ostream& stream, const class rune& rune)
     {
-        const rune::value_type c = r.code();
+        unsigned char buffer[5];
 
-        if (c < rune::max.code()
-            && (c & 0xfffe) != 0xfffe
-            && !(c >= 0xd800 && c <= 0xdfff)
-            && !(c >= 0xffd0 && c <= 0xfdef))
+        if (utf8_encode(buffer, rune.code()))
         {
-            char s[5];
-
-            if (c < 0x80)
-            {
-                s[0] = static_cast<unsigned char>(c);
-                s[1] = 0;
-            }
-            else if (c < 0x800)
-            {
-                s[0] = static_cast<unsigned char>(0xc0 | ((c & 0x7c0)) >> 6);
-                s[1] = static_cast<unsigned char>(0x80 | (c & 0x3f));
-                s[2] = 0;
-            }
-            else if (c < 0x10000)
-            {
-                s[0] = static_cast<unsigned char>(0xe0 | ((c & 0xf000) >> 12));
-                s[1] = static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6));
-                s[2] = static_cast<unsigned char>(0x80 | (c & 0x3f));
-                s[3] = 0;
-            } else {
-                s[0] = static_cast<unsigned char>(0xf0 | ((c & 0x1c0000) >> 18));
-                s[1] = static_cast<unsigned char>(0x80 | ((c & 0x3f000) >> 12));
-                s[2] = static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6));
-                s[3] = static_cast<unsigned char>(0x80 | (c & 0x3f));
-                s[4] = 0;
-            }
-            stream << s;
+            stream << buffer;
         }
 
         return stream;
@@ -1785,7 +1756,7 @@ namespace peelo
 
         if (c != std::istream::traits_type::eof())
         {
-            std::size_t size = utf8_size(c);
+            std::size_t size = utf8_decode_size(c);
             rune::value_type result;
 
             if (size == 0)

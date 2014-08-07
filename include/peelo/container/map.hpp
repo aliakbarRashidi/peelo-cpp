@@ -30,8 +30,7 @@
 #include <peelo/functional/equal_to.hpp>
 #include <peelo/functional/hash.hpp>
 #include <cstdlib>
-#include <iterator>
-#include <memory>
+#include <stdexcept>
 
 namespace peelo
 {

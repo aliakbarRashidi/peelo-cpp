@@ -479,6 +479,7 @@ namespace peelo
     std::ostream& operator<<(std::ostream&, const string&);
     std::wostream& operator<<(std::wostream&, const string&);
     std::istream& getline(std::istream&, string&);
+    std::wistream& getline(std::wistream&, string&);
 
     inline string operator+(const char* a, const string& b)
     {

@@ -326,6 +326,7 @@ namespace peelo
     std::ostream& operator<<(std::ostream&, const rune&);
     std::wostream& operator<<(std::wostream&, const rune&);
     std::istream& operator>>(std::istream&, rune&);
+    std::wistream& operator>>(std::wistream&, rune&);
 
     template<>
     struct hash<rune>

@@ -34,7 +34,8 @@ namespace peelo
         }
     }
 
-    static inline bool utf8_encode(unsigned char* out, rune::value_type c)
+    template< typename T >
+    static inline bool utf8_encode(T* out, rune::value_type c)
     {
         if (c > rune::max.code()
             || (c & 0xfffe) == 0xfffe
@@ -45,26 +46,26 @@ namespace peelo
         }
         else if (c < 0x80)
         {
-            out[0] = static_cast<unsigned char>(c);
+            out[0] = static_cast<T>(c);
             out[1] = 0;
         }
         else if (c < 0x800)
         {
-            out[0] = static_cast<unsigned char>(0xc0 | ((c & 0x7c0) >> 6));
-            out[1] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+            out[0] = static_cast<T>(0xc0 | ((c & 0x7c0) >> 6));
+            out[1] = static_cast<T>(0x80 | (c & 0x3f));
             out[2] = 0;
         }
         else if (c < 0x10000)
         {
-            out[0] = static_cast<unsigned char>(0xe0 | ((c & 0xf000) >> 12));
-            out[1] = static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6));
-            out[2] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+            out[0] = static_cast<T>(0xe0 | ((c & 0xf000) >> 12));
+            out[1] = static_cast<T>(0x80 | ((c & 0xfc0) >> 6));
+            out[2] = static_cast<T>(0x80 | (c & 0x3f));
             out[3] = 0;
         } else {
-            out[0] = static_cast<unsigned char>(0xf0 | ((c & 0x1c0000) >> 18));
-            out[1] = static_cast<unsigned char>(0x80 | ((c & 0x3f000) >> 12));
-            out[2] = static_cast<unsigned char>(0x80 | ((c & 0xfc0) >> 6));
-            out[3] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+            out[0] = static_cast<T>(0xf0 | ((c & 0x1c0000) >> 18));
+            out[1] = static_cast<T>(0x80 | ((c & 0x3f000) >> 12));
+            out[2] = static_cast<T>(0x80 | ((c & 0xfc0) >> 6));
+            out[3] = static_cast<T>(0x80 | (c & 0x3f));
             out[4] = 0;
         }
 

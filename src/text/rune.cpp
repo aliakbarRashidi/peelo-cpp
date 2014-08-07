@@ -1710,42 +1710,33 @@ namespace peelo
     {
         const rune::value_type c = r.code();
 
+#if defined(_WIN32)
         if (c < rune::max.code()
             && (c & 0xfffe) != 0xfffe
             && !(c >= 0xd800 && c <= 0xdfff)
             && !(c >= 0xffd0 && c <= 0xfdef))
         {
-#if defined(_WIN32)
+            wchar_t buffer[3];
+
             if (c > 0xfff)
             {
-                stream << static_cast<wchar_t>(0xd800 + (c >> 10))
-                       << static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
+                buffer[0] = static_cast<wchar_t>(0xd800 + (c >> 10));
+                buffer[1] = static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
+                buffer[2] = 0;
             } else {
-                stream << static_cast<wchar_t>(c);
+                buffer[0] = static_cast<wchar_t>(c);
+                buffer[1] = 0;
             }
-#else
-            if (c < 0x80)
-            {
-                stream << static_cast<wchar_t>(c);
-            }
-            else if (c < 0x800)
-            {
-                stream << static_cast<wchar_t>(0xc0 | ((c & 0x7c0)) >> 6)
-                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
-            }
-            else if (c < 0x10000)
-            {
-                stream << static_cast<wchar_t>(0xe0 | ((c & 0xf000) >> 12))
-                       << static_cast<wchar_t>(0x80 | ((c & 0xfc0) >> 6))
-                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
-            } else {
-                stream << static_cast<wchar_t>(0xf0 | ((c & 0x1c0000) >> 18))
-                       << static_cast<wchar_t>(0x80 | ((c & 0x3f000) >> 12))
-                       << static_cast<wchar_t>(0x80 | ((c & 0xfc0) >> 6))
-                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
-            }
-#endif
+            stream << buffer;
         }
+#else
+        wchar_t buffer[5];
+
+        if (utf8_encode(buffer, c))
+        {
+            stream << buffer;
+        }
+#endif
 
         return stream;
     }
@@ -1804,6 +1795,95 @@ namespace peelo
                 }
                 result = (result << 6) | (c & 0x3f);
             }
+            r.assign(result);
+        }
+
+        return stream;
+    }
+
+    std::wistream& operator>>(std::wistream& stream, rune& r)
+    {
+        int c = stream.get();
+
+        if (c != std::wistream::traits_type::eof())
+        {
+            rune::value_type result;
+
+#if defined(_WIN32)
+            int c1 = c;
+            int c2 = stream.get();
+
+            if (c == std::wistream::traits_type::eof())
+            {
+                return stream;
+            }
+            else if (c1 >= 0xd8 && c1 <= 0xdb)
+            {
+                int c3 = stream.get();
+                int c4;
+
+                if (c3 == std::wistream::traits_type::eof()
+                    || (c4 = stream.get()) == std::wistream::traits_type::eof())
+                {
+                    return stream;
+                }
+                result = static_cast<rune::value_type>(
+                        ((((c2 - 0xd8) << 2) + ((c1 & 0xc0) >> 6) + 1) << 16)
+                        + ((((c1 & 0x3f) << 2) + (c4 - 0xdc)) << 8)
+                        + c3;
+                );
+            } else {
+                result = static_cast<rune::value_type>(c2 * 256 + c1);
+            }
+#else
+            std::size_t size = utf8_decode_size(c);
+
+            if (size == 0)
+            {
+                stream.setstate(std::istream::failbit);
+
+                return stream;
+            }
+            switch (size)
+            {
+                case 1:
+                    result = c;
+                    break;
+
+                case 2:
+                    result = c & 0x1f;
+                    break;
+
+                case 3:
+                    result = c & 0x0f;
+                    break;
+
+                case 4:
+                    result = c & 0x07;
+                    break;
+
+                case 5:
+                    result = c & 0x03;
+                    break;
+
+                default:
+                    result = c & 0x01;
+            }
+            for (std::size_t i = 1; i < size; ++i)
+            {
+                if ((c = stream.get()) == std::istream::traits_type::eof())
+                {
+                    return stream;
+                }
+                else if ((c & 0xc0) != 0x80)
+                {
+                    stream.setstate(std::istream::failbit);
+
+                    return stream;
+                }
+                result = (result << 6) | (c & 0x3f);
+            }
+#endif
             r.assign(result);
         }
 

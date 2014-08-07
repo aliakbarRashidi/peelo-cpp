@@ -1491,14 +1491,17 @@ namespace peelo
 
     std::wostream& operator<<(std::wostream& stream, const string& s)
     {
-        vector<wchar_t> result;
-
 #if defined(_WIN32)
-        result.reserve(s.length() + 1);
-        for (std::string::size_type i = 0; i < s.length(); ++i)
+        wchar_t buffer[3];
+#else
+        wchar_t buffer[5];
+#endif
+
+        for (string::size_type i = 0; i < s.length(); ++i)
         {
             const rune::value_type c = s[i].code();
 
+#if defined(_WIN32)
             if (c > rune::max.code()
                 || (c & 0xfffe) == 0xfffe
                 || (c >= 0xd800 && c <= 0xdfff)
@@ -1508,82 +1511,50 @@ namespace peelo
             }
             else if (c > 0xffff)
             {
-                result << static_cast<wchar_t>(0xd800 + (c >> 10))
-                       << static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
+                buffer[0] = static_cast<wchar_t>(0xd800 + (c >> 10));
+                buffer[1] = static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
+                buffer[2] = 0;
             } else {
-                result << static_cast<wchar_t>(c);
+                buffer[0] = static_cast<wchar_t>(c);
+                buffer[1] = 0;
             }
-        }
+            stream << buffer;
 #else
-        string::size_type size = 0;
-
-        for (string::size_type i = 0; i < s.length(); ++i)
-        {
-            const rune::value_type c = s[i].code();
-
-            if (c > rune::max.code()
-                || (c & 0xfffe) == 0xfffe
-                || (c >= 0xd800 && c <= 0xdfff)
-                || (c >= 0xffd0 && c <= 0xfdef))
+            if (utf8_encode(buffer, c))
             {
-                continue;
+                stream << buffer;
             }
-            else if (c < 0x80)
-            {
-                ++size;
-            }
-            else if (c < 0x800)
-            {
-                size += 2;
-            }
-            else if (c < 0x10000)
-            {
-                size += 3;
-            } else {
-                size += 4;
-            }
-        }
-        result.reserve(size + 1);
-        for (std::string::size_type i = 0; i < s.length(); ++i)
-        {
-            const rune::value_type c = s[i].code();
-
-            if (c > rune::max.code()
-                || (c & 0xfffe) == 0xfffe
-                || (c >= 0xd800 && c <= 0xdfff)
-                || (c >= 0xffd0 && c <= 0xfdef))
-            {
-                continue;
-            }
-            else if (c < 0x80)
-            {
-                result << static_cast<wchar_t>(c);
-            }
-            else if (c < 0x800)
-            {
-                result << static_cast<wchar_t>(0xc0 | ((c & 0x7c0)) >> 6)
-                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
-            }
-            else if (c < 0x10000)
-            {
-                result << static_cast<wchar_t>(0xe0 | ((c & 0xf000) >> 12))
-                       << static_cast<wchar_t>(0x80 | ((c & 0xfc0) >> 6))
-                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
-            } else {
-                result << static_cast<wchar_t>(0xf0 | ((c & 0x1c0000) >> 18))
-                       << static_cast<wchar_t>(0x80 | ((c & 0x3f000) >> 12))
-                       << static_cast<wchar_t>(0x80 | ((c & 0xfc0) >> 6))
-                       << static_cast<wchar_t>(0x80 | (c & 0x3f));
-            }
-        }
 #endif
-        result << static_cast<wchar_t>(0);
-        stream << result.data();
+        }
 
         return stream;
     }
 
     std::istream& getline(std::istream& stream, string& s)
+    {
+        rune r;
+        stringbuilder buffer;
+
+        do
+        {
+            stream >> r;
+            if (!stream.good())
+            {
+                return stream;
+            }
+            else if (r == '\n')
+            {
+                break;
+            }
+            buffer.append(r);
+        }
+        while (true);
+        s.assign(buffer.str());
+
+        return stream;
+    }
+
+    std::wistream& getline(std::wistream& stream, string& s)
     {
         rune r;
         stringbuilder buffer;

@@ -1476,13 +1476,19 @@ namespace peelo
 
     std::ostream& operator<<(std::ostream& stream, const string& s)
     {
-        unsigned char buffer[5];
+        std::ostream::sentry sentry(stream);
 
-        for (string::size_type i = 0; i < s.length(); ++i)
+        if (sentry)
         {
-            if (utf8_encode(buffer, s[i].code()))
+            char buffer[4];
+            std::streamsize size;
+
+            for (string::size_type i = 0; i < s.length(); ++i)
             {
-                stream << buffer;
+                if (utf8_encode(buffer, size, s[i].code()))
+                {
+                    stream.rdbuf()->sputn(buffer, size);
+                }
             }
         }
 
@@ -1491,40 +1497,46 @@ namespace peelo
 
     std::wostream& operator<<(std::wostream& stream, const string& s)
     {
-#if defined(_WIN32)
-        wchar_t buffer[3];
-#else
-        wchar_t buffer[5];
-#endif
+        std::wostream::sentry sentry(stream);
 
-        for (string::size_type i = 0; i < s.length(); ++i)
+        if (sentry)
         {
-            const rune::value_type c = s[i].code();
+#if defined(_WIN32)
+            wchar_t buffer[2];
+#else
+            wchar_t buffer[4];
+#endif
+            std::streamsize size;
+
+            for (string::size_type i = 0; i < s.length(); ++i)
+            {
+                const rune::value_type c = s[i].code();
 
 #if defined(_WIN32)
-            if (c > rune::max.code()
-                || (c & 0xfffe) == 0xfffe
-                || (c >= 0xd800 && c <= 0xdfff)
-                || (c >= 0xffd0 && c <= 0xfdef))
-            {
-                continue;
-            }
-            else if (c > 0xffff)
-            {
-                buffer[0] = static_cast<wchar_t>(0xd800 + (c >> 10));
-                buffer[1] = static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
-                buffer[2] = 0;
-            } else {
-                buffer[0] = static_cast<wchar_t>(c);
-                buffer[1] = 0;
-            }
-            stream << buffer;
+                if (c > rune::max.code()
+                    || (c & 0xfffe) == 0xfffe
+                    || (c >= 0xd800 && c <= 0xdfff)
+                    || (c >= 0xffd0 && c <= 0xfdef))
+                {
+                    continue;
+                }
+                else if (c > 0xffff)
+                {
+                    buffer[0] = static_cast<wchar_t>(0xd800 + (c >> 10));
+                    buffer[1] = static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
+                    size = 2;
+                } else {
+                    buffer[0] = static_cast<wchar_t>(c);
+                    size = 1;
+                }
+                stream.write(buffer, size);
 #else
-            if (utf8_encode(buffer, c))
-            {
-                stream << buffer;
-            }
+                if (utf8_encode(buffer, size, c))
+                {
+                    stream.rdbuf()->sputn(buffer, size);
+                }
 #endif
+            }
         }
 
         return stream;

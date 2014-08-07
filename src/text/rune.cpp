@@ -1696,11 +1696,17 @@ namespace peelo
 
     std::ostream& operator<<(std::ostream& stream, const class rune& rune)
     {
-        unsigned char buffer[5];
+        std::ostream::sentry sentry(stream);
 
-        if (utf8_encode(buffer, rune.code()))
+        if (sentry)
         {
-            stream << buffer;
+            char buffer[4];
+            std::streamsize size;
+
+            if (utf8_encode(buffer, size, rune.code()))
+            {
+                stream.rdbuf()->sputn(buffer, size);
+            }
         }
 
         return stream;
@@ -1708,35 +1714,43 @@ namespace peelo
 
     std::wostream& operator<<(std::wostream& stream, const rune& r)
     {
-        const rune::value_type c = r.code();
+        std::wostream::sentry sentry(stream);
+
+        if (sentry)
+        {
+            const rune::value_type c = r.code();
+#if defined(_WIN32)
+            wchar_t buffer[2];
+#else
+            wchar_t buffer[4];
+#endif
+            std::streamsize size;
 
 #if defined(_WIN32)
-        if (c < rune::max.code()
-            && (c & 0xfffe) != 0xfffe
-            && !(c >= 0xd800 && c <= 0xdfff)
-            && !(c >= 0xffd0 && c <= 0xfdef))
-        {
-            wchar_t buffer[3];
-
+            if (c > rune::max.code()
+                || (c & 0xfffe) == 0xfffe
+                || (c >= 0xd800 && c <= 0xdfff)
+                || (c >= 0xffd0 && c <= 0xfdef))
+            {
+                return stream;
+            }
             if (c > 0xfff)
             {
                 buffer[0] = static_cast<wchar_t>(0xd800 + (c >> 10));
                 buffer[1] = static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
-                buffer[2] = 0;
+                size = 2;
             } else {
                 buffer[0] = static_cast<wchar_t>(c);
-                buffer[1] = 0;
+                size = 1;
             }
-            stream << buffer;
-        }
 #else
-        wchar_t buffer[5];
-
-        if (utf8_encode(buffer, c))
-        {
-            stream << buffer;
-        }
+            if (!utf8_encode(buffer, size, c))
+            {
+                return stream;
+            }
 #endif
+            stream.rdbuf()->sputn(buffer, size);
+        }
 
         return stream;
     }

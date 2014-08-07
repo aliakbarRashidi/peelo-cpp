@@ -501,71 +501,95 @@ namespace peelo
         return *this;
     }
 
-    std::ostream& operator<<(std::ostream& stream, const stringbuilder& sb)
+    std::ostream& operator<<(std::ostream& os, const stringbuilder& sb)
     {
-        std::ostream::sentry sentry(stream);
+        std::ostream::sentry sentry(os);
+        char buffer[4];
+        std::streamsize size;
+        const std::streamsize width = os.width();
+        const bool a = sb.length() < width;
+        const bool b = (os.flags() & std::ios_base::adjustfield) != std::ios_base::left;
 
-        if (sentry)
+        if (!sentry)
         {
-            char buffer[4];
-            std::streamsize size;
-
-            for (stringbuilder::size_type i = 0; i < sb.length(); ++i)
+            return os;
+        }
+        if (a && b)
+        {
+            for (std::streamsize i = sb.length(); i < width; ++i)
             {
-                if (utf8_encode(buffer, size, sb[i].code()))
+                os.rdbuf()->sputc(os.fill());
+            }
+        }
+        for (stringbuilder::size_type i = 0; i < sb.length(); ++i)
+        {
+            if (utf8_encode(buffer, size, sb[i].code()))
+            {
+                os.rdbuf()->sputn(buffer, size);
+            }
+        }
+        if (a)
+        {
+            if (!b)
+            {
+                for (std::streamsize i = sb.length(); i < width; ++i)
                 {
-                    stream.rdbuf()->sputn(buffer, size);
+                    os.rdbuf()->sputc(os.fill());
                 }
             }
         }
+        os.width(0);
 
-        return stream;
+        return os;
     }
 
-    std::wostream& operator<<(std::wostream& stream, const stringbuilder& sb)
+    std::wostream& operator<<(std::wostream& os, const stringbuilder& sb)
     {
-        std::wostream::sentry sentry(stream);
+        std::wostream::sentry sentry(os);
+#if defined(_WIN32)
+        wchar_t buffer[2];
+#else
+        wchar_t buffer[4];
+#endif
+        std::streamsize size;
+        const std::streamsize width = os.width();
+        const bool a = sb.length() < width;
+        const bool b = (os.flags() & std::ios_base::adjustfield) != std::ios_base::left;
 
-        if (sentry)
+        if (!sentry)
         {
-#if defined(_WIN32)
-            wchar_t buffer[2];
-#else
-            wchar_t buffer[4];
-#endif
-            std::streamsize size;
-
-            for (stringbuilder::size_type i = 0; i < sb.length(); ++i)
+            return os;
+        }
+        if (a && b)
+        {
+            for (std::streamsize i = sb.length(); i < width; ++i)
             {
-                const rune::value_type c = sb[i].code();
-
-#if defined(_WIN32)
-                if (c > rune::max.code()
-                    || (c & 0xfffe) == 0xfffe
-                    || (c >= 0xd800 && c <= 0xdfff)
-                    || (c >= 0xffd0 && c <= 0xfdef))
-                {
-                    continue;
-                }
-                else if (c > 0xffff)
-                {
-                    buffer[0] = static_cast<wchar_t>(0xd800 + (c >> 10));
-                    buffer[1] = static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
-                    size = 2;
-                } else {
-                    buffer[0] = static_cast<wchar_t>(c);
-                    size = 1;
-                }
-                stream.write(buffer, size);
-#else
-                if (utf8_encode(buffer, size, c))
-                {
-                    stream.rdbuf()->sputn(buffer, size);
-                }
-#endif
+                os.rdbuf()->sputc(os.fill());
             }
         }
+        for (stringbuilder::size_type i = 0; i < sb.length(); ++i)
+        {
+#if defined(_WIN32)
+            if (utf16_encode(buffer, size, sb[i].code()))
+#else
+            if (utf8_encode(buffer, size, sb[i].code()))
+#endif
+            {
+                os.rdbuf()->sputn(buffer, size);
+            }
+        }
+        if (a)
+        {
+            if (!b)
+            {
+                for (std::streamsize i = sb.length(); i < width; ++i)
+                {
+                    os.rdbuf()->sputc(os.fill());
+                }
+            }
+        }
+        os.width(0);
 
-        return stream;
+        return os;
     }
 }

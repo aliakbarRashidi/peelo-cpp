@@ -24,6 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <peelo/algorithm/abs.hpp>
+#include <peelo/algorithm/max.hpp>
 #include <peelo/algorithm/min.hpp>
 #include <peelo/text/stringbuilder.hpp>
 #include <stdexcept>
@@ -1474,120 +1475,156 @@ namespace peelo
         return sb.str();
     }
 
-    std::ostream& operator<<(std::ostream& stream, const string& s)
+    std::ostream& operator<<(std::ostream& os, const string& s)
     {
-        std::ostream::sentry sentry(stream);
+        std::ostream::sentry sentry(os);
+        char buffer[4];
+        std::streamsize size;
+        const std::streamsize width = os.width();
+        const bool a = s.length() < width;
+        const bool b = (os.flags() & std::ios_base::adjustfield) != std::ios_base::left;
 
-        if (sentry)
+        if (!sentry)
         {
-            char buffer[4];
-            std::streamsize size;
-
-            for (string::size_type i = 0; i < s.length(); ++i)
+            return os;
+        }
+        if (a && b)
+        {
+            for (std::streamsize i = s.length(); i < width; ++i)
             {
-                if (utf8_encode(buffer, size, s[i].code()))
+                os.rdbuf()->sputc(os.fill());
+            }
+        }
+        for (string::size_type i = 0; i < s.length(); ++i)
+        {
+            if (utf8_encode(buffer, size, s[i].code()))
+            {
+                os.rdbuf()->sputn(buffer, size);
+            }
+        }
+        if (a)
+        {
+            if (!b)
+            {
+                for (std::streamsize i = s.length(); i < width; ++i)
                 {
-                    stream.rdbuf()->sputn(buffer, size);
+                    os.rdbuf()->sputc(os.fill());
                 }
             }
         }
+        os.width(0);
 
-        return stream;
+        return os;
     }
 
-    std::wostream& operator<<(std::wostream& stream, const string& s)
+    std::wostream& operator<<(std::wostream& os, const string& s)
     {
-        std::wostream::sentry sentry(stream);
+        std::wostream::sentry sentry(os);
+#if defined(_WIN32)
+        wchar_t buffer[2];
+#else
+        wchar_t buffer[4];
+#endif
+        std::streamsize size;
+        const std::streamsize width = os.width();
+        const bool a = s.length() < width;
+        const bool b = (os.flags() & std::ios_base::adjustfield) != std::ios_base::left;
+
+        if (!sentry)
+        {
+            return os;
+        }
+        if (a && b)
+        {
+            for (std::streamsize i = s.length(); i < width; ++i)
+            {
+                os.rdbuf()->sputc(os.fill());
+            }
+        }
+        for (string::size_type i = 0; i < s.length(); ++i)
+        {
+#if defined(_WIN32)
+            if (utf16_encode(buffer, size, s[i].code()))
+#else
+            if (utf8_encode(buffer, size, s[i].code()))
+#endif
+            {
+                os.rdbuf()->sputn(buffer, size);
+            }
+        }
+        if (a)
+        {
+            if (!b)
+            {
+                for (std::streamsize i = s.length(); i < width; ++i)
+                {
+                    os.rdbuf()->sputc(os.fill());
+                }
+            }
+        }
+        os.width(0);
+
+        return os;
+    }
+
+    std::istream& getline(std::istream& is, string& s)
+    {
+        std::istream::sentry sentry(is);
 
         if (sentry)
         {
-#if defined(_WIN32)
-            wchar_t buffer[2];
-#else
-            wchar_t buffer[4];
-#endif
-            std::streamsize size;
+            rune::value_type code;
+            stringbuilder buffer;
 
-            for (string::size_type i = 0; i < s.length(); ++i)
+            do
             {
-                const rune::value_type c = s[i].code();
-
-#if defined(_WIN32)
-                if (c > rune::max.code()
-                    || (c & 0xfffe) == 0xfffe
-                    || (c >= 0xd800 && c <= 0xdfff)
-                    || (c >= 0xffd0 && c <= 0xfdef))
+                if (utf8_decode(is, code))
                 {
-                    continue;
-                }
-                else if (c > 0xffff)
-                {
-                    buffer[0] = static_cast<wchar_t>(0xd800 + (c >> 10));
-                    buffer[1] = static_cast<wchar_t>(0xdc00 + (c & 0x3ff));
-                    size = 2;
+                    if (code == '\n')
+                    {
+                        break;
+                    } else {
+                        buffer.append(code);
+                    }
                 } else {
-                    buffer[0] = static_cast<wchar_t>(c);
-                    size = 1;
+                    return is;
                 }
-                stream.write(buffer, size);
-#else
-                if (utf8_encode(buffer, size, c))
+            }
+            while (is.good());
+            s.assign(buffer.str());
+        }
+
+        return is;
+    }
+
+    std::wistream& getline(std::wistream& is, string& s)
+    {
+        std::wistream::sentry sentry(is);
+
+        if (sentry)
+        {
+            rune::value_type code;
+            stringbuilder buffer;
+
+            do
+            {
+                if (utf8_decode(is, code))
                 {
-                    stream.rdbuf()->sputn(buffer, size);
+                    if (code == '\n')
+                    {
+                        break;
+                    } else {
+                        buffer.append(code);
+                    }
+                } else {
+                    return is;
                 }
-#endif
             }
+            while (is.good());
+            s.assign(buffer.str());
         }
 
-        return stream;
-    }
-
-    std::istream& getline(std::istream& stream, string& s)
-    {
-        rune r;
-        stringbuilder buffer;
-
-        do
-        {
-            stream >> r;
-            if (!stream.good())
-            {
-                return stream;
-            }
-            else if (r == '\n')
-            {
-                break;
-            }
-            buffer.append(r);
-        }
-        while (true);
-        s.assign(buffer.str());
-
-        return stream;
-    }
-
-    std::wistream& getline(std::wistream& stream, string& s)
-    {
-        rune r;
-        stringbuilder buffer;
-
-        do
-        {
-            stream >> r;
-            if (!stream.good())
-            {
-                return stream;
-            }
-            else if (r == '\n')
-            {
-                break;
-            }
-            buffer.append(r);
-        }
-        while (true);
-        s.assign(buffer.str());
-
-        return stream;
+        return is;
     }
 
     string::iterator::iterator()

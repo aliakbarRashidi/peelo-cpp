@@ -18,9 +18,9 @@
 - URI parsing
 
 # Text
-- String, rune and string builder classes: Input and output operators should
-  behave like FormattedInputFunction and FormattedOutputFunction as described in
-  the [C++ wiki][1].
+- String, rune and string builder classes: Input operators should behave like
+  FormattedInputFunction as described in the [C++ wiki][1].
+- Input operators for string builder class. Maybe also getline function.
 - Update to Unicode 7.0
 
 [1]: http://en.cppreference.com/w/cpp/string/basic_string/operator_ltltgtgt

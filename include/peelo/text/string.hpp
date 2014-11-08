@@ -74,6 +74,11 @@ namespace peelo
         virtual ~string();
 
         /**
+         * Constructs formatted string, using C printf as it's backend.
+         */
+        static string format(const char* format, ...);
+
+        /**
          * Returns <code>true</code> if the string is not empty.
          */
         inline operator bool() const

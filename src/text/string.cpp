@@ -28,6 +28,8 @@
 #include <peelo/algorithm/min.hpp>
 #include <peelo/text/stringbuilder.hpp>
 #include <stdexcept>
+#include <cstdio>
+#include <cstdarg>
 #include <cstring>
 #include "utf8utils.hpp"
 
@@ -169,6 +171,35 @@ namespace peelo
             delete m_counter;
             delete[] m_runes;
         }
+    }
+
+    string string::format(const char* format, ...)
+    {
+        string result;
+        va_list ap;
+
+        va_start(ap, format);
+
+#if defined(PEELO_HAVE_VASPRINTF)
+        char* tmp = 0;
+
+        vasprintf(&tmp, format, ap);
+        result = tmp;
+        std::free(static_cast<void*>(tmp));
+#else
+        char buffer[1024];
+
+# if defined(PEELO_HAVE_VSNPRINTF)
+        vsnprintf(buffer, 1024, format, ap);
+# else
+        std::vsprintf(buffer, format, ap);
+# endif
+        result = buffer;
+#endif
+
+        va_end(ap);
+
+        return result;
     }
 
     string::const_reference string::front() const

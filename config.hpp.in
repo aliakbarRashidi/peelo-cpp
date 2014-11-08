@@ -4,4 +4,7 @@
 #cmakedefine PEELO_HAVE_CSTDINT 1
 #cmakedefine PEELO_HAVE_STDINT_H 1
 
+#cmakedefine PEELO_HAVE_VASPRINTF 1
+#cmakedefine PEELO_HAVE_VSNPRINTF 1
+
 #endif /* !PEELO_CONFIG_HPP_GUARD */

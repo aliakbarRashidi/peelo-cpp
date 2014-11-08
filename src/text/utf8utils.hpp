@@ -95,12 +95,14 @@ namespace peelo
 
     static inline bool utf8_decode(std::wistream& is, rune::value_type& result)
     {
-        std::basic_streambuf<wchar_t, std::wistream::traits_type>* b = is.rdbuf();
-        int c1 = b->sbumpc();
-        int c2 = b->sbumpc();
+        typedef std::wistream::traits_type traits;
+        const traits::int_type eof = traits::eof();
+        std::basic_streambuf<wchar_t, traits>* b = is.rdbuf();
+        int c1;
+        int c2;
 
-        if ((c1 = b->sbumpc()) == std::wistream::traits_type::eof()
-            || (c2 = b->sbumpc()) == std::wistream::traits_type::eof())
+        if (static_cast<traits::int_type>(c1 = b->sbumpc()) == eof
+            || static_cast<traits::int_type>(c2 = b->sbumpc()) == eof)
         {
             return false;
         }
@@ -109,15 +111,15 @@ namespace peelo
             int c3;
             int c4;
 
-            if ((c3 = b->sbumpc()) == std::wistream::traits_type::eof()
-                || (c4 = b->sbumpc()) == std::wistream::traits_type::eof())
+            if (static_cast<traits::int_type>(c3 = b->sbumpc()) == eof
+                || static_cast<traits::int_type>(c4 = b->sbumpc()) == eof)
             {
                 return false;
             }
             result = static_cast<rune::value_type>(
-                    ((((c2 - 0xd8) << 2) + ((c1 & 0xc0) >> 6) + 1) << 16)
-                    + ((((c1 & 0x3f) << 2) + (c4 - 0xdc)) << 8)
-                    + c3
+                ((((c2 - 0xd8) << 2) + ((c1 & 0xc0) >> 6) + 1) << 16)
+                + ((((c1 & 0x3f) << 2) + (c4 - 0xdc)) << 8)
+                + c3
             );
         } else {
             result = static_cast<rune::value_type>(c2 * 256 + c1);

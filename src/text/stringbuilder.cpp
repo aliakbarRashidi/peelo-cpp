@@ -507,7 +507,7 @@ namespace peelo
         char buffer[4];
         std::streamsize size;
         const std::streamsize width = os.width();
-        const bool a = sb.length() < width;
+        const bool a = static_cast<std::streamsize>(sb.length()) < width;
         const bool b = (os.flags() & std::ios_base::adjustfield) != std::ios_base::left;
 
         if (!sentry)
@@ -553,7 +553,7 @@ namespace peelo
 #endif
         std::streamsize size;
         const std::streamsize width = os.width();
-        const bool a = sb.length() < width;
+        const bool a = static_cast<std::streamsize>(sb.length()) < width;
         const bool b = (os.flags() & std::ios_base::adjustfield) != std::ios_base::left;
 
         if (!sentry)

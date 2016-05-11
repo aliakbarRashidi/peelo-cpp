@@ -204,7 +204,7 @@ namespace peelo
         return day > 0 && day <= month.length(is_leap_year(year));
     }
 
-    const weekday& date::day_of_week() const
+    weekday date::day_of_week() const
     {
 #if defined(_WIN32)
         SYSTEMTIME st;
@@ -217,13 +217,13 @@ namespace peelo
         ::FileTimeToSystemTime(&ft, &st);
         switch (st.wDayOfWeek)
         {
-            case 0: return weekday::sun;
-            case 1: return weekday::mon;
-            case 2: return weekday::tue;
-            case 3: return weekday::wed;
-            case 4: return weekday::thu;
-            case 5: return weekday::fri;
-            case 6: return weekday::sat;
+            case 0: return weekday_sun;
+            case 1: return weekday_mon;
+            case 2: return weekday_tue;
+            case 3: return weekday_wed;
+            case 4: return weekday_thu;
+            case 5: return weekday_fri;
+            case 6: return weekday_sat;
         }
 #else
         std::tm tm;

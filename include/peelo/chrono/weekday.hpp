@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, peelo.net
+ * Copyright (c) 2016, peelo.net
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,102 +30,39 @@
 
 namespace peelo
 {
-    class weekday
-    {
-    public:
-        /** Monday. */
-        static const weekday mon;
-        /** Tuesday. */
-        static const weekday tue;
-        /** Wednesday. */
-        static const weekday wed;
-        /** Thursday. */
-        static const weekday thu;
-        /** Friday. */
-        static const weekday fri;
-        /** Saturday. */
-        static const weekday sat;
-        /** Sunday. */
-        static const weekday sun;
+  /**
+   * Enumerated type which represents day of the week, where Monday is the
+   * first day of the week.
+   */
+  enum class weekday
+  {
+    /** Monday. */
+    mon = 1,
+    /** Tuesday. */
+    tue = 2,
+    /** Wednesday. */
+    wed = 3,
+    /** Thursday. */
+    thu = 4,
+    /** Friday. */
+    fri = 5,
+    /** Saturday. */
+    sat = 6,
+    /** Sunday. */
+    sun = 7
+  };
 
-        explicit weekday(int index = 1);
+  weekday& operator++(weekday&);
+  weekday& operator--(weekday&);
+  weekday operator++(weekday&, int);
+  weekday operator--(weekday&, int);
+  weekday operator+(const weekday&, int);
+  weekday operator-(const weekday&, int);
+  weekday& operator+=(weekday&, int);
+  weekday& operator-=(weekday&, int);
 
-        /**
-         * Copy constructor.
-         */
-        weekday(const weekday& that);
-
-        static bool is_valid(int index);
-
-        inline int index() const
-        {
-            return m_index;
-        }
-
-        weekday& assign(const weekday& that);
-
-        /**
-         * Assignment operator.
-         */
-        inline weekday& operator=(const weekday& that)
-        {
-            return assign(that);
-        }
-
-        bool equals(const weekday& that) const;
-
-        /**
-         * Equality testing operator.
-         */
-        inline bool operator==(const weekday& that) const
-        {
-            return equals(that);
-        }
-
-        /**
-         * Non-equality testing operator.
-         */
-        inline bool operator!=(const weekday& that) const
-        {
-            return !equals(that);
-        }
-
-        int compare(const weekday& that) const;
-
-        inline bool operator<(const weekday& that) const
-        {
-            return compare(that) < 0;
-        }
-
-        inline bool operator>(const weekday& that) const
-        {
-            return compare(that) > 0;
-        }
-
-        inline bool operator<=(const weekday& that) const
-        {
-            return compare(that) <= 0;
-        }
-
-        inline bool operator>=(const weekday& that) const
-        {
-            return compare(that) >= 0;
-        }
-
-        weekday& operator++();
-
-        weekday operator++(int);
-
-        weekday& operator--();
-
-        weekday operator--(int);
-
-    private:
-        int m_index;
-    };
-
-    std::ostream& operator<<(std::ostream&, const weekday&);
-    std::wostream& operator<<(std::wostream&, const weekday&);
+  std::ostream& operator<<(std::ostream&, const weekday&);
+  std::wostream& operator<<(std::wostream&, const weekday&);
 }
 
 #endif /* !PEELO_CHRONO_WEEKDAY_HPP_GUARD */

@@ -109,7 +109,7 @@ namespace peelo
         /**
          * Returns weekday for this date.
          */
-        const weekday& day_of_week() const;
+        weekday day_of_week() const;
 
         /**
          * Returns the day of the year (from 1 to 365 or 366 on leap years) for

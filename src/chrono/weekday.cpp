@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, peelo.net
+ * Copyright (c) 2016, peelo.net
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,173 +24,174 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <peelo/chrono/weekday.hpp>
-#include <stdexcept>
 
 namespace peelo
 {
-    const weekday weekday::mon(1);
-    const weekday weekday::tue(2);
-    const weekday weekday::wed(3);
-    const weekday weekday::thu(4);
-    const weekday weekday::fri(5);
-    const weekday weekday::sat(6);
-    const weekday weekday::sun(7);
+  weekday& operator++(weekday& original)
+  {
+    return original += 1;
+  }
 
-    weekday::weekday(int index)
-        : m_index(index)
+  weekday& operator--(weekday& original)
+  {
+    return original -= 1;
+  }
+
+  weekday operator++(weekday& original, int)
+  {
+    const weekday return_value = original;
+
+    original += 1;
+
+    return return_value;
+  }
+
+  weekday operator--(weekday& original, int)
+  {
+    const weekday return_value = original;
+
+    original -= 1;
+
+    return return_value;
+  }
+
+  weekday operator+(const weekday& original, int delta)
+  {
+    if (delta >= 0)
     {
-        if (!is_valid(index))
-        {
-            throw std::invalid_argument("invalid weekday index");
-        }
+      int result = static_cast<int>(original);
+
+      for (int i = 0; i < delta; ++i)
+      {
+        result = result < 7 ? result + 1 : 1;
+      }
+
+      return static_cast<weekday>(result);
     }
 
-    weekday::weekday(const weekday& that)
-        : m_index(that.m_index) {}
+    return original - (-delta);
+  }
 
-    bool weekday::is_valid(int index)
+  weekday operator-(const weekday& original, int delta)
+  {
+    if (delta >= 0)
     {
-        return index >= 1 && index <= 7;
+      int result = static_cast<int>(original);
+
+      for (int i = 0; i < delta; ++i)
+      {
+        result = result > 1 ? result - 1 : 7;
+      }
+
+      return static_cast<weekday>(result);
     }
 
-    weekday& weekday::assign(const weekday& that)
-    {
-        m_index = that.m_index;
+    return original + (-delta);
+  }
 
-        return *this;
+  weekday& operator+=(weekday& original, int delta)
+  {
+    if (delta >= 0)
+    {
+      int result = static_cast<int>(original);
+
+      for (int i = 0; i < delta; ++i)
+      {
+        result = result < 7 ? result + 1 : 1;
+      }
+
+      return original = static_cast<weekday>(result);
     }
 
-    bool weekday::equals(const weekday& that) const
+    return original -= (-delta);
+  }
+
+  weekday& operator-=(weekday& original, int delta)
+  {
+    if (delta >= 0)
     {
-        return m_index == that.m_index;
+      int result = static_cast<int>(original);
+
+      for (int i = 0; i < delta; ++i)
+      {
+        result = result > 1 ? result - 1 : 7;
+      }
+
+      return original = static_cast<weekday>(result);
     }
 
-    int weekday::compare(const weekday& that) const
+    return original += (-delta);
+  }
+
+  std::ostream& operator<<(std::ostream& os, const weekday& day)
+  {
+    switch (day)
     {
-        return m_index > that.m_index ? 1 : m_index < that.m_index ? -1 : 0;
+      case weekday::mon:
+        os << "Monday";
+        break;
+
+      case weekday::tue:
+        os << "Tuesday";
+        break;
+
+      case weekday::wed:
+        os << "Wednesday";
+        break;
+
+      case weekday::thu:
+        os << "Thursday";
+        break;
+
+      case weekday::fri:
+        os << "Friday";
+        break;
+
+      case weekday::sat:
+        os << "Saturday";
+        break;
+
+      case weekday::sun:
+        os << "Sunday";
+        break;
     }
 
-    weekday& weekday::operator++()
-    {
-        if (m_index < 7)
-        {
-            ++m_index;
-        } else {
-            m_index = 1;
-        }
+    return os;
+  }
 
-        return *this;
+  std::wostream& operator<<(std::wostream& os, const weekday& day)
+  {
+    switch (day)
+    {
+      case weekday::mon:
+        os << L"Monday";
+        break;
+
+      case weekday::tue:
+        os << L"Tuesday";
+        break;
+
+      case weekday::wed:
+        os << L"Wednesday";
+        break;
+
+      case weekday::thu:
+        os << L"Thursday";
+        break;
+
+      case weekday::fri:
+        os << L"Friday";
+        break;
+
+      case weekday::sat:
+        os << L"Saturday";
+        break;
+
+      case weekday::sun:
+        os << L"Sunday";
+        break;
     }
 
-    weekday weekday::operator++(int)
-    {
-        const int index = m_index;
-
-        if (m_index < 7)
-        {
-            ++m_index;
-        } else {
-            m_index = 1;
-        }
-
-        return weekday(index);
-    }
-
-    weekday& weekday::operator--()
-    {
-        if (m_index > 1)
-        {
-            --m_index;
-        } else {
-            m_index = 7;
-        }
-
-        return *this;
-    }
-
-    weekday weekday::operator--(int)
-    {
-        const int index = m_index;
-
-        if (m_index > 1)
-        {
-            --m_index;
-        } else {
-            m_index = 7;
-        }
-
-        return weekday(index);
-    }
-
-    std::ostream& operator<<(std::ostream& os, const weekday& w)
-    {
-        switch (w.index())
-        {
-            case 1:
-                os << "Monday";
-                break;
-
-            case 2:
-                os << "Tuesday";
-                break;
-
-            case 3:
-                os << "Wednesday";
-                break;
-
-            case 4:
-                os << "Thursday";
-                break;
-
-            case 5:
-                os << "Friday";
-                break;
-
-            case 6:
-                os << "Saturday";
-                break;
-
-            case 7:
-                os << "Sunday";
-                break;
-        }
-
-        return os;
-    }
-
-    std::wostream& operator<<(std::wostream& os, const weekday& w)
-    {
-        switch (w.index())
-        {
-            case 1:
-                os << L"Monday";
-                break;
-
-            case 2:
-                os << L"Tuesday";
-                break;
-
-            case 3:
-                os << L"Wednesday";
-                break;
-
-            case 4:
-                os << L"Thursday";
-                break;
-
-            case 5:
-                os << L"Friday";
-                break;
-
-            case 6:
-                os << L"Saturday";
-                break;
-
-            case 7:
-                os << L"Sunday";
-                break;
-        }
-
-        return os;
-    }
+    return os;
+  }
 }

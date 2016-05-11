@@ -104,7 +104,7 @@ namespace peelo
         /**
          * Returns weekday for this date.
          */
-        inline const weekday& day_of_week() const
+        inline weekday day_of_week() const
         {
             return m_date.day_of_week();
         }

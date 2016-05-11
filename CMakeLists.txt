@@ -1,29 +1,39 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT("peelo-cpp" CXX)
+project("peelo-cpp" CXX)
+cmake_minimum_required(VERSION 3.0)
 
-INCLUDE(CheckIncludeFileCXX)
-INCLUDE(CheckCXXSymbolExists)
+include(CheckCXXCompilerFlag)
+include(CheckCXXSymbolExists)
+include(CheckIncludeFileCXX)
 
-CHECK_INCLUDE_FILE_CXX(cstdint PEELO_HAVE_CSTDINT)
-IF (NOT PEELO_HAVE_CSTDINT)
-    CHECK_INCLUDE_FILE_CXX(stdint.h PEELO_HAVE_STDINT_H)
-ENDIF()
+check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 
-CHECK_CXX_SYMBOL_EXISTS(vasprintf cstdarg PEELO_HAVE_VASPRINTF)
-CHECK_CXX_SYMBOL_EXISTS(vsnprintf cstdarg PEELO_HAVE_VSNPRINTF)
+if(COMPILER_SUPPORTS_CXX11)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(COMPILER_SUPPORTS_CXX0X)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+else()
+  message(FATAL_ERROR "Compiler ${CMAKE_CXX_COMPILER} has no C++11 support.")
+endif()
 
-CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/peelo/config.hpp
+check_include_file_cxx(cstdint PEELO_HAVE_CSTDINT)
+check_include_file_cxx(stdint.h PEELO_HAVE_STDINT_H)
+
+check_cxx_symbol_exists(vasprintf cstdarg PEELO_HAVE_VASPRINTF)
+check_cxx_symbol_exists(vsnprintf cstdarg PEELO_HAVE_VSNPRINTF)
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/peelo/config.hpp
 )
 
-SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
-SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
-LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH})
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+link_directories(${LIBRARY_OUTPUT_PATH})
 
-ADD_LIBRARY(
+add_library(
     peelo-cpp
     src/chrono/date.cpp
     src/chrono/datetime.cpp
@@ -41,21 +51,21 @@ ADD_LIBRARY(
     src/text/stringbuilder.cpp
 )
 
-INSTALL(
+install(
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/peelo
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
 )
-INSTALL(
+install(
     TARGETS peelo-cpp ARCHIVE DESTINATION lib
 )
 
-ENABLE_TESTING()
-AUX_SOURCE_DIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/test TEST_SRCS)
-FOREACH(i ${TEST_SRCS})
-    GET_FILENAME_COMPONENT(name ${i} NAME_WE)
-    ADD_EXECUTABLE(${name} ${i})
-    TARGET_LINK_LIBRARIES(${name} peelo-cpp)
-    ADD_TEST(${name} ${EXECUTABLE_OUTPUT_PATH}/${name})
-    ADD_DEPENDENCIES(${name} peelo-cpp)
-ENDFOREACH()
+enable_testing()
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/test TEST_SRCS)
+foreach(i ${TEST_SRCS})
+    get_filename_component(name ${i} NAME_WE)
+    add_executable(${name} ${i})
+    target_link_libraries(${name} peelo-cpp)
+    add_test(${name} ${EXECUTABLE_OUTPUT_PATH}/${name})
+    add_dependencies(${name} peelo-cpp)
+endforeach()

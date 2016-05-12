@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, peelo.net
+ * Copyright (c) 2016, peelo.net
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,73 +27,119 @@
 
 namespace peelo
 {
-    static const int hours_per_day = 24;
-    static const int minutes_per_day = 1440;
-    static const int minutes_per_hour = 60;
-    static const int seconds_per_day = 86400;
-    static const int seconds_per_hour = 3600;
-    static const int seconds_per_minute = 60;
+  duration::duration(int days, int hours, int minutes, int seconds)
+    : m_seconds(
+      (days * seconds_per_day)
+      + (hours * seconds_per_hour)
+      + (minutes * seconds_per_minute)
+      + seconds
+    ) {}
 
-    duration::duration(int days, int hours, int minutes, int seconds)
-        : m_seconds(
-                days * seconds_per_day
-                + hours * seconds_per_hour
-                + minutes * seconds_per_minute
-                + seconds
-        ) {}
-    
-    duration::duration(const duration& that)
-        : m_seconds(that.m_seconds) {}
+  duration::duration(const duration& that)
+    : m_seconds(that.m_seconds) {}
 
-    int duration::days() const
-    {
-        return m_seconds / seconds_per_day;
-    }
+  int duration::days() const
+  {
+    return m_seconds / seconds_per_day;
+  }
 
-    int duration::hours() const
-    {
-        return m_seconds / seconds_per_hour;
-    }
+  int duration::hours() const
+  {
+    return m_seconds / seconds_per_hour;
+  }
 
-    int duration::minutes() const
-    {
-        return m_seconds / seconds_per_minute;
-    }
+  int duration::minutes() const
+  {
+    return m_seconds / seconds_per_minute;
+  }
 
-    duration& duration::assign(const duration& that)
-    {
-        m_seconds = that.m_seconds;
+  duration& duration::assign(const duration& that)
+  {
+    m_seconds = that.m_seconds;
 
-        return *this;
-    }
+    return *this;
+  }
 
-    bool duration::equals(const duration& that) const
-    {
-        return m_seconds == that.m_seconds;
-    }
+  bool duration::equals(const duration& that) const
+  {
+    return m_seconds == that.m_seconds;
+  }
 
-    int duration::compare(const duration& that) const
-    {
-        return m_seconds > that.m_seconds ? 1 : m_seconds < that.m_seconds ? -1 : 0;
-    }
+  int duration::compare(const duration& that) const
+  {
+    return compare(that.m_seconds);
+  }
 
-    duration duration::operator+(const duration& that) const
-    {
-        return duration(0, 0, 0, m_seconds + that.m_seconds);
-    }
+  int duration::compare(int seconds) const
+  {
+    return m_seconds > seconds ? 1 : m_seconds < seconds ? -1 : 0;
+  }
 
-    duration duration::operator-(const duration& that) const
-    {
-        return duration(0, 0, 0, m_seconds - that.m_seconds);
-    }
+  duration duration::operator+(const duration& that) const
+  {
+    return operator+(that.m_seconds);
+  }
 
-    duration duration::operator*(int factor) const
-    {
-        return duration(0, 0, 0, m_seconds * factor);
-    }
+  duration duration::operator+(int seconds) const
+  {
+    return duration(0, 0, 0, m_seconds + seconds);
+  }
 
-    duration duration::operator/(int quotient) const
-    {
-        return duration(0, 0, 0, m_seconds / quotient);
-    }
+  duration duration::operator-(const duration& that) const
+  {
+    return operator-(that.m_seconds);
+  }
+
+  duration duration::operator-(int seconds) const
+  {
+    return duration(0, 0, 0, m_seconds - seconds);
+  }
+
+  duration duration::operator*(int factor) const
+  {
+    return duration(0, 0, 0, m_seconds * factor);
+  }
+
+  duration duration::operator/(int quotient) const
+  {
+    return duration(0, 0, 0, m_seconds / quotient);
+  }
+
+  duration& duration::operator+=(const duration& that)
+  {
+    return operator+=(that.m_seconds);
+  }
+
+  duration& duration::operator+=(int seconds)
+  {
+    m_seconds += seconds;
+
+    return *this;
+  }
+
+  duration& duration::operator-=(const duration& that)
+  {
+    return operator-=(that.m_seconds);
+  }
+
+  duration& duration::operator-=(int seconds)
+  {
+    m_seconds -= seconds;
+
+    return *this;
+  }
+
+  duration& duration::operator*=(int factor)
+  {
+    m_seconds *= factor;
+
+    return *this;
+  }
+
+  duration& duration::operator/=(int quotient)
+  {
+    m_seconds /= quotient;
+
+    return *this;
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, peelo.net
+ * Copyright (c) 2016, peelo.net
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,215 +24,204 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <peelo/chrono/month.hpp>
-#include <stdexcept>
 
 namespace peelo
 {
-    const month month::jan(1);
-    const month month::feb(2);
-    const month month::mar(3);
-    const month month::apr(4);
-    const month month::may(5);
-    const month month::jun(6);
-    const month month::jul(7);
-    const month month::aug(8);
-    const month month::sep(9);
-    const month month::oct(10);
-    const month month::nov(11);
-    const month month::dec(12);
+  month& operator++(month& original)
+  {
+    return original += 1;
+  }
 
-    month::month(int index)
-        : m_index(index)
+  month& operator--(month& original)
+  {
+    return original -= 1;
+  }
+
+  month operator++(month& original, int)
+  {
+    const month return_value = original;
+
+    original += 1;
+
+    return return_value;
+  }
+
+  month operator--(month& original, int)
+  {
+    const month return_value = original;
+
+    original -= 1;
+
+    return return_value;
+  }
+
+  month operator+(const month& original, int delta)
+  {
+    if (delta >= 0)
     {
-        if (!is_valid(index))
-        {
-            throw std::invalid_argument("invalid month index");
-        }
+      int result = static_cast<int>(original);
+
+      for (int i = 0; i < delta; ++i)
+      {
+        result = result < 12 ? result + 1 : 1;
+      }
+
+      return static_cast<month>(result);
     }
 
-    month::month(const month& that)
-        : m_index(that.m_index) {}
+    return original - (-delta);
+  }
 
-    bool month::is_valid(int index)
+  month operator-(const month& original, int delta)
+  {
+    if (delta >= 0)
     {
-        return index >= 1 && index <= 12;
+      int result = static_cast<int>(original);
+
+      for (int i = 0; i < delta; ++i)
+      {
+        result = result > 1 ? result - 1 : 12;
+      }
+
+      return static_cast<month>(result);
     }
 
-    int month::length(bool leap_year) const
+    return original + (-delta);
+  }
+
+  month& operator+=(month& original, int delta)
+  {
+    int result = static_cast<int>(original);
+
+    for (int i = 0; i < delta; ++i)
     {
-        switch (m_index)
-        {
-            case 1: return 31;
-            case 2: return leap_year ? 29 : 28;
-            case 3: return 31;
-            case 4: return 30;
-            case 5: return 31;
-            case 6: return 30;
-            case 7: return 31;
-            case 8: return 31;
-            case 9: return 30;
-            case 10: return 31;
-            case 11: return 30;
-            default: return 31;
-        }
+      result = result < 12 ? result + 1 : 1;
     }
 
-    month& month::assign(const month& that)
-    {
-        m_index = that.m_index;
+    return original = static_cast<month>(result);
+  }
 
-        return *this;
+  month& operator-=(month& original, int delta)
+  {
+    int result = static_cast<int>(original);
+
+    for (int i = 0; i < delta; ++i)
+    {
+      result = result > 1 ? result - 1 : 12;
     }
 
-    bool month::equals(const month& that) const
+    return original = static_cast<month>(result);
+  }
+
+  std::ostream& operator<<(std::ostream& os, const month& m)
+  {
+    switch (m)
     {
-        return m_index == that.m_index;
+      case month::jan:
+        os << "January";
+        break;
+
+      case month::feb:
+        os << "February";
+        break;
+
+      case month::mar:
+        os << "March";
+        break;
+
+      case month::apr:
+        os << "April";
+        break;
+
+      case month::may:
+        os << "May";
+        break;
+
+      case month::jun:
+        os << "June";
+        break;
+
+      case month::jul:
+        os << "July";
+        break;
+
+      case month::aug:
+        os << "August";
+        break;
+
+      case month::sep:
+        os << "September";
+        break;
+
+      case month::oct:
+        os << "October";
+        break;
+
+      case month::nov:
+        os << "November";
+        break;
+
+      case month::dec:
+        os << "December";
+        break;
     }
 
-    int month::compare(const month& that) const
+    return os;
+  }
+
+  std::wostream& operator<<(std::wostream& os, const month& m)
+  {
+    switch (m)
     {
-        return m_index > that.m_index ? 1 : m_index < that.m_index ? -1 : 0;
+      case month::jan:
+        os << L"January";
+        break;
+
+      case month::feb:
+        os << L"February";
+        break;
+
+      case month::mar:
+        os << L"March";
+        break;
+
+      case month::apr:
+        os << L"April";
+        break;
+
+      case month::may:
+        os << L"May";
+        break;
+
+      case month::jun:
+        os << L"June";
+        break;
+
+      case month::jul:
+        os << L"July";
+        break;
+
+      case month::aug:
+        os << L"August";
+        break;
+
+      case month::sep:
+        os << L"September";
+        break;
+
+      case month::oct:
+        os << L"October";
+        break;
+
+      case month::nov:
+        os << L"November";
+        break;
+
+      case month::dec:
+        os << L"December";
+        break;
     }
 
-    month& month::operator++()
-    {
-        if (m_index < 12)
-        {
-            ++m_index;
-        } else {
-            m_index = 1;
-        }
-
-        return *this;
-    }
-
-    month month::operator++(int)
-    {
-        const int index = m_index;
-
-        if (m_index < 12)
-        {
-            ++m_index;
-        } else {
-            m_index = 1;
-        }
-
-        return month(index);
-    }
-
-    month& month::operator--()
-    {
-        if (m_index > 1)
-        {
-            --m_index;
-        } else {
-            m_index = 12;
-        }
-
-        return *this;
-    }
-
-    month month::operator--(int)
-    {
-        const int index = m_index;
-
-        if (m_index > 1)
-        {
-            --m_index;
-        } else {
-            m_index = 12;
-        }
-
-        return month(index);
-    }
-
-    std::ostream& operator<<(std::ostream& os, const month& m)
-    {
-        switch (m.index())
-        {
-            case 1:
-                os << "January";
-                break;
-            case 2:
-                os << "February";
-                break;
-            case 3:
-                os << "March";
-                break;
-            case 4:
-                os << "April";
-                break;
-            case 5:
-                os << "May";
-                break;
-            case 6:
-                os << "June";
-                break;
-            case 7:
-                os << "July";
-                break;
-            case 8:
-                os << "August";
-                break;
-            case 9:
-                os << "September";
-                break;
-            case 10:
-                os << "October";
-                break;
-            case 11:
-                os << "November";
-                break;
-            case 12:
-                os << "December";
-                break;
-        }
-
-        return os;
-    }
-
-    std::wostream& operator<<(std::wostream& os, const month& m)
-    {
-        switch (m.index())
-        {
-            case 1:
-                os << L"January";
-                break;
-            case 2:
-                os << L"February";
-                break;
-            case 3:
-                os << L"March";
-                break;
-            case 4:
-                os << L"April";
-                break;
-            case 5:
-                os << L"May";
-                break;
-            case 6:
-                os << L"June";
-                break;
-            case 7:
-                os << L"July";
-                break;
-            case 8:
-                os << L"August";
-                break;
-            case 9:
-                os << L"September";
-                break;
-            case 10:
-                os << L"October";
-                break;
-            case 11:
-                os << L"November";
-                break;
-            case 12:
-                os << L"December";
-                break;
-        }
-
-        return os;
-    }
+    return os;
+  }
 }

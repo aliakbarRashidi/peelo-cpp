@@ -35,7 +35,7 @@
 namespace peelo
 {
     datetime::datetime(int year,
-                       const class month& month,
+                       const enum month& month,
                        int day,
                        int hour,
                        int minute,
@@ -118,7 +118,7 @@ namespace peelo
     }
 
     bool datetime::is_valid(int year,
-                            const class month& month,
+                            const enum month& month,
                             int day,
                             int hour,
                             int minute,
@@ -142,7 +142,7 @@ namespace peelo
 
         // Compute days in a year
         long days = (m_date.day() - 1)
-                    + (days_before_month[m_date.month().index() - 1]);
+                    + (days_before_month[static_cast<int>(m_date.month()) - 1]);
 
         // Leap year adjustment
         if (m_date.month() > month::jan && m_date.days_in_year() == 366)
@@ -165,7 +165,7 @@ namespace peelo
                 days -= date::days_in_year(y);
             }
         }
-    
+
         return time + (days * 86400);
     }
 

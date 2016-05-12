@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, peelo.net
+ * Copyright (c) 2016, peelo.net
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,129 +30,48 @@
 
 namespace peelo
 {
-    /**
-     * Month value based on Gregorian calendar.
-     */
-    class month
-    {
-    public:
-        /** January. */
-        static const month jan;
-        /** February. */
-        static const month feb;
-        /** March. */
-        static const month mar;
-        /** April. */
-        static const month apr;
-        /** May. */
-        static const month may;
-        /** June. */
-        static const month jun;
-        /** July. */
-        static const month jul;
-        /** August. */
-        static const month aug;
-        /** September. */
-        static const month sep;
-        /** October. */
-        static const month oct;
-        /** November. */
-        static const month nov;
-        /** December. */
-        static const month dec;
+  /**
+   * Enum type which represents month on Gregorian calendar.
+   */
+  enum class month
+  {
+    /** January. */
+    jan = 1,
+    /** February. */
+    feb = 2,
+    /** March. */
+    mar = 3,
+    /** April. */
+    apr = 4,
+    /** May. */
+    may = 5,
+    /** June. */
+    jun = 6,
+    /** July. */
+    jul = 7,
+    /** August. */
+    aug = 8,
+    /** September. */
+    sep = 9,
+    /** October. */
+    oct = 10,
+    /** November. */
+    nov = 11,
+    /** December. */
+    dec = 12
+  };
 
-        explicit month(int index = 1);
+  month& operator++(month&);
+  month& operator--(month&);
+  month operator++(month&, int);
+  month operator--(month&, int);
+  month operator+(const month&, int);
+  month operator-(const month&, int);
+  month& operator+=(month&, int);
+  month& operator-=(month&, int);
 
-        /**
-         * Copy constructor.
-         */
-        month(const month& that);
-
-        static bool is_valid(int index);
-
-        /**
-         * Returns numerical index of the month (from 1 to 12).
-         */
-        inline int index() const
-        {
-            return m_index;
-        }
-
-        /**
-         * Returns the number of days in the month (28 to 31).
-         */
-        int length(bool leap_year) const;
-
-        month& assign(const month& that);
-
-        /**
-         * Assignment operator.
-         */
-        inline month& operator=(const month& that)
-        {
-            return assign(that);
-        }
-
-        bool equals(const month& that) const;
-
-        inline bool operator==(const month& that) const
-        {
-            return equals(that);
-        }
-
-        inline bool operator!=(const month& that) const
-        {
-            return !equals(that);
-        }
-
-        int compare(const month& that) const;
-
-        inline bool operator<(const month& that) const
-        {
-            return compare(that) < 0;
-        }
-
-        inline bool operator>(const month& that) const
-        {
-            return compare(that) > 0;
-        }
-
-        inline bool operator<=(const month& that) const
-        {
-            return compare(that) <= 0;
-        }
-
-        inline bool operator>=(const month& that) const
-        {
-            return compare(that) >= 0;
-        }
-
-        /**
-         * Increments month by one.
-         */
-        month& operator++();
-
-        /**
-         * Increments month by one.
-         */
-        month operator++(int);
-
-        /**
-         * Decrements month by one.
-         */
-        month& operator--();
-
-        /**
-         * Decrements month by one.
-         */
-        month operator--(int);
-
-    private:
-        int m_index;
-    };
-
-    std::ostream& operator<<(std::ostream&, const month&);
-    std::wostream& operator<<(std::wostream&, const month&);
+  std::ostream& operator<<(std::ostream&, const month&);
+  std::wostream& operator<<(std::wostream&, const month&);
 }
 
 #endif /* !PEELO_CHRONO_MONTH_HPP_GUARD */
